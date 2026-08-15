@@ -4,11 +4,18 @@
   "private": true,
   "description": "A desktop distribution of the official DeepSeek Harness.",
   "type": "module",
+  "main": "src/main.js",
   "scripts": {
     "harness": "dsh",
-    "harness:web": "dsh web"
+    "harness:web": "dsh web",
+    "start": "electron .",
+    "test": "node --test",
+    "smoke": "electron . --smoke-test"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.1.0-rc.6"
+  },
+  "devDependencies": {
+    "electron": "43.4.0"
   }
 }

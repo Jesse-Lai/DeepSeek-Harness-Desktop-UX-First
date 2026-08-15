@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DSH Desktop</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: Canvas;
+        color: CanvasText;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+      }
+      main {
+        width: min(440px, calc(100vw - 64px));
+        text-align: center;
+      }
+      .mark {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 24px;
+        border: 4px solid color-mix(in srgb, CanvasText 15%, transparent);
+        border-top-color: #4f72ff;
+        border-radius: 50%;
+        animation: spin 900ms linear infinite;
+      }
+      [data-state="error"] .mark {
+        border: 0;
+        animation: none;
+      }
+      [data-state="error"] .mark::before {
+        content: "!";
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        color: white;
+        background: #d84a4a;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+      p {
+        margin: 0;
+        color: color-mix(in srgb, CanvasText 65%, transparent);
+        line-height: 1.6;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    <script src="./loading.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true"></div>
+      <h1 id="title">正在启动 DeepSeek Harness</h1>
+      <p id="message">第一次启动可能需要稍等片刻。</p>
+    </main>
+  </body>
+</html>

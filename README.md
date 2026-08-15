@@ -26,10 +26,10 @@
 
 ### 2. 开发 macOS MVP
 
-- 创建 Electron 桌面外壳。
-- 在 App 内启动 Harness。
-- 显示官方 Harness Web UI。
-- 处理启动失败和退出清理。
+- [x] 创建 Electron 桌面外壳。
+- [x] 在 App 内启动 Harness。
+- [x] 显示官方 Harness Web UI。
+- [x] 处理启动失败和退出清理。
 
 ### 3. 制作完整安装包
 
@@ -51,5 +51,9 @@
 
 ## 当前进度
 
-阶段 1 已于 2026-08-16 在 Intel Mac 上完成。验证环境、结果与桌面集成注意事项见
-[Intel Mac 验证记录](docs/validation/intel-mac.md)。
+阶段 1 和阶段 2 已于 2026-08-16 在 Intel Mac 上完成：
+
+- [官方包验证记录](docs/validation/intel-mac.md)
+- [macOS MVP 验证记录](docs/validation/macos-mvp.md)
+
+下一步进入阶段 3，制作无需 Node 或 npm 的完整安装包。
