@@ -1,0 +1,14 @@
+{
+  "name": "dsh-desktop",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A desktop distribution of the official DeepSeek Harness.",
+  "type": "module",
+  "scripts": {
+    "harness": "dsh",
+    "harness:web": "dsh web"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.1.0-rc.6"
+  }
+}
