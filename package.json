@@ -8,6 +8,7 @@
   "scripts": {
     "harness": "dsh",
     "harness:web": "dsh web",
+    "package:mac:arm64": "electron-packager . \"DSH Desktop\" --platform=darwin --arch=arm64 --electron-version=43.4.0 --out=dist --overwrite --app-bundle-id=ai.deepseek.dsh-desktop --ignore=\"^/(.git|.github|dist|docs|test)(/|$)\" --osx-sign.identity=- --no-osx-sign.identityValidation --no-osx-sign.continueOnError",
     "start": "electron .",
     "test": "node --test",
     "smoke": "electron . --smoke-test"
@@ -16,6 +17,7 @@
     "@deepseek-ai/dsh": "0.1.0-rc.6"
   },
   "devDependencies": {
+    "@electron/packager": "20.3.0",
     "electron": "43.4.0"
   }
 }

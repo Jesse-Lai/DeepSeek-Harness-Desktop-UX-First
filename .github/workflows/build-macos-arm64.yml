@@ -1,0 +1,52 @@
+name: Build macOS ARM64
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Package macOS ARM64
+    runs-on: macos-15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Package application
+        run: npm run package:mac:arm64
+
+      - name: Verify ARM64 application
+        run: |
+          test "$(uname -m)" = "arm64"
+          test "$(lipo -archs "dist/DSH Desktop-darwin-arm64/DSH Desktop.app/Contents/MacOS/DSH Desktop")" = "arm64"
+          codesign --verify --deep --strict --verbose=2 "dist/DSH Desktop-darwin-arm64/DSH Desktop.app"
+
+      - name: Smoke test packaged application
+        run: |
+          "dist/DSH Desktop-darwin-arm64/DSH Desktop.app/Contents/MacOS/DSH Desktop" --smoke-test
+
+      - name: Create downloadable archive
+        run: ditto -c -k --sequesterRsrc --keepParent "dist/DSH Desktop-darwin-arm64/DSH Desktop.app" "dist/DSH-Desktop-macOS-arm64.zip"
+
+      - name: Upload macOS ARM64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DSH-Desktop-macOS-arm64-${{ github.sha }}
+          path: dist/DSH-Desktop-macOS-arm64.zip
+          if-no-files-found: error
