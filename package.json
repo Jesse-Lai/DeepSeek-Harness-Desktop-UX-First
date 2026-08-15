@@ -8,7 +8,7 @@
   "scripts": {
     "harness": "dsh",
     "harness:web": "dsh web",
-    "package:mac:arm64": "electron-packager . \"DSH Desktop\" --platform=darwin --arch=arm64 --electron-version=43.4.0 --out=dist --overwrite --app-bundle-id=ai.deepseek.dsh-desktop --ignore=\"^/(.git|.github|dist|docs|test)(/|$)\" --osx-sign.identity=- --no-osx-sign.identityValidation --no-osx-sign.continueOnError",
+    "package:mac:arm64": "node scripts/package-macos-arm64.js",
     "start": "electron .",
     "test": "node --test",
     "smoke": "electron . --smoke-test"

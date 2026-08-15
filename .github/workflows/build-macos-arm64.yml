@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -45,7 +45,7 @@ jobs:
         run: ditto -c -k --sequesterRsrc --keepParent "dist/DSH Desktop-darwin-arm64/DSH Desktop.app" "dist/DSH-Desktop-macOS-arm64.zip"
 
       - name: Upload macOS ARM64 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DSH-Desktop-macOS-arm64-${{ github.sha }}
           path: dist/DSH-Desktop-macOS-arm64.zip
