@@ -6,3 +6,7 @@ if (params.get("state") === "error") {
   document.querySelector("#message").textContent =
     params.get("message") ?? "请退出应用后重试。";
 }
+
+document.querySelector("#restart").addEventListener("click", () => {
+  window.desktop.restart();
+});

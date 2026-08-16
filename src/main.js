@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, shell } from "electron";
 import { startHarness } from "./harness.js";
 
 const require = createRequire(import.meta.url);
@@ -11,6 +11,7 @@ const sourceDirectory = dirname(fileURLToPath(import.meta.url));
 const harnessPackagePath = require.resolve("@deepseek-ai/dsh/package.json");
 const harnessCliPath = join(dirname(harnessPackagePath), "lib", "bin.js");
 const smokeTest = process.argv.includes("--smoke-test");
+const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
 
 let mainWindow;
 let harness;
@@ -20,6 +21,13 @@ let quitting = false;
 let shutdownPromise;
 
 app.setName("DSH Desktop");
+
+function focusMainWindow() {
+  if (mainWindow?.isDestroyed() !== false) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
 
 function conciseError(error) {
   const message = error instanceof Error ? error.message : String(error);
@@ -65,6 +73,7 @@ function createWindow() {
     show: false,
     backgroundColor: "#ffffff",
     webPreferences: {
+      preload: join(sourceDirectory, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -73,10 +82,60 @@ function createWindow() {
   });
 
   window.once("ready-to-show", () => window.show());
+  window.webContents.on(
+    "did-fail-load",
+    (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      if (!isMainFrame || quitting || !validatedURL.startsWith("http://127.0.0.1:")) return;
+      void loadStatus(
+        "error",
+        `Harness 页面加载失败（${errorCode}）：${errorDescription}\n请重新启动后再试。`,
+      );
+    },
+  );
+  window.webContents.on("render-process-gone", (_event, details) => {
+    if (quitting) return;
+    void loadStatus(
+      "error",
+      `界面进程意外退出：${details.reason}\n请重新启动后再试。`,
+    );
+  });
   window.on("closed", () => {
     if (mainWindow === window) mainWindow = undefined;
   });
   return window;
+}
+
+function restartApplication() {
+  if (quitting) return;
+  app.relaunch();
+  void shutdown().finally(() => app.quit());
+}
+
+function installApplicationMenu() {
+  const template = [
+    ...(process.platform === "darwin"
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: "about" },
+              { type: "separator" },
+              { label: "重新启动 DeepSeek Harness", click: restartApplication },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideOthers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" },
+            ],
+          },
+        ]
+      : []),
+    { role: "editMenu" },
+    { role: "viewMenu" },
+    { role: "windowMenu" },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
 async function launchDesktop() {
@@ -161,7 +220,20 @@ app.on("before-quit", (event) => {
 
 app.on("window-all-closed", () => app.quit());
 
+if (hasSingleInstanceLock) {
+  app.on("second-instance", focusMainWindow);
+  ipcMain.on("desktop:restart", (event) => {
+    if (!event.senderFrame.url.startsWith("file://")) return;
+    restartApplication();
+  });
+}
+
 async function main() {
+  if (!hasSingleInstanceLock) {
+    app.quit();
+    return;
+  }
+
   await app.whenReady();
 
   if (smokeTest) {
@@ -171,6 +243,7 @@ async function main() {
     return;
   }
 
+  installApplicationMenu();
   await launchDesktop();
 }
 

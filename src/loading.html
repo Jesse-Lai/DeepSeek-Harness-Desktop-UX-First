@@ -61,6 +61,25 @@
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
+      button {
+        display: none;
+        margin: 24px auto 0;
+        border: 0;
+        border-radius: 9px;
+        padding: 10px 18px;
+        color: white;
+        background: #315efb;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid color-mix(in srgb, #315efb 45%, transparent);
+        outline-offset: 3px;
+      }
+      [data-state="error"] button {
+        display: block;
+      }
       @keyframes spin {
         to { transform: rotate(360deg); }
       }
@@ -72,6 +91,7 @@
       <div class="mark" aria-hidden="true"></div>
       <h1 id="title">正在启动 DeepSeek Harness</h1>
       <p id="message">第一次启动可能需要稍等片刻。</p>
+      <button id="restart" type="button">重新启动</button>
     </main>
   </body>
 </html>
