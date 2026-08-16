@@ -73,4 +73,7 @@ npm start
 `package-lock.json` 安装并测试依赖，然后生成保留 7 天的开发依赖包。将包内的
 `node_modules` 解压到项目根目录后即可开发。
 
+工作流会先确认 Electron 主程序为 ARM64，并用它启动一次真实 Harness 冒烟测试；因此依赖包
+不仅包含 JavaScript 依赖，也包含本机开发所需的 Electron ARM64 runtime。
+
 `node_modules` 和 `dist` 只保留在本机，不提交到 GitHub。

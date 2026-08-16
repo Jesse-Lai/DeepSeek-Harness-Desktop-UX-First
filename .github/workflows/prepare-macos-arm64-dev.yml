@@ -27,6 +27,15 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Install and verify Electron ARM64 runtime
+        run: |
+          electron_path="$(node -p "require('electron')")"
+          file "$electron_path"
+          test "$(lipo -archs "$electron_path")" = "arm64"
+
+      - name: Run Harness smoke test
+        run: npm run smoke
+
       - name: Archive development dependencies
         run: COPYFILE_DISABLE=1 tar -czf dsh-desktop-node-modules-macos-arm64.tgz node_modules
 
