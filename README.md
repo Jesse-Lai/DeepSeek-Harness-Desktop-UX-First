@@ -57,3 +57,20 @@
 - [macOS MVP 验证记录](docs/validation/macos-mvp.md)
 
 下一步进入阶段 3，制作无需 Node 或 npm 的完整安装包。
+
+## 本地开发
+
+正常网络环境使用：
+
+```bash
+npm ci
+npm test
+npm start
+```
+
+如果公司网络无法访问 npm，可在 GitHub Actions 手动运行
+`Prepare macOS ARM64 development dependencies`。该工作流会在 ARM64 macOS runner 上按
+`package-lock.json` 安装并测试依赖，然后生成保留 7 天的开发依赖包。将包内的
+`node_modules` 解压到项目根目录后即可开发。
+
+`node_modules` 和 `dist` 只保留在本机，不提交到 GitHub。

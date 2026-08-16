@@ -1,0 +1,39 @@
+name: Prepare macOS ARM64 development dependencies
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Bundle locked development dependencies
+    runs-on: macos-15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Archive development dependencies
+        run: COPYFILE_DISABLE=1 tar -czf dsh-desktop-node-modules-macos-arm64.tgz node_modules
+
+      - name: Upload development dependencies
+        uses: actions/upload-artifact@v7
+        with:
+          name: DSH-Desktop-dev-dependencies-macOS-arm64-${{ github.sha }}
+          path: dsh-desktop-node-modules-macos-arm64.tgz
+          if-no-files-found: error
+          retention-days: 7
