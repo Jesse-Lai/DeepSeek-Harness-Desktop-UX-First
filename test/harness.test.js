@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
-import { mkdtemp, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough } from "node:stream";
@@ -95,6 +95,55 @@ test("startHarness launches the official CLI with isolated desktop paths", () =>
     assert.equal(invocation.options.env.ELECTRON_RUN_AS_NODE, "1");
     await controller.stop();
     assert.deepEqual(child.kills, ["SIGTERM"]);
+  }));
+
+test("startHarness installs and composes the bundled desktop UI plugin", () =>
+  withTempDirectory(async (directory) => {
+    const child = new FakeChild();
+    const pluginSourcePath = join(directory, "plugin-source");
+    const patchPath = join(directory, "desktop.patch.yml");
+    await mkdir(pluginSourcePath, { recursive: true });
+    await writeFile(join(pluginSourcePath, "package.json"), "{}\n");
+    await writeFile(patchPath, "[]\n");
+
+    let invocation;
+    const starting = startHarness({
+      executablePath: "electron",
+      cliPath: "dsh.js",
+      patchPath,
+      pluginSourcePath,
+      userDataPath: directory,
+      checkHttpReady: async () => true,
+      spawn(executable, args, options) {
+        invocation = { executable, args, options };
+        queueMicrotask(() => child.stdout.write("dsh web: http://127.0.0.1:43211\n"));
+        return child;
+      },
+    });
+
+    const controller = await starting;
+    assert.deepEqual(invocation.args, [
+      "--expose-internals",
+      "dsh.js",
+      "web",
+      "--patch",
+      patchPath,
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "0",
+    ]);
+    await access(
+      join(
+        directory,
+        "harness",
+        "node_modules",
+        "@jesse-lai",
+        "dsh-desktop-ui",
+        "package.json",
+      ),
+    );
+    await controller.stop();
   }));
 
 test("startHarness reports stderr when the child exits before readiness", () =>

@@ -2,6 +2,7 @@ import { createRequire } from "node:module";
 import { mkdtemp, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
+import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, Menu, shell } from "electron";
 import { startHarness } from "./harness.js";
@@ -10,6 +11,14 @@ const require = createRequire(import.meta.url);
 const sourceDirectory = dirname(fileURLToPath(import.meta.url));
 const harnessPackagePath = require.resolve("@deepseek-ai/dsh/package.json");
 const harnessCliPath = join(dirname(harnessPackagePath), "lib", "bin.js");
+const desktopPatchPath = join(sourceDirectory, "dsh-desktop.patch.yml");
+const desktopUiPluginPath = join(
+  sourceDirectory,
+  "..",
+  "plugins",
+  "@jesse-lai",
+  "dsh-desktop-ui",
+);
 const smokeTest = process.argv.includes("--smoke-test");
 const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
 
@@ -147,6 +156,8 @@ async function launchDesktop() {
     harnessStartup = startHarness({
       executablePath: process.execPath,
       cliPath: harnessCliPath,
+      patchPath: desktopPatchPath,
+      pluginSourcePath: desktopUiPluginPath,
       userDataPath: app.getPath("userData"),
       signal: startupAbortController.signal,
       onUnexpectedExit: ({ code, signal, cause }) => {
@@ -173,12 +184,15 @@ async function launchDesktop() {
 async function runSmokeTest() {
   const smokeDirectory = await mkdtemp(join(tmpdir(), "dsh-desktop-smoke-"));
   let controller;
+  let smokeWindow;
 
   try {
     console.log("Starting DeepSeek Harness smoke test...");
     controller = await startHarness({
       executablePath: process.execPath,
       cliPath: harnessCliPath,
+      patchPath: desktopPatchPath,
+      pluginSourcePath: desktopUiPluginPath,
       userDataPath: smokeDirectory,
     });
     const response = await fetch(controller.url, {
@@ -189,12 +203,37 @@ async function runSmokeTest() {
     if (!/<title>\s*DeepSeek Harness\s*<\/title>/i.test(html)) {
       throw new Error("Harness 页面标题不符合预期");
     }
+
+    smokeWindow = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        webSecurity: true,
+      },
+    });
+    await smokeWindow.loadURL(controller.url);
+
+    const deadline = Date.now() + 15_000;
+    let pluginLoaded = false;
+    while (!pluginLoaded && Date.now() < deadline) {
+      pluginLoaded = await smokeWindow.webContents.executeJavaScript(
+        `document.documentElement.dataset.dshDesktopUi === "prompt-kit" &&
+         Boolean(document.querySelector('style[data-plugin="@jesse-lai/dsh-desktop-ui"]'))`,
+        true,
+      );
+      if (!pluginLoaded) await delay(100);
+    }
+    if (!pluginLoaded) throw new Error("DSH Desktop UI 插件未在页面中加载");
+
     console.log(`DSH Desktop smoke test passed: ${controller.url}`);
     return 0;
   } catch (error) {
     console.error(`DSH Desktop smoke test failed: ${conciseError(error)}`);
     return 1;
   } finally {
+    smokeWindow?.destroy();
     await controller?.stop();
     await rm(smokeDirectory, { recursive: true, force: true });
   }

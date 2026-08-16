@@ -1,5 +1,5 @@
 import { spawn as spawnProcess } from "node:child_process";
-import { mkdir } from "node:fs/promises";
+import { cp, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 const READY_PATTERN = /dsh web:\s+(http:\/\/127\.0\.0\.1:\d+)(?=\s|$)/;
@@ -76,6 +76,8 @@ export async function stopHarnessProcess(child, timeoutMs = 5_000) {
 export async function startHarness({
   executablePath,
   cliPath,
+  patchPath,
+  pluginSourcePath,
   userDataPath,
   workspacePath = join(userDataPath, "workspace"),
   startupTimeoutMs = 30_000,
@@ -96,13 +98,29 @@ export async function startHarness({
     mkdir(harnessHome, { recursive: true }),
     mkdir(workspacePath, { recursive: true }),
   ]);
+
+  if (pluginSourcePath !== undefined) {
+    const pluginInstallPath = join(
+      harnessHome,
+      "node_modules",
+      "@jesse-lai",
+      "dsh-desktop-ui",
+    );
+    await rm(pluginInstallPath, { recursive: true, force: true });
+    await mkdir(join(pluginInstallPath, ".."), { recursive: true });
+    await cp(pluginSourcePath, pluginInstallPath, { recursive: true });
+  }
   if (signal?.aborted) throw new HarnessStartError("Harness 启动已取消");
+
+  const args = ["--expose-internals", cliPath, "web"];
+  if (patchPath !== undefined) args.push("--patch", patchPath);
+  args.push("--host", "127.0.0.1", "--port", "0");
 
   let child;
   try {
     child = spawn(
       executablePath,
-      ["--expose-internals", cliPath, "web", "--host", "127.0.0.1", "--port", "0"],
+      args,
       {
         cwd: workspacePath,
         env: {

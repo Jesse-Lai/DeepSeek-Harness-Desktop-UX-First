@@ -56,6 +56,9 @@
 - [官方包验证记录](docs/validation/intel-mac.md)
 - [macOS MVP 验证记录](docs/validation/macos-mvp.md)
 
+第一版桌面 UI 插件已接入官方 Harness 配置树，用于调整侧栏、聊天区和输入区的视觉表现，
+不替换 Harness 原有的会话、工具或输入逻辑。
+
 下一步进入阶段 3，制作无需 Node 或 npm 的完整安装包。
 
 ## 本地开发
@@ -77,3 +80,6 @@ npm start
 不仅包含 JavaScript 依赖，也包含本机开发所需的 Electron ARM64 runtime。
 
 `node_modules` 和 `dist` 只保留在本机，不提交到 GitHub。
+
+日常界面开发使用 `npm start` 直接预览；只在阶段完成、打包配置变更或准备发布时重新构建
+ARM64、x64 和 Windows 安装包。
