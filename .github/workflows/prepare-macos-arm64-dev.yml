@@ -29,7 +29,7 @@ jobs:
 
       - name: Install and verify Electron ARM64 runtime
         run: |
-          electron_path="$(node -p "require('electron')")"
+          electron_path="$(node -p "require('electron')" | tail -n 1)"
           file "$electron_path"
           test "$(lipo -archs "$electron_path")" = "arm64"
 
