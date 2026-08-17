@@ -1,13 +1,23 @@
+import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { packager } from "@electron/packager";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
+const execFileAsync = promisify(execFile);
 const targetArch = process.argv[2] ?? "arm64";
 if (!new Set(["arm64", "x64"]).has(targetArch)) {
   throw new Error(`Unsupported macOS architecture: ${targetArch}`);
 }
+await execFileAsync(process.execPath, [
+  join(projectRoot, "scripts", "build-macos-icon.js"),
+]);
+await execFileAsync(process.execPath, [
+  join(projectRoot, "scripts", "build-macos-native.js"),
+  targetArch,
+]);
 const lockfile = JSON.parse(
   await readFile(join(projectRoot, "package-lock.json"), "utf8"),
 );
@@ -54,6 +64,10 @@ const outputPaths = await packager({
   asar: false,
   prune: false,
   appBundleId: "ai.deepseek.dsh-desktop",
+  icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
+  extendInfo: {
+    LSMinimumSystemVersion: "26.0",
+  },
   ignore: ignoreFromApplication,
   osxSign: {
     identity: "-",

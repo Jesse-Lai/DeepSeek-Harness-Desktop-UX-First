@@ -83,3 +83,12 @@ npm start
 
 日常界面开发使用 `npm start` 直接预览；只在阶段完成、打包配置变更或准备发布时重新构建
 ARM64、x64 和 Windows 安装包。
+
+也可以生成一个可从 Finder 双击启动的 macOS 开发版：
+
+```bash
+npm run app:dev:mac
+```
+
+生成的 `dist/dev/DSH Desktop Dev.app` 直接读取当前项目源码。修改 UI 后退出并重新打开即可看到
+更新；项目目录被移动、删除，或 `node_modules` 不存在时，开发版将无法启动。
