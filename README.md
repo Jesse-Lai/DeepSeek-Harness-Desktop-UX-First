@@ -67,9 +67,33 @@ DeepSeek Harness UX First 基于 DeepSeek Harness 打造，致力于提供媲美
 
 ## 与官方 DeepSeek Harness 的关系
 
-本项目使用固定版本的官方 `@deepseek-ai/dsh` npm 软件包，不复制或长期修改 Harness 官方源码。桌面端的视觉与交互增强通过 Harness 配置和插件机制实现，以尽可能保持官方能力与生态兼容性。
+本项目基于 [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) 构建，并使用固定版本的官方 `@deepseek-ai/dsh` npm 软件包，不复制或长期修改 Harness 官方源码。
 
-DeepSeek Harness UX First 是社区项目，与 DeepSeek 官方无隶属关系。有关 Harness 本身的功能和许可，请参阅 [DeepSeek Harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness)。
+官方项目提供 Agent 核心、会话、工具、模型接入、Web UI，以及 Plugins、MCP 和 Skills 生态。本项目主要负责：
+
+- Electron 桌面应用封装
+- 本地 Harness 服务的启动、停止与异常清理
+- 桌面窗口和操作系统集成
+- Node、Harness 与运行依赖的一体化打包
+- macOS 与 Windows 安装包构建
+- 基于插件机制的视觉、交互与 Reasoning 呈现优化
+
+如果你希望使用命令行版本、了解 Harness 核心能力或参与上游开发，请优先访问官方仓库。
+
+DeepSeek Harness UX First 是社区项目，与 DeepSeek 官方无隶属关系。
+
+## 给开发者
+
+与直接修改上游 Web UI 不同，本项目的体验增强本身就是一个 DSH 插件。桌面壳与 UI 插件沿用 DeepSeek Harness 的官方组合路径，在保持核心功能和生态兼容性的同时，对桌面端体验进行独立迭代。
+
+当前的桌面 UI 插件位于 [`plugins/@jesse-lai/dsh-desktop-ui`](plugins/@jesse-lai/dsh-desktop-ui)，通过 Harness 配置树接入主题、布局、侧栏和会话界面，负责：
+
+- 桌面端视觉样式和布局优化
+- Reasoning、执行进度与工具活动呈现
+- 插件的安装、启用与卸载
+- 在不替换官方会话、工具和输入逻辑的前提下持续迭代交互
+
+这种边界让上游 Harness 可以持续升级，也让桌面体验能够以插件方式独立演进。关于当前版本的启动与兼容性验证，可查看 [Intel Mac 验证记录](docs/validation/intel-mac.md) 和 [macOS MVP 验证记录](docs/validation/macos-mvp.md)。
 
 ## 本地开发
 
@@ -81,17 +105,18 @@ npm test
 npm start
 ```
 
-macOS 上也可以生成一个从 Finder 双击启动、直接读取当前项目源码的开发版：
-
-```bash
-npm run app:dev:mac
-```
-
 `node_modules` 和 `dist` 仅保留在本机，不提交到 GitHub。
 
 ## 参与贡献
 
 欢迎通过 Issues 提交问题、建议和产品想法，也欢迎通过 Pull Requests 参与功能、交互、插件和文档改进。
+
+## 特别感谢
+
+- [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 原始仓库与 DeepSeek AI 团队，为本项目提供 Agent 核心、工具、会话、Web UI 和插件生态。
+- [Cordis](https://github.com/deepseek-ai/deepseek-harness/tree/main/vendor/cordis) 提供的插件化基础，让桌面能力和体验增强可以沿统一的组合路径实现。
+- [Prompt Kit](https://github.com/ibelick/prompt-kit) 提供的交互与视觉模式参考，相关许可信息记录在 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- 所有参与讨论、测试、反馈、贡献，以及持续使用和支持本项目的社区成员。
 
 ## License
 
