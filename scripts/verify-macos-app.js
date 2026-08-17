@@ -64,7 +64,11 @@ const { stdout: architectures } = await execFileAsync("/usr/bin/lipo", [
   "-archs",
   executablePath,
 ]);
-assertEqual(architectures.trim(), targetArch, "Executable architecture");
+assertEqual(
+  architectures.trim(),
+  targetArch === "x64" ? "x86_64" : targetArch,
+  "Executable architecture",
+);
 await execFileAsync("/usr/bin/codesign", [
   "--verify",
   "--deep",
