@@ -1,5 +1,10 @@
 # DeepSeek Harness UX First
 
+把官方 DeepSeek Harness 封装成下载后即可双击使用的桌面应用。当前版本：`1.0.0-rc.1`。
+
+正式构建请从 [GitHub Releases](https://github.com/Jesse-Lai/DeepSeek-Harness-Desktop-UX-First/releases)
+下载；不要下载 GitHub 自动生成的 Source code 压缩包。
+
 ## 目标
 
 - 将官方 DeepSeek Harness 做成桌面应用。
@@ -40,21 +45,21 @@
 
 ### 3. 制作完整安装包
 
-- 内置 Node、Harness 和全部运行依赖。
-- 确保用户无需安装开发工具。
-- 在干净环境验证双击运行。
+- [x] 内置 Node、Harness 和全部运行依赖。
+- [x] 确保用户无需安装开发工具。
+- [x] 加入打包版双击运行冒烟测试。
 
 ### 4. 多平台构建
 
-- 构建 macOS x64 安装包。
-- 构建并验证 macOS arm64 安装包。
-- 构建 Windows x64 安装包并完成基本启动测试。
+- [x] 加入 macOS x64 构建和验证流程。
+- [x] 构建并验证 macOS arm64 应用包。
+- [x] 加入 Windows x64 构建和基本启动测试。
 
 ### 5. 发布开源版本
 
-- 补充使用说明和第三方许可证。
-- 完成应用签名、公证和安装包验证。
-- 通过 GitHub Releases 发布。
+- [x] 补充使用说明和第三方许可证。
+- [ ] 使用生产证书完成应用签名、公证和安装包验证。
+- [ ] 通过 GitHub Releases 发布 `v1.0.0`。
 
 ## 当前进度
 
@@ -66,7 +71,20 @@
 第一版桌面 UI 插件已接入官方 Harness 配置树，用于调整侧栏、聊天区和输入区的视觉表现，
 不替换 Harness 原有的会话、工具或输入逻辑。
 
-下一步进入阶段 3，制作无需 Node 或 npm 的完整安装包。
+当前正在验证 `1.0.0-rc.1` 三平台发行物。生产签名、公证和 GitHub Release 是正式版前的最后步骤。
+
+## 下载与安装
+
+- macOS Apple Silicon：下载 `DeepSeek-Harness-UX-First-macOS-arm64.zip`，解压后将应用拖入
+  `/Applications`，再双击打开。
+- macOS Intel：下载 `DeepSeek-Harness-UX-First-macOS-x64.zip`，其余步骤相同。
+- Windows x64：下载 `DeepSeek-Harness-UX-First-Windows-x64.zip`，完整解压后双击
+  `DeepSeek Harness UX First.exe`。
+
+1.0 通过 GitHub Releases 手动更新。覆盖旧应用不会清空对话、项目、设置或 API 信息；应用继续读取
+旧的 `DSH Desktop` 数据目录。完整说明见 [更新与本地数据](docs/updates.md)。
+
+发布历史见 [CHANGELOG](CHANGELOG.md)，安全问题请按 [安全策略](SECURITY.md) 私下报告。
 
 ## 本地开发
 

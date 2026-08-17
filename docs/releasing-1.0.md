@@ -39,7 +39,7 @@ npm run package:mac:arm64
 DSH_RELEASE_BUILD=1 npm run verify:mac:arm64
 ```
 
-CI may instead provide these secrets without committing them:
+The tag release workflow uses these GitHub Actions secrets without committing them:
 
 - `MACOS_CERTIFICATE_BASE64`
 - `MACOS_CERTIFICATE_PASSWORD`
@@ -53,16 +53,36 @@ ticket, and fails verification unless Gatekeeper accepts the result.
 
 ## Windows signing
 
-The current Windows workflow creates an unsigned portable test artifact. Before 1.0, obtain an
-Authenticode code-signing certificate or a managed signing service, sign the executable and final
-installer/archive contents, timestamp the signatures, and verify them with `Get-AuthenticodeSignature`.
-Certificate files and passwords must be stored only in GitHub Actions secrets or the signing service.
+Development workflows create an unsigned portable test artifact. A production build sets
+`DSH_RELEASE_BUILD=1`; packaging then requires `WINDOWS_CERTIFICATE_FILE` and
+`WINDOWS_CERTIFICATE_PASSWORD`, signs all eligible application binaries through
+`@electron/windows-sign`, and timestamps the signatures. `npm run verify:win:x64` rejects a release whose
+main executable does not have a valid Authenticode signature.
+
+The tag release workflow reconstructs the PFX only in the temporary runner directory from these secrets:
+
+- `WINDOWS_CERTIFICATE_BASE64`
+- `WINDOWS_CERTIFICATE_PASSWORD`
+
+Certificate files and passwords must never be committed or uploaded as build artifacts.
+
+## Automated tag release
+
+`.github/workflows/release.yml` is the only workflow that publishes a GitHub Release. It runs for `v*`
+tags and first requires the tag to equal `v` plus the version in `package.json`. It then builds, signs,
+verifies, and smoke-tests macOS ARM64, macOS x64, and Windows x64 independently. The release is created
+only after all three jobs pass, and includes a combined `SHA256SUMS` file.
+
+Tags containing a hyphen, such as `v1.0.0-rc.1`, are published as GitHub prereleases. Stable tags such as
+`v1.0.0` are published as normal releases.
 
 ## Release order
 
 1. Merge the final feature and update `main`.
-2. Set the application version to `1.0.0-rc.1`; build all three targets.
+2. Set the application version to `1.0.0-rc.1`; build all three targets and test the artifacts without
+   publishing a public Stable release.
 3. Test each artifact on a clean machine without Node or npm.
 4. Fix release-only failures, then set version `1.0.0`.
-5. Create and push tag `v1.0.0`.
-6. Build signed artifacts from that exact tag, generate SHA-256 checksums, and publish the GitHub Release.
+5. Confirm all signing secrets are configured, then create and push tag `v1.0.0`.
+6. Let the tag workflow build signed artifacts from that exact tag, generate SHA-256 checksums, and publish
+   the GitHub Release.

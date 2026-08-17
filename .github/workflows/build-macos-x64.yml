@@ -2,6 +2,8 @@ name: Build macOS x64
 
 on:
   push:
+    branches:
+      - "**"
   workflow_dispatch:
 
 permissions:

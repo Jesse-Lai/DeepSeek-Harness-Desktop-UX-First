@@ -2,6 +2,8 @@ name: Build Windows x64
 
 on:
   push:
+    branches:
+      - "**"
   workflow_dispatch:
 
 permissions:
@@ -32,6 +34,9 @@ jobs:
 
       - name: Package application
         run: npm run package:win:x64
+
+      - name: Verify Windows application
+        run: npm run verify:win:x64
 
       - name: Smoke test packaged application
         run: npm run smoke:packaged:win:x64
