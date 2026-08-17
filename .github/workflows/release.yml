@@ -81,7 +81,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: npm run package:mac:${{ matrix.arch }}
+        run: |
+          ulimit -n 10240
+          npm run package:mac:${{ matrix.arch }}
 
       - name: Verify signed application
         env:

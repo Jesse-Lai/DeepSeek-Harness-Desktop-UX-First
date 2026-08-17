@@ -33,7 +33,9 @@ jobs:
           npm run licenses:check
 
       - name: Package application
-        run: npm run package:mac:arm64
+        run: |
+          ulimit -n 10240
+          npm run package:mac:arm64
 
       - name: Verify ARM64 application
         run: npm run verify:mac:arm64
