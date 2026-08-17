@@ -3,14 +3,7 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { projectRoot } from "./package-shared.js";
 
-const sourceLogo = join(
-  projectRoot,
-  "node_modules",
-  "@deepseek-ai",
-  "dsh-web-frontend",
-  "dist",
-  "favicon.svg",
-);
+const sourceAvatar = join(projectRoot, "assets", "app-icon-source.png");
 const outputDirectory = join(projectRoot, "dist", "icon");
 const masterIcon = join(outputDirectory, "app-icon-1024.png");
 const outputIcon = join(outputDirectory, "app-icon.ico");
@@ -20,16 +13,16 @@ await mkdir(outputDirectory, { recursive: true });
 
 const background = Buffer.from(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-    <rect x="56" y="56" width="912" height="912" rx="208" fill="#faf9f5"/>
-    <rect x="68" y="68" width="888" height="888" rx="196" fill="none" stroke="#e8e6df" stroke-width="8"/>
+    <rect x="56" y="56" width="912" height="912" rx="208" fill="#000000"/>
+    <rect x="68" y="68" width="888" height="888" rx="196" fill="none" stroke="#3f3f46" stroke-width="8"/>
   </svg>
 `);
-const officialLogo = await sharp(sourceLogo)
-  .resize(600, 600, { fit: "contain" })
+const avatar = await sharp(sourceAvatar)
+  .resize(660, 660, { fit: "contain" })
   .png()
   .toBuffer();
 await sharp(background)
-  .composite([{ input: officialLogo, left: 212, top: 212 }])
+  .composite([{ input: avatar, left: 182, top: 182 }])
   .png()
   .toFile(masterIcon);
 

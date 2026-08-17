@@ -4,14 +4,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
-const sourceLogo = join(
-  projectRoot,
-  "node_modules",
-  "@deepseek-ai",
-  "dsh-web-frontend",
-  "dist",
-  "favicon.svg",
-);
+const sourceAvatar = join(projectRoot, "assets", "app-icon-source.png");
 const outputDirectory = join(projectRoot, "dist", "icon");
 const masterIcon = join(outputDirectory, "app-icon-1024.png");
 const outputIcon = join(outputDirectory, "app-icon.icns");
@@ -39,16 +32,16 @@ const background = Buffer.from(`
         <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000000" flood-opacity="0.18"/>
       </filter>
     </defs>
-    <rect x="64" y="52" width="896" height="896" rx="220" fill="#f4f3ee" filter="url(#shadow)"/>
-    <rect x="76" y="64" width="872" height="872" rx="208" fill="#faf9f5" stroke="#e8e6df" stroke-width="8"/>
+    <rect x="64" y="52" width="896" height="896" rx="220" fill="#000000" filter="url(#shadow)"/>
+    <rect x="76" y="64" width="872" height="872" rx="208" fill="#000000" stroke="#3f3f46" stroke-width="8"/>
   </svg>
 `);
-const officialLogo = await sharp(sourceLogo)
-  .resize(600, 600, { fit: "contain" })
+const avatar = await sharp(sourceAvatar)
+  .resize(660, 660, { fit: "contain" })
   .png()
   .toBuffer();
 await sharp(background)
-  .composite([{ input: officialLogo, left: 212, top: 212 }])
+  .composite([{ input: avatar, left: 182, top: 182 }])
   .png()
   .toFile(masterIcon);
 
