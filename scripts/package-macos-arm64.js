@@ -1,12 +1,12 @@
 import { execFile } from "node:child_process";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import { packager } from "@electron/packager";
 import {
   applicationVersion,
   ignoreFromApplication,
   projectRoot,
 } from "./package-shared.js";
+import { installSerialPackagerCopy } from "./install-serial-packager-copy.js";
 import { macOSBundleIdentifier, productName } from "../src/product.js";
 
 const execFileAsync = promisify(execFile);
@@ -59,31 +59,38 @@ function releaseSigningOptions() {
   };
 }
 
-const outputPaths = await packager({
-  dir: projectRoot,
-  name: productName,
-  platform: "darwin",
-  arch: targetArch,
-  electronVersion: "43.4.0",
-  appVersion: applicationVersion,
-  buildVersion: process.env.MACOS_BUILD_VERSION ?? defaultBuildVersion,
-  out: join(projectRoot, "dist"),
-  overwrite: true,
-  asar: false,
-  prune: false,
-  appBundleId,
-  appCategoryType: "public.app-category.developer-tools",
-  appCopyright: "Copyright © 2026 Jesse Lai",
-  extendInfo: {
-    NSAppTransportSecurity: {
-      NSAllowsArbitraryLoads: false,
-      NSAllowsLocalNetworking: true,
+const restorePackagerCopy = installSerialPackagerCopy(projectRoot);
+let outputPaths;
+try {
+  const { packager } = await import("@electron/packager");
+  outputPaths = await packager({
+    dir: projectRoot,
+    name: productName,
+    platform: "darwin",
+    arch: targetArch,
+    electronVersion: "43.4.0",
+    appVersion: applicationVersion,
+    buildVersion: process.env.MACOS_BUILD_VERSION ?? defaultBuildVersion,
+    out: join(projectRoot, "dist"),
+    overwrite: true,
+    asar: false,
+    prune: false,
+    appBundleId,
+    appCategoryType: "public.app-category.developer-tools",
+    appCopyright: "Copyright © 2026 Jesse Lai",
+    extendInfo: {
+      NSAppTransportSecurity: {
+        NSAllowsArbitraryLoads: false,
+        NSAllowsLocalNetworking: true,
+      },
     },
-  },
-  icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
-  ignore: ignoreFromApplication,
-  ...releaseSigningOptions(),
-});
+    icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
+    ignore: ignoreFromApplication,
+    ...releaseSigningOptions(),
+  });
+} finally {
+  restorePackagerCopy();
+}
 
 console.log(
   `Wrote ${releaseBuild ? "signed and notarized " : "development "}${targetArch} app to: ${outputPaths[0]}`,
