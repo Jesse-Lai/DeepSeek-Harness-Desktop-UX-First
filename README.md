@@ -15,6 +15,13 @@
 - 发布时将 Node、Harness 和所需依赖一起打包。
 - 优先完成 macOS；Windows 先保证基本可用。
 
+## 桌面架构
+
+- Electron 只创建一个主 `BrowserWindow`，Harness React 应用是唯一交互渲染层。
+- 侧栏、Composer、按钮、菜单、Modal、Hover 和焦点状态全部由 Chromium DOM/CSS 处理。
+- macOS 主窗口使用透明背景与 `vibrancy: "under-window"`；侧栏通过半透明 Web 背景露出系统模糊，主对话区保持不透明。
+- 交通灯由 Electron 窗口 API 管理。项目不使用 `NSGlassEffectView`、`NSPanel` 或透明子窗口覆盖 Chromium。
+
 ## 阶段
 
 ### 1. 验证官方 npm 包

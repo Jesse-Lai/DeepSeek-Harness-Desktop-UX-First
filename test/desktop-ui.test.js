@@ -19,7 +19,6 @@ const iconTypesPath = join(
 );
 const mainPath = join(root, "src", "main.js");
 const preloadPath = join(root, "src", "preload.cjs");
-const nativeGlassPath = join(root, "native", "macos-composer-glass.mm");
 const syncIconsPath = join(root, "scripts", "sync-lucide-animated-icons.js");
 const loadingPath = join(root, "src", "loading.html");
 
@@ -30,8 +29,6 @@ async function installTheme(
     includeIcon = false,
     includeShell = false,
     includeSidebarSessions = false,
-    composerOverlay = false,
-    includeModal = false,
     includeAffordances = false,
   } = {},
 ) {
@@ -39,60 +36,12 @@ async function installTheme(
   let registration;
   let appendedStyle;
   let cleanup;
-  let trafficLightSyncCount = 0;
-  let composerSessionListener;
-  let composerSessionRequestCount = 0;
   let mutationCallback;
   let mutationObserverConnected = false;
   let mutationObserverObserveCount = 0;
   let mutationObserverDisconnectCount = 0;
   let mutationObserverOptions;
   let mutationObserverObservedWriteCount = 0;
-  const publishedComposerSessions = [];
-  const modalOverlayUpdates = [];
-
-  const createStore = (initial) => {
-    let snapshot = initial;
-    const listeners = new Set();
-    return {
-      getSnapshot: () => snapshot,
-      subscribe(listener) {
-        listeners.add(listener);
-        return () => listeners.delete(listener);
-      },
-      set(next) {
-        snapshot = next;
-        for (const listener of [...listeners]) listener();
-      },
-    };
-  };
-  const sessionsList = createStore({
-    ids: ["session-a", "session-b"],
-    current: "session-a",
-  });
-  const workspacesList = createStore({
-    items: [{
-      workspaceId: "workspace-a",
-      sessionIds: ["session-a", "session-b"],
-    }],
-  });
-  const sessions = {
-    list: sessionsList,
-    create({ sessionId }) {
-      sessionsList.set({
-        ...sessionsList.getSnapshot(),
-        ids: [...sessionsList.getSnapshot().ids, sessionId],
-      });
-      return Promise.resolve(sessionId);
-    },
-    open(sessionId) {
-      sessionsList.set({ ...sessionsList.getSnapshot(), current: sessionId });
-    },
-    clear() {
-      sessionsList.set({ ...sessionsList.getSnapshot(), current: undefined });
-    },
-  };
-  const workspaces = { list: workspacesList };
 
   class FakeMutationObserver {
     constructor(callback) {
@@ -368,7 +317,6 @@ async function installTheme(
       })()
     : null;
   const allFixtureElements = shellFixture === null ? [] : collectElements(shellFixture.shell);
-  const modalDialog = includeModal ? new FakeHTMLElement() : null;
   const documentElement = { dataset: {} };
   const document = {
     body: {},
@@ -382,7 +330,6 @@ async function installTheme(
     },
     querySelector(selector) {
       if (selector === "[data-shell-overlay]") return shellFixture?.overlay ?? null;
-      if (selector === '[role="dialog"][aria-modal="true"]') return modalDialog;
       return null;
     },
     querySelectorAll(selector) {
@@ -450,27 +397,7 @@ async function installTheme(
   };
   const sandbox = {
     window: {
-      desktop: {
-        composerOverlay,
-        syncTrafficLightPosition() {
-          trafficLightSyncCount += 1;
-        },
-        setModalOverlayVisible(visible, maskAlpha) {
-          modalOverlayUpdates.push({ visible, maskAlpha });
-        },
-        publishComposerSessionContext(context) {
-          publishedComposerSessions.push(context);
-        },
-        onComposerSessionContext(listener) {
-          composerSessionListener = listener;
-          return () => {
-            if (composerSessionListener === listener) composerSessionListener = undefined;
-          };
-        },
-        requestComposerSessionContext() {
-          composerSessionRequestCount += 1;
-        },
-      },
+      desktop: { restart() {} },
       requestAnimationFrame(callback) {
         callback();
       },
@@ -493,8 +420,6 @@ async function installTheme(
   assert.equal(registration.id, "@jesse-lai/dsh-desktop-ui");
   const plugin = registration.factory();
   plugin.apply({
-    sessions,
-    workspaces,
     effect(callback) {
       cleanup = callback();
     },
@@ -508,11 +433,6 @@ async function installTheme(
     plugin,
     shellFixture,
     sourceIcon,
-    trafficLightSyncCount,
-    publishedComposerSessions,
-    composerSessionRequestCount,
-    modalOverlayUpdates,
-    sessions,
     mutationObserverState() {
       return {
         connected: mutationObserverConnected,
@@ -526,9 +446,6 @@ async function installTheme(
     },
     flushMutations() {
       mutationCallback?.();
-    },
-    emitComposerSessionContext(context) {
-      composerSessionListener?.(context);
     },
   };
 }
@@ -658,6 +575,7 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
 
   assert.equal(documentElement.dataset.dshDesktopUi, "jesse-composer");
   assert.equal(documentElement.dataset.dshDesktopPlatform, "macos");
+  assert.equal(documentElement.dataset.dshWindowRole, "main");
   assert.doesNotMatch(appendedStyle.textContent, /backdrop-filter: blur\(/);
   assert.doesNotMatch(appendedStyle.textContent, /saturate\(/);
   assert.match(appendedStyle.textContent, /--dsh-desktop-composer-width: 654px/);
@@ -712,14 +630,6 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.doesNotMatch(appendedStyle.textContent, /linear-gradient\(180deg, rgb\(255 255 255 \/ 46%\)/);
   assert.doesNotMatch(appendedStyle.textContent, /linear-gradient\(rgb\(255 255 255 \/ 30%\)/);
   assert.doesNotMatch(appendedStyle.textContent, /rgb\(63 156 255 \/ 9%\)/);
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-native-glass\]\[data-dsh-composer-foreground\] \[data-composer-card\][^{]*\{[^}]*background: transparent !important[^}]*box-shadow: none !important/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-native-glass\]\[data-dsh-composer-foreground\][\s\S]*?\[data-composer-card\]::before\s*\{[^}]*inset: 0;[^}]*border-radius: 48px;[^}]*corner-shape: squircle;[^}]*box-shadow:\s*0 0 var\(--dsh-desktop-composer-shadow-blur\) 0\s*var\(--dsh-desktop-composer-shadow\)/,
-  );
   assert.match(appendedStyle.textContent, /data-dsh-composer-primary/);
   assert.match(
     appendedStyle.textContent,
@@ -770,10 +680,6 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
     /data-dsh-scroll-button\][^{]*\{[^}]*position: fixed !important;[^}]*inset: var\(--dsh-desktop-scroll-top, 0px\) auto auto\s*var\(--dsh-desktop-scroll-left, 0px\) !important;[^}]*translate: none !important;[^}]*transform: none !important/,
   );
   assert.match(
-    appendedStyle.textContent,
-    /data-dsh-native-glass\] \[data-dsh-scroll-button\][^{]*\{[^}]*color: transparent !important[^}]*background: transparent !important[^}]*box-shadow: none !important/,
-  );
-  assert.match(
     source,
     /const left = cardRect\.left \+ cardRect\.width \/ 2 - 18;[\s\S]*const top = cardRect\.top - 36 - 12;/,
   );
@@ -782,7 +688,6 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.match(source, /slot\.querySelector\(":scope > button"\)/);
   assert.doesNotMatch(source, /const marked = document\.querySelector\("\[data-dsh-scroll-button\]"\)/);
   assert.match(source, /syncFixedComposerLayout\(\);[\s\S]*markScrollButton\(\);/);
-  assert.match(source, /checkVisibility\(\{ checkOpacity: true, checkVisibilityCSS: true \}\)/);
   assert.doesNotMatch(
     appendedStyle.textContent,
     /data-conversation-scroll\][^{]*\{[^}]*scroll-behavior: smooth/,
@@ -818,14 +723,6 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.match(
     appendedStyle.textContent,
     /data-sidebar-collapsed\][\s\S]*?data-dsh-desktop-sidebar-logo\] button:last-child > svg:last-of-type[^{]*\{[^}]*display: inline !important/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-native-glass\] \[data-dsh-desktop-sidebar-new\][^{]*\{[^}]*color: transparent !important[^}]*background: transparent !important/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-native-glass\][\s\S]*?data-sidebar-collapsed\][\s\S]*?data-dsh-desktop-sidebar-new\]:hover[^{]*\{[^}]*background: var\(--dsw-alias-interactive-bg-hover\) !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -894,7 +791,7 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-shell\]\[data-sidebar-collapsed\][^{]*\{[^}]*padding-right: 0;[^}]*background: var\(--dsw-alias-bg-base\) !important/,
+    /data-dsh-desktop-shell\]\[data-sidebar-collapsed\][^{]*\{[^}]*padding-right: 0;[^}]*background: transparent !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -906,11 +803,11 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-native-glass\][\s\S]*?data-dsh-desktop-shell\]\[data-sidebar-collapsed\][^{]*\{[^}]*background: transparent !important/,
+    /data-dsh-desktop-sidebar-column\][^{]*\{[^}]*background: color-mix\([\s\S]*?var\(--dsw-alias-bg-base\) 34%,[\s\S]*?transparent[\s\S]*?\) !important/,
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-native-glass\][\s\S]*?data-sidebar-collapsed\][\s\S]*?data-dsh-desktop-sidebar-column\][^{]*\{[^}]*background: var\(--dsw-alias-bg-base\) !important/,
+    /data-dsh-desktop-center\],[\s\S]*?data-dsh-desktop-details\][^{]*\{[^}]*background: var\(--dsw-alias-bg-base\) !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -955,19 +852,14 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.equal(appendedStyle.removed, true);
   assert.equal(documentElement.dataset.dshDesktopUi, undefined);
   assert.equal(documentElement.dataset.dshDesktopPlatform, undefined);
+  assert.equal(documentElement.dataset.dshWindowRole, undefined);
 });
 
-test("modal mask covers native glass without moving, hiding, or replacing buttons", async () => {
-  const fixture = await installTheme("MacIntel", "", { includeModal: true });
+test("modal mask remains entirely inside the Chromium renderer", async () => {
+  const fixture = await installTheme("MacIntel");
   const mainSource = await readFile(mainPath, "utf8");
-  const nativeSource = await readFile(nativeGlassPath, "utf8");
   const preloadSource = await readFile(preloadPath, "utf8");
 
-  assert.equal(fixture.documentElement.dataset.dshModalOverlay, "");
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(fixture.modalOverlayUpdates)),
-    [{ visible: true, maskAlpha: 0.24 }],
-  );
   assert.match(
     fixture.appendedStyle.textContent,
     /role="presentation"\]:has\(> \[role="dialog"\]\[aria-modal="true"\]\)[\s\S]*?> \[aria-hidden="true"\][^{]*\{[^}]*-webkit-backdrop-filter: none !important;[^}]*backdrop-filter: none !important;/,
@@ -976,67 +868,10 @@ test("modal mask covers native glass without moving, hiding, or replacing button
     fixture.appendedStyle.textContent,
     /role="presentation"\]:has\(> \[role="dialog"\]\[aria-modal="true"\]\)[^{]*\{[^}]*position: fixed !important;[^}]*inset: 0 !important;[^}]*z-index: 2147483000 !important;/,
   );
-  assert.doesNotMatch(
-    fixture.appendedStyle.textContent,
-    /data-dsh-native-glass\]\[data-dsh-modal-overlay\][\s\S]*?data-dsh-desktop-sidebar-new/,
-  );
-  assert.match(
-    preloadSource,
-    /desktop\.setModalOverlayVisible = \(visible, maskAlpha\)[\s\S]*?desktop:modal-overlay-visible/,
-  );
-  assert.match(nativeSource, /addSubview:glass positioned:NSWindowAbove relativeTo:relativeView/);
-  assert.match(nativeSource, /DSHModalMaskState/);
-  assert.match(nativeSource, /setModalMask/);
-  const nativeModalSource = nativeSource.slice(
-    nativeSource.indexOf("napi_value SetModalMask"),
-    nativeSource.indexOf("napi_value RemoveComposerGlassPanel"),
-  );
-  assert.doesNotMatch(nativeModalSource, /sidebarGlass\.hidden|scrollGlass\.hidden/);
-  assert.match(
-    nativeSource,
-    /state\.visible = visible && state\.alpha > 0\.0;[\s\S]*?sidebarGlass\.modalMaskView = UpdateModalMaskView[\s\S]*?scrollGlass\.modalMaskView = UpdateModalMaskView/,
-  );
-  assert.match(
-    nativeSource,
-    /maskView\.layer\.backgroundColor =[\s\S]*?colorWithWhite:0\.0 alpha:state\.alpha/,
-  );
-  assert.doesNotMatch(nativeSource, /glass\.hidden = glass\.baseHidden \|\| ModalMaskState/);
-  const setModalSource = mainSource.slice(
-    mainSource.indexOf("function setModalOverlayVisible"),
-    mainSource.indexOf("function removeComposerGlassPanel"),
-  );
-  assert.doesNotMatch(
-    setModalSource,
-    /removeSidebarButtonGlass|removeScrollButtonGlass/,
-  );
-  assert.match(
-    mainSource,
-    /!modalOverlayStateKnown \|\|[\s\S]*?modalOverlayVisible \|\|[\s\S]*?frame === undefined/,
-  );
-  assert.match(
-    mainSource,
-    /const stateWasKnown = modalOverlayStateKnown;[\s\S]*?modalOverlayStateKnown = true;/,
-  );
-  assert.match(
-    mainSource,
-    /"did-start-navigation"[\s\S]*?modalOverlayStateKnown = false;[\s\S]*?updateComposerLayers\(\);/,
-  );
-  assert.match(
-    mainSource,
-    /function setModalOverlayVisible\(visible, maskAlpha = 0\)[\s\S]*?composerForegroundWindow\?\.hide\(\);[\s\S]*?removeComposerGlassPanel\(\);/,
-  );
-  assert.match(mainSource, /composerGlass\.setModalMask/);
-  assert.match(mainSource, /ipcMain\.on\("desktop:modal-overlay-visible"/);
+  assert.doesNotMatch(mainSource, /modalOverlay|setModalMask|NSPanel|NSGlassEffectView/);
+  assert.doesNotMatch(preloadSource, /modal-overlay|setModalOverlayVisible/);
 
   fixture.cleanup();
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(fixture.modalOverlayUpdates)),
-    [
-      { visible: true, maskAlpha: 0.24 },
-      { visible: false, maskAlpha: 0 },
-    ],
-  );
-  assert.equal(fixture.documentElement.dataset.dshModalOverlay, undefined);
 });
 
 test("Windows keeps the Jesse composer geometry while disabling glass", async () => {
@@ -1108,394 +943,100 @@ test("Windows keeps the Jesse composer geometry while disabling glass", async ()
   cleanup();
 });
 
-test("foreground Renderer keeps the Composer, hero controls, and DeepSeek menus stable", async () => {
-  const main = await installTheme("MacIntel");
-  assert.equal(main.documentElement.dataset.dshComposerOverlay, undefined);
-  assert.equal(main.documentElement.dataset.dshNativeComposerMenus, undefined);
-  main.cleanup();
-
-  const { appendedStyle, cleanup, documentElement } = await installTheme(
-    "MacIntel",
-    "",
-    { composerOverlay: true },
-  );
-  const clientSource = await readFile(clientPath, "utf8");
-
-  assert.equal(documentElement.dataset.dshComposerOverlay, "");
-  assert.equal(documentElement.dataset.dshNativeComposerMenus, undefined);
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\] \[data-composer-card\][^{]*\{[^}]*border-radius: var\(--dsh-desktop-card-radius\) !important[^}]*background: transparent !important[^}]*box-shadow: none !important/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\]\[data-dsh-composer-overlay-has-layout\][\s\S]*?\[data-composer-card\][^{]*\{[^}]*position: fixed !important;[^}]*dsh-composer-overlay-card-bottom[^}]*dsh-composer-overlay-card-left[^}]*dsh-composer-overlay-card-width/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\]\[data-dsh-composer-overlay-has-layout\][\s\S]*?\[data-dsh-hero-workspace-row\][^{]*\{[^}]*position: fixed !important;[^}]*dsh-composer-overlay-hero-top[^}]*dsh-composer-overlay-hero-left[^}]*dsh-composer-overlay-hero-width/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /\[role="menu"\],[\s\S]*?\[role="listbox"\],[\s\S]*?\[role="tooltip"\]/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /html\[data-dsh-composer-overlay\][\s\S]*?:is\(\[role="menu"\], \[role="listbox"\]\)[^{]*\{[^}]*z-index: 2147482999 !important;[^}]*isolation: isolate/,
-  );
-  assert.doesNotMatch(
-    appendedStyle.textContent,
-    /data-dsh-web-composer-menu/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\] \[data-dsh-composer-mirror-dialog\][\s\S]*?visibility: hidden !important;[\s\S]*?pointer-events: none !important;/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\][\s\S]*?\[data-dsh-composer-mirror-dialog-host\][^{]*\{[^}]*display: none !important;[^}]*pointer-events: none !important;/,
-  );
-  assert.match(
-    appendedStyle.textContent,
-    /data-dsh-composer-overlay\] \[data-dsh-composer-owned-dialog-host\][\s\S]*?visibility: visible !important/,
-  );
-  assert.match(
-    clientSource,
-    /const captureAll = \[\.\.\.document\.querySelectorAll\([\s\S]*?\[role="menu"\][\s\S]*?\[role="listbox"\][\s\S]*?\[role="dialog"\]/,
-  );
-  assert.match(
-    clientSource,
-    /setComposerOverlayInteraction\?\.\(interaction\)/,
-  );
-  assert.match(clientSource, /markComposerOverlayDialogs/);
-  assert.match(clientSource, /data-dsh-composer-owned-dialog/);
-  assert.match(
-    clientSource,
-    /hasMirrorDialog[\s\S]*?root\.removeAttribute\("inert"\)/,
-  );
-  assert.match(clientSource, /"inert",[\s\S]*?"open"/);
-
-  cleanup();
-  assert.equal(documentElement.dataset.dshComposerOverlay, undefined);
-});
-
-test("composer dropdowns preserve DeepSeek content without an AppKit popup bridge", async () => {
-  const [clientSource, mainSource, preloadSource] = await Promise.all([
-    readFile(clientPath, "utf8"),
+test("Electron shell enforces one BrowserWindow and one renderer bridge", async () => {
+  const [mainSource, preloadSource, clientSource, packageSource] = await Promise.all([
     readFile(mainPath, "utf8"),
     readFile(preloadPath, "utf8"),
+    readFile(clientPath, "utf8"),
+    readFile(join(root, "package.json"), "utf8"),
   ]);
 
-  for (const kind of ["workspace", "preset", "permission", "model"]) {
-    assert.match(clientSource, new RegExp(`dshComposerMenuTrigger = "${kind}"`));
-  }
-  assert.doesNotMatch(clientSource, /installNativeComposerMenus|showNativeMenu/);
-  assert.doesNotMatch(preloadSource, /nativeMenuCapabilities|desktop:show-native-menu/);
-  assert.doesNotMatch(mainSource, /showNativeMenu|desktop:show-native-menu|nativeMenuTemplate/);
-  assert.doesNotMatch(clientSource, /installWebComposerMenuBridge|requestComposerWebMenu/);
-  assert.doesNotMatch(preloadSource, /desktop:composer-web-menu/);
-  assert.doesNotMatch(mainSource, /desktop:composer-web-menu|composerWebMenuVisible/);
-  assert.match(preloadSource, /desktop:composer-overlay-interaction/);
-  assert.match(mainSource, /ipcMain\.on\("desktop:composer-overlay-interaction"/);
-  assert.match(
-    clientSource,
-    /const regions = \[cardRegion, heroRegion\]\.filter\(Boolean\)/,
-  );
-  assert.match(
-    mainSource,
-    /composerForegroundWindow\.setBounds\(contentBounds\)/,
-  );
-  assert.match(mainSource, /composerOverlayInteraction\.card \?\? frame/);
-  assert.match(
-    mainSource,
-    /const cardChanged = !composerFramesEqual[\s\S]*?if \(cardChanged\) updateComposerLayers\(\)/,
-  );
-  assert.match(mainSource, /setIgnoreMouseEvents\(true, \{ forward: true \}\)/);
-  assert.match(mainSource, /setIgnoreMouseEvents\(false\)/);
-});
+  assert.equal((mainSource.match(/new BrowserWindow\(/g) ?? []).length, 1);
+  assert.match(mainSource, /BrowserWindow\.getAllWindows\(\)/);
+  assert.match(mainSource, /windows\.length !== 1 \|\| windows\[0\] !== mainWindow/);
+  assert.doesNotMatch(mainSource, /parent: mainWindow|additionalArguments|setIgnoreMouseEvents/);
+  assert.doesNotMatch(mainSource, /composerForegroundWindow|composerOverlayInteraction/);
+  assert.doesNotMatch(mainSource, /desktop:(?:composer|modal-overlay|sidebar-button|scroll-button)/);
 
-test("foreground Composer follows the main Renderer session before it can submit", async () => {
-  const main = await installTheme("MacIntel");
-  assert.deepEqual(JSON.parse(JSON.stringify(main.publishedComposerSessions)), [{
-    sessionId: "session-a",
-    workspaceId: "workspace-a",
-  }]);
-
-  main.sessions.open("session-b");
-  assert.deepEqual(JSON.parse(JSON.stringify(main.publishedComposerSessions.at(-1))), {
-    sessionId: "session-b",
-    workspaceId: "workspace-a",
-  });
-  main.cleanup();
-
-  const overlay = await installTheme("MacIntel", "", { composerOverlay: true });
-  assert.equal(overlay.composerSessionRequestCount, 1);
-  assert.equal(overlay.documentElement.dataset.dshComposerSessionPending, "");
-  overlay.emitComposerSessionContext({
-    sessionId: "session-b",
-    workspaceId: "workspace-a",
-    revision: 7,
-  });
-  assert.equal(overlay.sessions.list.getSnapshot().current, "session-b");
-  assert.equal(overlay.documentElement.dataset.dshComposerSessionPending, undefined);
-  assert.equal(overlay.documentElement.dataset.dshComposerSessionRevision, "7");
-
-  overlay.emitComposerSessionContext({
-    sessionId: "session-a",
-    workspaceId: "workspace-a",
-    revision: 6,
-  });
-  assert.equal(overlay.sessions.list.getSnapshot().current, "session-b");
-
-  overlay.emitComposerSessionContext({
-    sessionId: "session-c",
-    workspaceId: "workspace-a",
-    revision: 8,
-  });
-  await Promise.resolve();
-  assert.equal(overlay.sessions.list.getSnapshot().current, "session-c");
-  assert.equal(overlay.documentElement.dataset.dshComposerSessionPending, undefined);
-  overlay.cleanup();
-});
-
-test("Composer preload marks the action under an inactive-window pointer", async () => {
-  const source = await readFile(preloadPath, "utf8");
-  const ipcListeners = new Map();
-  const attributes = new Set();
-  const composerCard = {};
-  let disabled = false;
-
-  class HoverTarget {
-    closest(selector) {
-      return selector === "[data-composer-card]" ? composerCard : null;
-    }
-
-    matches(selector) {
-      return selector === ":disabled" && disabled;
-    }
-
-    setAttribute(name) {
-      attributes.add(name);
-    }
-
-    removeAttribute(name) {
-      attributes.delete(name);
-    }
-  }
-
-  const target = new HoverTarget();
-  const hit = {
-    closest(selector) {
-      return selector.includes("[data-dsh-composer-command]") ? target : null;
-    },
-  };
-  const ipcRenderer = {
-    invoke() {},
-    on(channel, listener) {
-      ipcListeners.set(channel, listener);
-    },
-    removeListener(channel, listener) {
-      if (ipcListeners.get(channel) === listener) ipcListeners.delete(channel);
-    },
-    send() {},
-  };
-
-  vm.runInNewContext(source, {
-    HTMLElement: HoverTarget,
-    document: {
-      elementFromPoint(x, y) {
-        assert.deepEqual([x, y], [24, 18]);
-        return hit;
-      },
-    },
-    process: {
-      argv: ["electron", ".", "--dsh-composer-overlay"],
-      platform: "darwin",
-    },
+  let exposed;
+  const sent = [];
+  vm.runInNewContext(preloadSource, {
     require(specifier) {
       assert.equal(specifier, "electron");
       return {
-        contextBridge: { exposeInMainWorld() {} },
-        ipcRenderer,
+        contextBridge: {
+          exposeInMainWorld(name, value) {
+            assert.equal(name, "desktop");
+            exposed = value;
+          },
+        },
+        ipcRenderer: {
+          send(...args) {
+            sent.push(args);
+          },
+        },
       };
     },
-    window: { addEventListener() {} },
   }, { filename: preloadPath });
+  assert.deepEqual(Object.keys(exposed), ["restart"]);
+  exposed.restart();
+  assert.deepEqual(sent, [["desktop:restart"]]);
 
-  const hover = ipcListeners.get("desktop:composer-hover-point");
-  assert.equal(typeof hover, "function");
-  hover({}, { x: 24, y: 18 });
-  assert.equal(attributes.has("data-dsh-forwarded-hover"), true);
-  hover({}, null);
-  assert.equal(attributes.has("data-dsh-forwarded-hover"), false);
-
-  disabled = true;
-  hover({}, { x: 24, y: 18 });
-  assert.equal(attributes.has("data-dsh-forwarded-hover"), false);
+  assert.doesNotMatch(clientSource, /composerOverlay|nativeGlass|setComposerGlassFrame/);
+  assert.doesNotMatch(clientSource, /publishComposerSessionContext|forwardedHover/);
+  assert.doesNotMatch(packageSource, /build:native|build-macos-native|prestart|presmoke/);
 });
 
-test("macOS keeps one 36px glass panel between the app and Composer", async () => {
-  const [source, nativeSource, preloadSource, clientSource] = await Promise.all([
+test("Composer controls and DeepSeek menus remain in the main React tree", async () => {
+  const fixture = await installTheme("MacIntel");
+  const clientSource = await readFile(clientPath, "utf8");
+
+  assert.equal(fixture.documentElement.dataset.dshWindowRole, "main");
+  for (const kind of ["workspace", "preset", "permission", "model"]) {
+    assert.match(clientSource, new RegExp(`dshComposerMenuTrigger = "${kind}"`));
+  }
+  assert.match(clientSource, /document\.querySelectorAll\("\[data-composer-card\]"\)\.forEach\(markComposer\)/);
+  assert.match(clientSource, /markHeroWorkspaceRows\(\)/);
+  assert.doesNotMatch(clientSource, /installNativeComposerMenus|showNativeMenu/);
+  assert.doesNotMatch(clientSource, /installWebComposerMenuBridge|requestComposerWebMenu/);
+  assert.doesNotMatch(clientSource, /SessionBridge|SessionContext/);
+
+  fixture.cleanup();
+  assert.equal(fixture.documentElement.dataset.dshWindowRole, undefined);
+});
+
+test("macOS transparency exposes vibrancy only around opaque Web content", async () => {
+  const [mainSource, clientSource] = await Promise.all([
     readFile(mainPath, "utf8"),
-    readFile(nativeGlassPath, "utf8"),
-    readFile(preloadPath, "utf8"),
     readFile(clientPath, "utf8"),
   ]);
+  const fixture = await installTheme("MacIntel");
+  const css = fixture.appendedStyle.textContent;
 
-  assert.match(source, /const isMacOS = process\.platform === "darwin"/);
-  assert.match(source, /titleBarStyle: "hiddenInset"/);
-  assert.match(source, /macOSTrafficLightPosition = \{ x: 14, y: 14 \}/);
-  assert.match(source, /trafficLightPosition: macOSTrafficLightPosition/);
+  assert.match(mainSource, /titleBarStyle: "hiddenInset"/);
+  assert.match(mainSource, /trafficLightPosition: macOSTrafficLightPosition/);
+  assert.match(mainSource, /transparent: true/);
+  assert.match(mainSource, /vibrancy: "under-window"/);
+  assert.match(mainSource, /visualEffectState: "active"/);
+  assert.match(mainSource, /backgroundColor: isMacOS \? "#00000000" : "#eef2f6"/);
+  assert.match(mainSource, /setWindowButtonPosition\(macOSTrafficLightPosition\)/);
+  assert.match(mainSource, /getWindowButtonPosition\(\)/);
+
   assert.match(
-    source,
-    /webContents\.on\("did-finish-load", syncTrafficLightPosition\)/,
-  );
-  assert.match(
-    source,
-    /setWindowButtonPosition\(macOSTrafficLightPosition\)/,
-  );
-  assert.match(source, /composerGlass\?\.setTrafficLightPosition/);
-  assert.match(source, /getMacOSTrafficLightMetrics/);
-  assert.match(source, /assertMacOSTrafficLightPosition\("Composer"/);
-  assert.match(nativeSource, /ApplyTrafficLightPosition/);
-  assert.match(nativeSource, /NSViewFrameDidChangeNotification/);
-  assert.match(nativeSource, /NSWindowDidUpdateNotification/);
-  assert.match(nativeSource, /TrafficLightPositionMatches/);
-  assert.match(nativeSource, /getTrafficLightMetrics/);
-  assert.match(nativeSource, /kTrafficLightCenterSpacing = 23\.0/);
-  assert.match(preloadSource, /syncTrafficLightPosition:[\s\S]*desktop:sync-traffic-lights/);
-  assert.match(preloadSource, /desktop:composer-session-publish/);
-  assert.match(preloadSource, /desktop:composer-session-context/);
-  assert.match(source, /ipcMain\.on\("desktop:sync-traffic-lights"/);
-  assert.match(source, /roundedCorners: true/);
-  assert.match(source, /vibrancy: "under-window"/);
-  assert.match(source, /visualEffectState: "active"/);
-  assert.match(source, /backgroundColor: isMacOS \? "#00000000" : "#eef2f6"/);
-  assert.match(source, /svg\[data-lucide-animated-icon\]/);
-  assert.match(source, /heroComposerAlignment\.rowLeft - heroComposerAlignment\.cardLeft/);
-  assert.doesNotMatch(nativeSource, /kComposerCornerRadius/);
-  assert.match(nativeSource, /kComposerGlassClipCornerRadius = 24\.0/);
-  assert.match(nativeSource, /kComposerGlassMaterialCornerRadius = 20\.0/);
-  assert.match(nativeSource, /glass\.cornerRadius = kComposerGlassMaterialCornerRadius/);
-  assert.match(nativeSource, /DSHComposerGlassPanel : NSPanel/);
-  assert.match(nativeSource, /NSWindowStyleMaskNonactivatingPanel/);
-  assert.match(nativeSource, /canBecomeKeyWindow[\s\S]*return NO/);
-  assert.match(nativeSource, /panel\.ignoresMouseEvents = YES/);
-  assert.match(nativeSource, /addChildWindow:panel ordered:NSWindowAbove/);
-  assert.match(nativeSource, /foregroundWindow\.acceptsMouseMovedEvents = YES/);
-  assert.match(nativeSource, /foregroundWindow orderWindow:NSWindowAbove/);
-  assert.match(nativeSource, /glass\.layer\.cornerRadius = kComposerGlassClipCornerRadius/);
-  assert.match(nativeSource, /glass\.layer\.cornerCurve = kCACornerCurveContinuous/);
-  assert.match(nativeSource, /glass\.layer\.masksToBounds = YES/);
-  assert.match(nativeSource, /kComposerGlassStrokeWidth = 0\.5/);
-  assert.match(nativeSource, /glass\.layer\.borderWidth = kComposerGlassStrokeWidth/);
-  assert.match(
-    nativeSource,
-    /glass\.layer\.borderColor =[\s\S]*colorWithSRGBRed:\(219\.0 \/ 255\.0\)/,
-  );
-  assert.match(nativeSource, /glass\.tintColor = nil/);
-  assert.match(
-    nativeSource,
-    /glassContent\.autoresizingMask = NSViewWidthSizable \| NSViewHeightSizable/,
-  );
-  assert.doesNotMatch(nativeSource, /glassContent\.layer\.cornerRadius/);
-  assert.doesNotMatch(nativeSource, /glassContent\.layer\.cornerCurve/);
-  assert.doesNotMatch(nativeSource, /glassContent\.layer\.masksToBounds/);
-  assert.match(nativeSource, /glassView\.contentView\.frame = panel\.glassView\.bounds/);
-  assert.match(
-    nativeSource,
-    /glassContent\.layer\.backgroundColor =[\s\S]*?colorWithWhite:1\.0 alpha:0\.60/,
-  );
-  assert.doesNotMatch(nativeSource, /shadowView/);
-  assert.doesNotMatch(nativeSource, /shadow\.layer\.shadowOpacity/);
-  assert.doesNotMatch(nativeSource, /shadow\.layer\.shadowRadius/);
-  assert.doesNotMatch(nativeSource, /shadow\.layer\.shadowPath/);
-  assert.doesNotMatch(nativeSource, /CGPathCreateWithRoundedRect/);
-  assert.match(nativeSource, /\[root addSubview:glass\]/);
-  assert.match(nativeSource, /panel\.glassView\.frame = cardFrame/);
-  assert.match(nativeSource, /setComposerGlassPanelFrame/);
-  assert.match(nativeSource, /removeComposerGlassPanel/);
-  assert.match(nativeSource, /DSHSidebarButtonGlassView : NSGlassEffectView/);
-  assert.match(nativeSource, /kSidebarButtonCornerRadius = 12\.0/);
-  assert.match(nativeSource, /MessageSquarePlusLibraryImage/);
-  assert.match(
-    nativeSource,
-    /systemFontOfSize:14\.0 weight:NSFontWeightRegular/,
-  );
-  assert.ok(
-    nativeSource.includes(
-      "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
-    ),
-  );
-  assert.ok(nativeSource.includes("M12 8v6"));
-  assert.ok(nativeSource.includes("M9 11h6"));
-  assert.match(nativeSource, /\[image setTemplate:YES\]/);
-  assert.doesNotMatch(nativeSource, /square\.and\.pencil/);
-  assert.match(nativeSource, /glass\.titleLabel\.hidden = compact/);
-  assert.match(nativeSource, /compact \? 18\.0 : 14\.0/);
-  assert.match(
-    nativeSource,
-    /glass\.baseHidden = compact \|\| width <= 0 \|\| height <= 0;/,
-  );
-  assert.match(nativeSource, /setSidebarButtonGlassFrame/);
-  assert.match(nativeSource, /DSHScrollButtonGlassView : NSGlassEffectView/);
-  assert.match(nativeSource, /kScrollButtonDiameter = 36\.0/);
-  assert.match(nativeSource, /ChevronDownLibraryImage/);
-  assert.ok(nativeSource.includes('d=\\"m6 9 6 6 6-6\\"'));
-  assert.match(nativeSource, /glass\.cornerRadius = radius/);
-  assert.match(
-    nativeSource,
-    /depth\.layer\.backgroundColor =[\s\S]*colorWithWhite:1\.0 alpha:0\.40/,
-  );
-  assert.doesNotMatch(nativeSource, /pressed \? 0\.30 : hovered \? 0\.48 : 0\.40/);
-  assert.match(nativeSource, /setScrollButtonGlassFrame/);
-  assert.match(nativeSource, /removeScrollButtonGlass/);
-  assert.match(source, /desktop:sidebar-button-glass-frame/);
-  assert.match(source, /desktop:scroll-button-glass-frame/);
-  assert.match(source, /hasAttribute\("data-sidebar-collapsed"\)/);
-  assert.match(
-    source,
-    /additionalArguments: \["--dsh-composer-overlay"\]/,
-  );
-  assert.match(source, /parent: mainWindow/);
-  assert.match(source, /acceptFirstMouse: true/);
-  assert.match(source, /screen\.getCursorScreenPoint\(\)/);
-  assert.match(
-    source,
-    /function forwardInactiveComposerMouseMove\(\)[\s\S]*?!overlay\.isVisible\(\)[\s\S]*?overlay\.isFocused\(\)[\s\S]*?!app\.isActive\(\)/,
+    css,
+    /data-dsh-desktop-platform="macos"[\s\S]*?#root[^{]*\{[^}]*background: transparent !important/,
   );
   assert.match(
-    source,
-    /overlay\.webContents\.send\("desktop:composer-hover-point", point\)/,
+    css,
+    /data-dsh-desktop-sidebar-column\][^{]*\{[^}]*background: color-mix\([\s\S]*?34%,[\s\S]*?transparent/,
   );
-  assert.match(source, /send\("desktop:composer-hover-point", null\)/);
   assert.match(
-    preloadSource,
-    /ipcRenderer\.on\("desktop:composer-hover-point", updateForwardedHover\)/,
+    css,
+    /data-dsh-desktop-center\],[\s\S]*?data-dsh-desktop-details\][^{]*\{[^}]*background: var\(--dsw-alias-bg-base\) !important/,
   );
-  assert.match(preloadSource, /document\.elementFromPoint\(point\.x, point\.y\)/);
-  assert.match(preloadSource, /setAttribute\(forwardedHoverAttribute, ""\)/);
-  assert.match(clientSource, /data-dsh-forwarded-hover/);
-  assert.match(source, /setInterval\(forwardInactiveComposerMouseMove, 16\)/);
-  assert.match(source, /stopComposerHoverForwarding\(\);[\s\S]*?composerForegroundReady = false/);
-  assert.match(source, /dataset\.dshComposerForeground/);
-  assert.match(source, /desktop:composer-overlay-interaction/);
-  assert.match(source, /composerForegroundWindow\.setBounds\(contentBounds\)/);
-  assert.match(source, /pointInsideComposerInteraction\(point\)/);
-  assert.match(source, /setIgnoreMouseEvents\(true, \{ forward: true \}\)/);
-  assert.match(source, /setIgnoreMouseEvents\(false\)/);
-  assert.match(source, /setComposerGlassPanelFrame/);
-  assert.match(
-    source,
-    /frame\.width <= 0[\s\S]*?composerForegroundWindow\.hide\(\);[\s\S]*?setMainComposerForeground\(false\);[\s\S]*?removeComposerGlassPanel\(\);[\s\S]*?return;/,
-  );
-  assert.match(source, /dsh-composer-overlay-card-bottom/);
-  assert.match(source, /dsh-composer-overlay-hero-top/);
-  assert.match(preloadSource, /process\.argv\.includes\("--dsh-composer-overlay"\)/);
-  assert.match(preloadSource, /desktop:composer-overlay-interaction/);
-  assert.match(preloadSource, /desktop:composer-glass-frame/);
-  assert.match(preloadSource, /desktop:sidebar-button-glass-frame/);
-  assert.match(preloadSource, /desktop:scroll-button-glass-frame/);
+  assert.doesNotMatch(clientSource, /NSGlassEffectView|NSPanel|data-dsh-native-glass/);
+
+  fixture.cleanup();
 });
 
 test("lucide-animated mapping covers every DSH primitive icon export", async () => {
@@ -1514,10 +1055,9 @@ test("lucide-animated mapping covers every DSH primitive icon export", async () 
 });
 
 test("non-primitive and hidden-state affordances also use the icon library", async () => {
-  const [clientSource, syncSource, nativeSource] = await Promise.all([
+  const [clientSource, syncSource] = await Promise.all([
     readFile(clientPath, "utf8"),
     readFile(syncIconsPath, "utf8"),
-    readFile(nativeGlassPath, "utf8"),
   ]);
 
   assert.match(syncSource, /const runtimeIconSlugs = \["history"\]/);
@@ -1540,9 +1080,6 @@ test("non-primitive and hidden-state affordances also use the icon library", asy
   assert.match(clientSource, /"aria-expanded",[\s\S]*?"aria-pressed",[\s\S]*?"open"/);
   assert.match(clientSource, /clearInjectedLibraryIcons\(injectedIconDecorations\)/);
 
-  assert.match(nativeSource, /ChevronDownLibraryImage/);
-  assert.ok(nativeSource.includes('d=\\"m6 9 6 6 6-6\\"'));
-  assert.doesNotMatch(nativeSource, /imageWithSystemSymbolName/);
 });
 
 test("injected library icons follow disclosure state and clean up safely", async () => {
@@ -1663,7 +1200,7 @@ test("startup UI keeps circles round and renders rounded rectangles continuously
 });
 
 test("sidebar markers pass through the slot wrapper and preserve the official root", async () => {
-  const { cleanup, shellFixture, trafficLightSyncCount } = await installTheme(
+  const { cleanup, shellFixture } = await installTheme(
     "MacIntel",
     "",
     { includeShell: true },
@@ -1677,8 +1214,6 @@ test("sidebar markers pass through the slot wrapper and preserve the official ro
   assert.equal(shellFixture.foot.dataset.dshDesktopSidebarFoot, "");
   assert.equal(shellFixture.center.dataset.dshDesktopCenter, "");
   assert.equal(shellFixture.details.dataset.dshDesktopDetails, "");
-  assert.equal(trafficLightSyncCount, 1);
-
   cleanup();
 });
 

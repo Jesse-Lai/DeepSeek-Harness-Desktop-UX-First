@@ -47,9 +47,6 @@ try {
 await execFileAsync(process.execPath, [
   join(projectRoot, "scripts", "build-macos-icon.js"),
 ]);
-await execFileAsync(process.execPath, [
-  join(projectRoot, "scripts", "build-macos-native.js"),
-]);
 
 const launcher = `#!/bin/zsh
 set -u
@@ -90,8 +87,6 @@ const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
   <string>1</string>
   <key>LSApplicationCategoryType</key>
   <string>public.app-category.developer-tools</string>
-  <key>LSMinimumSystemVersion</key>
-  <string>26.0</string>
   <key>NSAppTransportSecurity</key>
   <dict>
     <key>NSAllowsLocalNetworking</key>

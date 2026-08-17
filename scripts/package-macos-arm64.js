@@ -14,10 +14,6 @@ if (!new Set(["arm64", "x64"]).has(targetArch)) {
 await execFileAsync(process.execPath, [
   join(projectRoot, "scripts", "build-macos-icon.js"),
 ]);
-await execFileAsync(process.execPath, [
-  join(projectRoot, "scripts", "build-macos-native.js"),
-  targetArch,
-]);
 const lockfile = JSON.parse(
   await readFile(join(projectRoot, "package-lock.json"), "utf8"),
 );
@@ -65,9 +61,6 @@ const outputPaths = await packager({
   prune: false,
   appBundleId: "ai.deepseek.dsh-desktop",
   icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
-  extendInfo: {
-    LSMinimumSystemVersion: "26.0",
-  },
   ignore: ignoreFromApplication,
   osxSign: {
     identity: "-",

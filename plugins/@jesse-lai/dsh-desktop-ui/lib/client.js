@@ -454,6 +454,15 @@ window.__ModuleLoader__.load({
         --dsh-desktop-ease: cubic-bezier(.2, .8, .2, 1);
       }
 
+      /* Chromium is the only UI layer. The transparent macOS document lets
+         BrowserWindow's under-window vibrancy show through only where a Web
+         surface below deliberately remains translucent. */
+      html[data-dsh-desktop-platform="macos"],
+      html[data-dsh-desktop-platform="macos"] body,
+      html[data-dsh-desktop-platform="macos"] #root {
+        background: transparent !important;
+      }
+
       body {
         letter-spacing: -0.008em;
         text-rendering: optimizeLegibility;
@@ -648,6 +657,7 @@ window.__ModuleLoader__.load({
         gap: 0;
         padding: 0 var(--dsh-desktop-shell-gap) 0 0;
         isolation: isolate;
+        background: transparent !important;
         transition:
           grid-template-columns var(--ds-transition-duration-slow) var(--ds-ease-in-out),
           padding var(--ds-transition-duration-slow) var(--dsh-desktop-ease),
@@ -686,12 +696,16 @@ window.__ModuleLoader__.load({
         -webkit-app-region: drag;
       }
 
-      [data-dsh-desktop-sidebar-column],
       [data-dsh-desktop-sidebar] {
         background: transparent !important;
       }
 
       [data-dsh-desktop-sidebar-column] {
+        background: color-mix(
+          in srgb,
+          var(--dsw-alias-bg-base) 34%,
+          transparent
+        ) !important;
         border-right: 0 !important;
         transition: background-color var(--ds-transition-duration-slow) var(--dsh-desktop-ease);
       }
@@ -788,47 +802,6 @@ window.__ModuleLoader__.load({
         [data-dsh-desktop-sidebar-new] svg {
         width: 18px !important;
         height: 18px !important;
-      }
-
-      /* macOS 26 paints the control with AppKit's official
-         NSGlassEffectView. Keep the original Harness button as the semantic
-         hit target while its native content and material sit above Chromium. */
-      html[data-dsh-native-glass] [data-dsh-desktop-sidebar-new],
-      html[data-dsh-native-glass] [data-dsh-desktop-sidebar-new]:hover,
-      html[data-dsh-native-glass] [data-dsh-desktop-sidebar-new]:active {
-        color: transparent !important;
-        border-color: transparent !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        text-shadow: none !important;
-      }
-
-      html[data-dsh-native-glass] [data-dsh-desktop-sidebar-new] svg {
-        color: transparent !important;
-      }
-
-      /* The compact rail uses one shared Web hover treatment. Native glass is
-         reserved for the wide New Session button, where its material matches
-         the rest of the expanded sidebar. */
-      html[data-dsh-native-glass]
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
-        [data-dsh-desktop-sidebar-new] {
-        color: var(--dsw-alias-label-primary) !important;
-        border-color: transparent !important;
-        background: transparent !important;
-        box-shadow: none !important;
-      }
-
-      html[data-dsh-native-glass]
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
-        [data-dsh-desktop-sidebar-new]:hover {
-        background: var(--dsw-alias-interactive-bg-hover) !important;
-      }
-
-      html[data-dsh-native-glass]
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
-        [data-dsh-desktop-sidebar-new] svg {
-        color: currentColor !important;
       }
 
       [data-dsh-desktop-sidebar-region] {
@@ -996,7 +969,7 @@ window.__ModuleLoader__.load({
          colour, while the outer glass gutters and panel corners animate away. */
       [data-dsh-desktop-shell][data-sidebar-collapsed] {
         padding-right: 0;
-        background: var(--dsw-alias-bg-base) !important;
+        background: transparent !important;
       }
 
       [data-dsh-desktop-shell][data-sidebar-collapsed] [data-dsh-desktop-center],
@@ -1170,8 +1143,7 @@ window.__ModuleLoader__.load({
          up. The desktop shell gives the seat a viewport-fixed frame instead,
          and leaves an equal-height flex spacer in the scroll flow so the final
          message can still be read above it. */
-      html:not([data-dsh-composer-overlay])
-        [data-conversation-scroll][data-dsh-composer-fixed-host]::after {
+      [data-conversation-scroll][data-dsh-composer-fixed-host]::after {
         content: "";
         display: block;
         flex: 0 0 var(--dsh-desktop-composer-reserve, var(--dsh-composer-height, 0px));
@@ -1202,15 +1174,13 @@ window.__ModuleLoader__.load({
       /* A fixed-position Composer is no longer clipped by the rounded center
          column. Mirror the panel's lower corners on its opaque bottom fade so
          that fade cannot square off the conversation surface. */
-      html:not([data-dsh-composer-overlay])
-        [data-dsh-desktop-shell][data-details-collapsed]
+      [data-dsh-desktop-shell][data-details-collapsed]
         [data-phase="active"] > [data-conversation-scroll]
         > [data-composer-seat][data-dsh-composer-fixed] {
         border-bottom-right-radius: var(--dsh-desktop-panel-radius);
       }
 
-      html:not([data-dsh-composer-overlay])
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
+      [data-dsh-desktop-shell][data-sidebar-collapsed]
         [data-phase="active"] > [data-conversation-scroll]
         > [data-composer-seat][data-dsh-composer-fixed] {
         border-radius: 0;
@@ -1223,11 +1193,6 @@ window.__ModuleLoader__.load({
         align-self: center;
         margin-inline: auto;
         padding-left: 0 !important;
-      }
-
-      [data-dsh-hero-workspace-row]
-        button[data-dsh-forwarded-hover]:not(:disabled) {
-        background: var(--dsw-alias-interactive-bg-hover) !important;
       }
 
       [data-dsh-hero-workspace-row] button[aria-haspopup="menu"]
@@ -1363,8 +1328,6 @@ window.__ModuleLoader__.load({
       }
 
       [data-dsh-composer-command] button:hover:not(:disabled),
-      [data-dsh-composer-command] button[data-dsh-forwarded-hover]:not(:disabled),
-      button[data-dsh-composer-command][data-dsh-forwarded-hover]:not(:disabled),
       button[data-dsh-composer-command]:hover:not(:disabled) {
         color: var(--dsw-alias-label-primary) !important;
         background: var(--dsw-alias-interactive-bg-hover) !important;
@@ -1409,15 +1372,11 @@ window.__ModuleLoader__.load({
       }
 
       [data-dsh-composer-modes] button:hover:not(:disabled),
-      [data-dsh-composer-modes] button[data-dsh-forwarded-hover]:not(:disabled),
       [data-dsh-composer-modes] button[aria-expanded="true"],
       [data-dsh-composer-trailing]
         button[data-dsh-composer-menu-trigger="model"]:hover:not(:disabled),
       [data-dsh-composer-trailing]
-        button[data-dsh-composer-menu-trigger="model"][data-dsh-forwarded-hover]:not(:disabled),
-      [data-dsh-composer-trailing]
         button[data-dsh-composer-menu-trigger="model"][aria-expanded="true"],
-      [data-dsh-composer-modes] select[data-dsh-forwarded-hover]:not(:disabled),
       [data-dsh-composer-modes] select:hover:not(:disabled) {
         color: var(--dsw-alias-label-secondary) !important;
         background-color: var(--dsw-alias-interactive-bg-hover) !important;
@@ -1474,219 +1433,8 @@ window.__ModuleLoader__.load({
         transition: opacity 120ms var(--dsh-desktop-ease) !important;
       }
 
-      /* The Harness button remains the hit target while AppKit paints the
-         official circular material and matching library image above Chromium. */
-      html[data-dsh-native-glass] [data-dsh-scroll-button],
-      html[data-dsh-native-glass] [data-dsh-scroll-button]:hover,
-      html[data-dsh-native-glass] [data-dsh-scroll-button]:active {
-        color: transparent !important;
-        border-color: transparent !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        outline-color: transparent !important;
-        text-shadow: none !important;
-      }
-
-      html[data-dsh-native-glass] [data-dsh-scroll-button] svg {
-        color: transparent !important;
-      }
-
-      /* AppKit owns the clipped Liquid Glass and stroke. NSGlassEffectView
-         moves to a live compositor after launch, so its parent cannot retain
-         an alpha-derived shadow. Keep exactly one stable ambient shadow on a
-         separate 48px contour so tuning it cannot change the Composer shape. */
-      html[data-dsh-native-glass][data-dsh-composer-foreground] [data-composer-card] {
-        position: relative;
-        border-color: transparent !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-      }
-
-      html[data-dsh-native-glass][data-dsh-composer-foreground]
-        [data-composer-card]::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 48px;
-        corner-shape: squircle;
-        box-shadow:
-          0 0 var(--dsh-desktop-composer-shadow-blur) 0
-            var(--dsh-desktop-composer-shadow);
-        pointer-events: none;
-      }
-
-      /* IPC removes the native foreground layer in the same modal transition.
-         These rules also cover the brief frame before the main process has
-         acknowledged it, keeping the main Renderer as a complete fallback. */
-      html[data-dsh-native-glass][data-dsh-modal-overlay][data-dsh-composer-foreground]
-        [data-composer-card] {
-        background: var(--dsw-specific-input-major) !important;
-        box-shadow:
-          1.25px 0 0 -0.75px var(--dsh-desktop-composer-stroke),
-          0 0 0 0.5px var(--dsh-desktop-composer-stroke),
-          -1.25px 0 0 -0.75px var(--dsh-desktop-composer-stroke),
-          0 0 var(--dsh-desktop-composer-shadow-blur) 0
-            var(--dsh-desktop-composer-shadow) !important;
-      }
-
-      html[data-dsh-native-glass][data-dsh-modal-overlay][data-dsh-composer-foreground]
-        [data-composer-card]::before {
-        display: none;
-      }
-
-      html[data-dsh-modal-overlay][data-dsh-composer-foreground]
-        [data-composer-card] > * {
-        visibility: visible !important;
-      }
-
-      html[data-dsh-composer-foreground] [data-composer-card] > *,
-      html[data-dsh-composer-foreground] [data-dsh-hero-workspace-row] {
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
-      /* The transparent child renderer presents the original Harness-owned
-         Composer and its portals above the nonactivating native glass panel. */
-      html[data-dsh-composer-overlay],
-      html[data-dsh-composer-overlay] body,
-      html[data-dsh-composer-overlay] #root {
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        overflow: hidden !important;
-        background: transparent !important;
-      }
-
-      html[data-dsh-composer-overlay] body * {
-        visibility: hidden !important;
-      }
-
-      html[data-dsh-composer-overlay] body *:has(
-        :is([data-composer-card], [data-dsh-hero-workspace-row])
-      ) {
-        overflow: visible !important;
-        transform: none !important;
-        filter: none !important;
-        clip-path: none !important;
-        contain: none !important;
-      }
-
-      html[data-dsh-composer-overlay] [data-composer-card],
-      html[data-dsh-composer-overlay] [data-composer-card] *,
-      html[data-dsh-composer-overlay] [data-dsh-hero-workspace-row],
-      html[data-dsh-composer-overlay] [data-dsh-hero-workspace-row] *,
-      html[data-dsh-composer-overlay] :is(
-        [role="menu"],
-        [role="listbox"],
-        [role="tooltip"]
-      ),
-      html[data-dsh-composer-overlay] :is(
-        [role="menu"],
-        [role="listbox"],
-        [role="tooltip"]
-      ) * {
-        visibility: visible !important;
-      }
-
-      /* Keep every Composer dropdown Harness-owned. Only lift its original
-         portal above the fixed Composer; DeepSeek continues to own the menu's
-         geometry, paint, content and interaction. */
-      html[data-dsh-composer-overlay]
-        :is([role="menu"], [role="listbox"]) {
-        z-index: 2147482999 !important;
-        isolation: isolate;
-      }
-
-      /* Dialogs already mounted in the mirrored renderer before a Composer
-         interaction are duplicate app modals and stay suppressed. Dialogs
-         opened from a Composer control keep their original DeepSeek content
-         and are painted by this same full-size foreground renderer. */
-      html[data-dsh-composer-overlay]
-        [data-dsh-composer-mirror-dialog-host] {
-        display: none !important;
-        pointer-events: none !important;
-      }
-
-      html[data-dsh-composer-overlay] [data-dsh-composer-mirror-dialog],
-      html[data-dsh-composer-overlay] [data-dsh-composer-mirror-dialog] * {
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
-      html[data-dsh-composer-overlay] [data-dsh-composer-owned-dialog-host],
-      html[data-dsh-composer-overlay] [data-dsh-composer-owned-dialog-host] *,
-      html[data-dsh-composer-overlay] [data-dsh-composer-owned-dialog],
-      html[data-dsh-composer-overlay] [data-dsh-composer-owned-dialog] * {
-        visibility: visible !important;
-      }
-
-      html[data-dsh-composer-overlay] [data-composer-card] {
-        border: 0 !important;
-        border-radius: var(--dsh-desktop-card-radius) !important;
-        corner-shape: squircle;
-        background: transparent !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-      }
-
-      html[data-dsh-composer-overlay][data-dsh-composer-overlay-has-layout]
-        [data-composer-card] {
-        position: fixed !important;
-        inset:
-          auto
-          auto
-          var(--dsh-composer-overlay-card-bottom, 0px)
-          var(--dsh-composer-overlay-card-left, 0px) !important;
-        width: var(--dsh-composer-overlay-card-width, 100%) !important;
-        max-width: none !important;
-      }
-
-      html[data-dsh-composer-overlay][data-dsh-composer-overlay-has-layout]
-        [data-dsh-hero-workspace-row] {
-        position: fixed !important;
-        inset:
-          var(--dsh-composer-overlay-hero-top, 0px)
-          auto
-          auto
-          var(--dsh-composer-overlay-hero-left, 0px) !important;
-        width: var(--dsh-composer-overlay-hero-width, 0px) !important;
-        max-width: none !important;
-        margin: 0 !important;
-      }
-
-      html[data-dsh-composer-overlay]:not([data-dsh-composer-overlay-has-hero])
-        [data-dsh-hero-workspace-row] {
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
-      /* A foreground Renderer may briefly trail the main window after Session
-         navigation. Keep the stale Composer visible but non-interactive until
-         its own runtime has opened the main window's authoritative Session. */
-      html[data-dsh-composer-overlay][data-dsh-composer-session-pending]
-        [data-composer-card] {
-        pointer-events: none !important;
-        opacity: 0.72;
-      }
-
       html[data-dsh-desktop-platform="windows"] [data-composer-card],
       html[data-dsh-desktop-platform="other"] [data-composer-card] {
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-      }
-
-      /* Jesse Agent shell: glass belongs to the bottom-most window layer. */
-      html[data-dsh-desktop-platform="macos"],
-      html[data-dsh-desktop-platform="macos"] body,
-      html[data-dsh-desktop-platform="macos"] #root {
-        background: transparent !important;
-      }
-
-      html[data-dsh-native-glass] [data-dsh-desktop-shell] {
-        background: transparent !important;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
       }
@@ -1699,19 +1447,6 @@ window.__ModuleLoader__.load({
 
       html:not([data-dsh-desktop-platform="macos"])
         [data-dsh-desktop-shell][data-sidebar-collapsed] {
-        background: var(--dsw-alias-bg-base) !important;
-      }
-
-      /* Keep the shell transparent so the native sidebar material can show;
-         the center itself remains one uninterrupted web surface. */
-      html[data-dsh-native-glass]
-        [data-dsh-desktop-shell][data-sidebar-collapsed] {
-        background: transparent !important;
-      }
-
-      html[data-dsh-native-glass]
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
-        [data-dsh-desktop-sidebar-column] {
         background: var(--dsw-alias-bg-base) !important;
       }
 
@@ -2477,46 +2212,11 @@ window.__ModuleLoader__.load({
       });
     }
 
-    let nativeGlassAnimationFrame;
-    let nativeGlassLastFrame = "";
-    let nativeGlassResizeObserver;
-    let nativeGlassObservedCard;
-    let nativeSidebarButtonLastFrame = "";
-    let nativeSidebarButtonHovered = false;
-    let nativeSidebarButtonPressed = false;
-    const nativeSidebarButtonListeners = new Map();
-    let nativeScrollButtonLastFrame = "";
-    let nativeScrollButtonHovered = false;
-    let nativeScrollButtonPressed = false;
-    const nativeScrollButtonListeners = new Map();
     let composerLayoutAnimationFrame;
     let composerLayoutResizeObserver;
     let composerLayoutObservedSeat;
     let composerLayoutObservedScrollport;
     let composerLayoutLastGeometry = "";
-    let composerOverlayResizeObserver;
-    let composerOverlayObservedCard;
-    let composerOverlayObservedHeroRow;
-    let composerOverlayLastInteraction = "";
-    let composerOverlayOwnsNewDialogs = false;
-    let modalOverlayVisible;
-    let foregroundSuppressionVisible;
-    let foregroundSuppressionMaskAlpha;
-
-    function supportsNativeComposerGlass() {
-      return desktopPlatform() === "macos" &&
-        typeof window.desktop?.setComposerGlassFrame === "function";
-    }
-
-    function supportsNativeSidebarButtonGlass() {
-      return desktopPlatform() === "macos" &&
-        typeof window.desktop?.setSidebarButtonGlassFrame === "function";
-    }
-
-    function supportsNativeScrollButtonGlass() {
-      return desktopPlatform() === "macos" &&
-        typeof window.desktop?.setScrollButtonGlassFrame === "function";
-    }
 
     function clearFixedComposerLayout() {
       document.querySelectorAll("[data-dsh-composer-fixed]").forEach((seat) => {
@@ -2549,6 +2249,7 @@ window.__ModuleLoader__.load({
         composerLayoutObservedSeat = undefined;
         composerLayoutObservedScrollport = undefined;
         clearFixedComposerLayout();
+        markScrollButton();
         return;
       }
 
@@ -2603,18 +2304,16 @@ window.__ModuleLoader__.load({
         scrollport.style.setProperty("--dsh-desktop-composer-reserve", `${geometry[3]}px`);
         if (wasAtBottom) scrollport.scrollTop = scrollport.scrollHeight;
       }
+      markScrollButton();
     }
 
     function scheduleFixedComposerLayout() {
       if (composerLayoutAnimationFrame !== undefined) return;
-      composerLayoutAnimationFrame = window.requestAnimationFrame(() => {
-        syncFixedComposerLayout();
-        markScrollButton();
-        scheduleNativeComposerGlass();
-      });
+      composerLayoutAnimationFrame = window.requestAnimationFrame(syncFixedComposerLayout);
     }
 
     function positionScrollButton(button, card) {
+      if (!(button instanceof HTMLElement) || !(card instanceof HTMLElement)) return;
       const cardRect = card.getBoundingClientRect();
       const left = cardRect.left + cardRect.width / 2 - 18;
       const top = cardRect.top - 36 - 12;
@@ -2634,9 +2333,6 @@ window.__ModuleLoader__.load({
       const scrollport = card.closest("[data-conversation-scroll]");
       if (!(scrollport instanceof HTMLElement)) return null;
 
-      /* ChatView renders the semantic button in a zero-height sibling directly
-         after data-chat-flow. Resolve that structure on every pass instead of
-         retaining whichever chevron happened to be near the Composer first. */
       for (const flow of scrollport.querySelectorAll("[data-chat-flow]")) {
         const list = flow.parentElement;
         if (!(list instanceof HTMLElement)) continue;
@@ -2658,359 +2354,21 @@ window.__ModuleLoader__.load({
       return null;
     }
 
-    function installNativeScrollButtonListeners(button) {
-      if (!supportsNativeScrollButtonGlass() || nativeScrollButtonListeners.has(button)) return;
-      const updateState = (hovered, pressed) => {
-        nativeScrollButtonHovered = hovered;
-        nativeScrollButtonPressed = pressed;
-        scheduleNativeComposerGlass();
-      };
-      const onEnter = () => updateState(true, false);
-      const onLeave = () => updateState(false, false);
-      const onDown = () => updateState(true, true);
-      const onUp = () => updateState(true, false);
-      const onFocus = () => updateState(true, false);
-      const onBlur = () => updateState(false, false);
-      button.addEventListener("pointerenter", onEnter);
-      button.addEventListener("pointerleave", onLeave);
-      button.addEventListener("pointerdown", onDown);
-      button.addEventListener("pointerup", onUp);
-      button.addEventListener("pointercancel", onLeave);
-      button.addEventListener("focus", onFocus);
-      button.addEventListener("blur", onBlur);
-      nativeScrollButtonListeners.set(button, () => {
-        button.removeEventListener("pointerenter", onEnter);
-        button.removeEventListener("pointerleave", onLeave);
-        button.removeEventListener("pointerdown", onDown);
-        button.removeEventListener("pointerup", onUp);
-        button.removeEventListener("pointercancel", onLeave);
-        button.removeEventListener("focus", onFocus);
-        button.removeEventListener("blur", onBlur);
-      });
-    }
-
     function markScrollButton() {
       const card = document.querySelector("[data-composer-card]");
-      const button = window.desktop?.composerOverlay === true
-        ? null
-        : findScrollButton(card);
+      const button = findScrollButton(card);
       document.querySelectorAll("[data-dsh-scroll-button]").forEach((marked) => {
         if (marked === button) return;
-        nativeScrollButtonListeners.get(marked)?.();
-        nativeScrollButtonListeners.delete(marked);
         marked.style.removeProperty("--dsh-desktop-scroll-left");
         marked.style.removeProperty("--dsh-desktop-scroll-top");
         delete marked.dataset.dshScrollButton;
       });
-      if (!(button instanceof HTMLElement)) return;
+      if (!(button instanceof HTMLElement) || !(card instanceof HTMLElement)) return;
       button.dataset.dshScrollButton = "";
       positionScrollButton(button, card);
-      installNativeScrollButtonListeners(button);
     }
 
-    function syncNativeScrollButtonGlass() {
-      if (!supportsNativeScrollButtonGlass()) return;
-      const card = document.querySelector("[data-composer-card]");
-      const button = document.querySelector("[data-dsh-scroll-button]");
-      const hiddenFrame = {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        hovered: false,
-        pressed: false,
-      };
-      if (!(card instanceof HTMLElement) || !(button instanceof HTMLElement)) {
-        const serialized = JSON.stringify(hiddenFrame);
-        if (serialized !== nativeScrollButtonLastFrame) {
-          nativeScrollButtonLastFrame = serialized;
-          window.desktop.setScrollButtonGlassFrame(hiddenFrame);
-        }
-        return;
-      }
-
-      positionScrollButton(button, card);
-      const style = getComputedStyle(button);
-      const hidden = style.display === "none" ||
-        style.visibility === "hidden" ||
-        Number(style.opacity) <= 0 ||
-        button.getAttribute("aria-hidden") === "true" ||
-        button.getClientRects().length === 0 ||
-        (typeof button.checkVisibility === "function" &&
-          !button.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }));
-      if (hidden) {
-        const serialized = JSON.stringify(hiddenFrame);
-        if (serialized !== nativeScrollButtonLastFrame) {
-          nativeScrollButtonLastFrame = serialized;
-          window.desktop.setScrollButtonGlassFrame(hiddenFrame);
-        }
-        return;
-      }
-      const rect = button.getBoundingClientRect();
-      const frame = {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-        hovered: nativeScrollButtonHovered,
-        pressed: nativeScrollButtonPressed,
-      };
-      const serialized = JSON.stringify(frame);
-      if (serialized !== nativeScrollButtonLastFrame) {
-        nativeScrollButtonLastFrame = serialized;
-        window.desktop.setScrollButtonGlassFrame(frame);
-      }
-    }
-
-    function syncNativeSidebarButtonGlass() {
-      if (!supportsNativeSidebarButtonGlass()) return;
-      const button = document.querySelector("[data-dsh-desktop-sidebar-new]");
-      const hiddenFrame = {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        title: "New Session",
-        hovered: false,
-        pressed: false,
-      };
-      if (!(button instanceof HTMLElement)) {
-        const serialized = JSON.stringify(hiddenFrame);
-        if (serialized !== nativeSidebarButtonLastFrame) {
-          nativeSidebarButtonLastFrame = serialized;
-          window.desktop.setSidebarButtonGlassFrame(hiddenFrame);
-        }
-        return;
-      }
-
-      const rect = button.getBoundingClientRect();
-      const compact = document.querySelector("[data-dsh-desktop-shell]")
-        ?.hasAttribute("data-sidebar-collapsed") === true;
-      const frame = {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-        title: button.textContent?.trim() || "New Session",
-        compact,
-        hovered: nativeSidebarButtonHovered,
-        pressed: nativeSidebarButtonPressed,
-      };
-      const serialized = JSON.stringify(frame);
-      if (serialized !== nativeSidebarButtonLastFrame) {
-        nativeSidebarButtonLastFrame = serialized;
-        window.desktop.setSidebarButtonGlassFrame(frame);
-      }
-    }
-
-    function installNativeSidebarButtonListeners(button) {
-      if (!supportsNativeSidebarButtonGlass() || nativeSidebarButtonListeners.has(button)) return;
-      const updateState = (hovered, pressed) => {
-        nativeSidebarButtonHovered = hovered;
-        nativeSidebarButtonPressed = pressed;
-        scheduleNativeComposerGlass();
-      };
-      const onEnter = () => updateState(true, false);
-      const onLeave = () => updateState(false, false);
-      const onDown = () => updateState(true, true);
-      const onUp = () => updateState(true, false);
-      const onFocus = () => updateState(true, false);
-      const onBlur = () => updateState(false, false);
-      button.addEventListener("pointerenter", onEnter);
-      button.addEventListener("pointerleave", onLeave);
-      button.addEventListener("pointerdown", onDown);
-      button.addEventListener("pointerup", onUp);
-      button.addEventListener("pointercancel", onLeave);
-      button.addEventListener("focus", onFocus);
-      button.addEventListener("blur", onBlur);
-      nativeSidebarButtonListeners.set(button, () => {
-        button.removeEventListener("pointerenter", onEnter);
-        button.removeEventListener("pointerleave", onLeave);
-        button.removeEventListener("pointerdown", onDown);
-        button.removeEventListener("pointerup", onUp);
-        button.removeEventListener("pointercancel", onLeave);
-        button.removeEventListener("focus", onFocus);
-        button.removeEventListener("blur", onBlur);
-      });
-    }
-
-    function isVisibleComposerOverlaySurface(element) {
-      if (!(element instanceof HTMLElement)) return false;
-      const style = getComputedStyle(element);
-      return style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        Number(style.opacity) > 0 &&
-        element.getAttribute("aria-hidden") !== "true" &&
-        element.getClientRects().length > 0;
-    }
-
-    function composerOverlayRegion(element) {
-      if (!(element instanceof HTMLElement)) return undefined;
-      const rect = element.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return undefined;
-      return {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-      };
-    }
-
-    function markComposerOverlayDialogs() {
-      if (window.desktop?.composerOverlay !== true) return;
-      const dialogs = [...document.querySelectorAll('[role="dialog"]')];
-      dialogs.forEach((dialog) => {
-        if (!(dialog instanceof HTMLElement)) return;
-        if (
-          dialog.hasAttribute("data-dsh-composer-owned-dialog") ||
-          dialog.hasAttribute("data-dsh-composer-mirror-dialog")
-        ) {
-          return;
-        }
-        const presentation = dialog.closest('[role="presentation"]');
-        if (composerOverlayOwnsNewDialogs) {
-          dialog.dataset.dshComposerOwnedDialog = "";
-          if (presentation instanceof HTMLElement) {
-            presentation.dataset.dshComposerOwnedDialogHost = "";
-          }
-        } else {
-          dialog.dataset.dshComposerMirrorDialog = "";
-          if (presentation instanceof HTMLElement) {
-            presentation.dataset.dshComposerMirrorDialogHost = "";
-          }
-        }
-      });
-      const root = document.querySelector("#root");
-      if (!(root instanceof HTMLElement)) return;
-      const hasOwnedDialog = dialogs.some((dialog) =>
-        dialog instanceof HTMLElement &&
-        dialog.hasAttribute("data-dsh-composer-owned-dialog")
-      );
-      const hasMirrorDialog = dialogs.some((dialog) =>
-        dialog instanceof HTMLElement &&
-        dialog.hasAttribute("data-dsh-composer-mirror-dialog")
-      );
-      if (hasOwnedDialog) root.setAttribute("inert", "");
-      else if (hasMirrorDialog) root.removeAttribute("inert");
-    }
-
-    function installComposerOverlayDialogOwnership() {
-      if (window.desktop?.composerOverlay !== true) return () => {};
-      const onPointerDown = (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        if (target.closest([
-          "[data-composer-card]",
-          "[data-dsh-hero-workspace-row]",
-          '[role="menu"]',
-          '[role="listbox"]',
-          "[data-dsh-composer-owned-dialog]",
-        ].join(", ")) === null) {
-          return;
-        }
-        composerOverlayOwnsNewDialogs = true;
-      };
-      document.addEventListener("pointerdown", onPointerDown, true);
-      document.addEventListener("click", onPointerDown, true);
-      return () => {
-        document.removeEventListener("pointerdown", onPointerDown, true);
-        document.removeEventListener("click", onPointerDown, true);
-      };
-    }
-
-    function syncComposerOverlayInteraction() {
-      if (window.desktop?.composerOverlay !== true) return;
-      markComposerOverlayDialogs();
-      const card = document.querySelector("[data-composer-card]");
-      const heroRow = document.querySelector("[data-dsh-hero-workspace-row]");
-      if (
-        (composerOverlayObservedCard !== card ||
-          composerOverlayObservedHeroRow !== heroRow) &&
-        typeof ResizeObserver === "function"
-      ) {
-        composerOverlayResizeObserver?.disconnect();
-        composerOverlayResizeObserver = new ResizeObserver(syncComposerOverlayInteraction);
-        if (card instanceof HTMLElement) composerOverlayResizeObserver.observe(card);
-        if (heroRow instanceof HTMLElement) composerOverlayResizeObserver.observe(heroRow);
-        composerOverlayObservedCard = card;
-        composerOverlayObservedHeroRow = heroRow;
-      }
-
-      const cardRegion = composerOverlayRegion(card);
-      const heroRegion = composerOverlayRegion(heroRow);
-      const regions = [cardRegion, heroRegion].filter(Boolean);
-      const captureAll = [...document.querySelectorAll(
-        '[role="menu"], [role="listbox"], [role="dialog"]',
-      )].some(isVisibleComposerOverlaySurface);
-      const interaction = {
-        captureAll,
-        regions,
-        card: cardRegion ?? null,
-      };
-      const serialized = JSON.stringify(interaction);
-      if (serialized === composerOverlayLastInteraction) return;
-      composerOverlayLastInteraction = serialized;
-      window.desktop.setComposerOverlayInteraction?.(interaction);
-    }
-
-    function syncNativeComposerGlass() {
-      nativeGlassAnimationFrame = undefined;
-      markScrollButton();
-      syncNativeSidebarButtonGlass();
-      syncNativeScrollButtonGlass();
-      if (!supportsNativeComposerGlass()) return;
-
-      const card = document.querySelector("[data-composer-card]");
-      if (!(card instanceof HTMLElement)) {
-        const hiddenFrame = { x: 0, y: 0, width: 0, height: 0 };
-        const serialized = JSON.stringify(hiddenFrame);
-        if (serialized !== nativeGlassLastFrame) {
-          nativeGlassLastFrame = serialized;
-          window.desktop.setComposerGlassFrame(hiddenFrame);
-        }
-        return;
-      }
-
-      if (nativeGlassObservedCard !== card) {
-        nativeGlassResizeObserver?.disconnect();
-        nativeGlassResizeObserver = new ResizeObserver(scheduleNativeComposerGlass);
-        nativeGlassResizeObserver.observe(card);
-        nativeGlassObservedCard = card;
-      }
-
-      const cardRect = card.getBoundingClientRect();
-      const heroRow = document.querySelector("[data-dsh-hero-workspace-row]");
-      const heroRect = heroRow instanceof HTMLElement
-        ? heroRow.getBoundingClientRect()
-        : undefined;
-      const frame = {
-        x: cardRect.x,
-        y: cardRect.y,
-        width: cardRect.width,
-        height: cardRect.height,
-        hero: heroRect !== undefined && heroRect.width > 0 && heroRect.height > 0
-          ? {
-              x: heroRect.x,
-              y: heroRect.y,
-              width: heroRect.width,
-              height: heroRect.height,
-            }
-          : null,
-      };
-      const serialized = JSON.stringify(frame);
-      if (serialized !== nativeGlassLastFrame) {
-        nativeGlassLastFrame = serialized;
-        window.desktop.setComposerGlassFrame(frame);
-      }
-    }
-
-    function scheduleNativeComposerGlass() {
-      if (!supportsNativeComposerGlass()) return;
-      if (nativeGlassAnimationFrame !== undefined) return;
-      nativeGlassAnimationFrame = window.requestAnimationFrame(syncNativeComposerGlass);
-    }
-
-    function clearNativeComposerGlass() {
+    function clearComposerLayout() {
       if (composerLayoutAnimationFrame !== undefined) {
         window.cancelAnimationFrame(composerLayoutAnimationFrame);
         composerLayoutAnimationFrame = undefined;
@@ -3020,53 +2378,12 @@ window.__ModuleLoader__.load({
       composerLayoutObservedSeat = undefined;
       composerLayoutObservedScrollport = undefined;
       clearFixedComposerLayout();
-      if (nativeGlassAnimationFrame !== undefined) {
-        window.cancelAnimationFrame(nativeGlassAnimationFrame);
-        nativeGlassAnimationFrame = undefined;
-      }
-      nativeGlassResizeObserver?.disconnect();
-      nativeGlassResizeObserver = undefined;
-      nativeGlassObservedCard = undefined;
-      if (supportsNativeComposerGlass()) {
-        window.desktop.setComposerGlassFrame({ x: 0, y: 0, width: 0, height: 0 });
-      }
-      if (supportsNativeSidebarButtonGlass()) {
-        window.desktop.setSidebarButtonGlassFrame({
-          x: 0,
-          y: 0,
-          width: 0,
-          height: 0,
-          title: "New Session",
-          hovered: false,
-          pressed: false,
-        });
-      }
-      if (supportsNativeScrollButtonGlass()) {
-        window.desktop.setScrollButtonGlassFrame({
-          x: 0,
-          y: 0,
-          width: 0,
-          height: 0,
-          hovered: false,
-          pressed: false,
-        });
-      }
-      for (const removeListeners of nativeSidebarButtonListeners.values()) removeListeners();
-      nativeSidebarButtonListeners.clear();
-      nativeSidebarButtonHovered = false;
-      nativeSidebarButtonPressed = false;
-      nativeSidebarButtonLastFrame = "";
-      for (const removeListeners of nativeScrollButtonListeners.values()) removeListeners();
-      nativeScrollButtonListeners.clear();
-      nativeScrollButtonHovered = false;
-      nativeScrollButtonPressed = false;
-      nativeScrollButtonLastFrame = "";
-      nativeGlassLastFrame = "";
-      composerOverlayResizeObserver?.disconnect();
-      composerOverlayResizeObserver = undefined;
-      composerOverlayObservedCard = undefined;
-      composerOverlayObservedHeroRow = undefined;
-      composerOverlayLastInteraction = "";
+      document.querySelectorAll("[data-dsh-scroll-button]").forEach((button) => {
+        if (!(button instanceof HTMLElement)) return;
+        button.style.removeProperty("--dsh-desktop-scroll-left");
+        button.style.removeProperty("--dsh-desktop-scroll-top");
+        delete button.dataset.dshScrollButton;
+      });
     }
 
     function markComposer(card) {
@@ -3195,31 +2512,6 @@ window.__ModuleLoader__.load({
       return null;
     }
 
-    let nativeTrafficLightSyncScheduled = false;
-    let nativeTrafficLightsSynced = false;
-
-    function scheduleNativeTrafficLightSync() {
-      if (
-        window.desktop?.composerOverlay === true ||
-        nativeTrafficLightsSynced ||
-        nativeTrafficLightSyncScheduled
-      ) {
-        return;
-      }
-
-      nativeTrafficLightSyncScheduled = true;
-      const notify = () => {
-        nativeTrafficLightSyncScheduled = false;
-        nativeTrafficLightsSynced = true;
-        window.desktop?.syncTrafficLightPosition?.();
-      };
-      if (typeof window.requestAnimationFrame !== "function") {
-        notify();
-        return;
-      }
-      window.requestAnimationFrame(() => window.requestAnimationFrame(notify));
-    }
-
     function markDesktopShell() {
       const overlay = document.querySelector("[data-shell-overlay]");
       const shell = overlay?.parentElement;
@@ -3245,7 +2537,6 @@ window.__ModuleLoader__.load({
           : newSession.querySelector("button");
         if (newSessionButton instanceof HTMLElement) {
           newSessionButton.dataset.dshDesktopSidebarNew = "";
-          installNativeSidebarButtonListeners(newSessionButton);
         }
       }
       if (region instanceof HTMLElement) {
@@ -3255,58 +2546,15 @@ window.__ModuleLoader__.load({
       return true;
     }
 
-    function syncComposerForegroundSuppression() {
-      if (window.desktop?.composerOverlay === true) return;
-      const visible = modalOverlayVisible === true;
-      const maskAlpha = modalOverlayVisible === true
-        ? (document.body?.hasAttribute?.("data-ds-dark-theme") ? 0.5 : 0.24)
-        : 0;
-      if (
-        visible === foregroundSuppressionVisible &&
-        maskAlpha === foregroundSuppressionMaskAlpha
-      ) {
-        return;
-      }
-      foregroundSuppressionVisible = visible;
-      foregroundSuppressionMaskAlpha = maskAlpha;
-      window.desktop?.setModalOverlayVisible?.(visible, maskAlpha);
-    }
-
-    function syncModalOverlayState() {
-      if (window.desktop?.composerOverlay === true) return;
-      const visible = document.querySelector(
-        '[role="dialog"][aria-modal="true"]',
-      ) instanceof HTMLElement;
-      if (visible === modalOverlayVisible) return;
-      modalOverlayVisible = visible;
-      if (visible) document.documentElement.dataset.dshModalOverlay = "";
-      else delete document.documentElement.dataset.dshModalOverlay;
-      syncComposerForegroundSuppression();
-    }
-
-    function clearModalOverlayState() {
-      modalOverlayVisible = undefined;
-      delete document.documentElement.dataset.dshModalOverlay;
-      syncComposerForegroundSuppression();
-      foregroundSuppressionVisible = undefined;
-      foregroundSuppressionMaskAlpha = undefined;
-    }
-
     function markDesktopUi(decorations, injectedDecorations) {
-      syncModalOverlayState();
       decorateIcons(document, decorations);
       syncLibraryAffordances(injectedDecorations);
       markComposers();
       markGeneratingProgress();
       markHeroWorkspaceRows();
-      if (markDesktopShell()) {
-        markPendingSidebarSessions();
-        scheduleNativeTrafficLightSync();
-      }
+      if (markDesktopShell()) markPendingSidebarSessions();
       syncFixedComposerLayout();
       markScrollButton();
-      scheduleNativeComposerGlass();
-      syncComposerOverlayInteraction();
     }
 
     function clearComposerMarks() {
@@ -3330,10 +2578,6 @@ window.__ModuleLoader__.load({
         "data-dsh-composer-trailing",
         "data-dsh-composer-primary",
         "data-dsh-composer-menu-trigger",
-        "data-dsh-composer-owned-dialog",
-        "data-dsh-composer-owned-dialog-host",
-        "data-dsh-composer-mirror-dialog",
-        "data-dsh-composer-mirror-dialog-host",
         "data-dsh-scroll-button",
         "data-dsh-hero-workspace-row",
         "data-dsh-desktop-shell",
@@ -3354,118 +2598,6 @@ window.__ModuleLoader__.load({
       }
     }
 
-    function currentComposerSessionContext(ctx) {
-      const sessions = ctx.sessions.list.getSnapshot();
-      const sessionId = sessions.current ?? null;
-      const workspaceId = sessionId === null
-        ? null
-        : ctx.workspaces.list.getSnapshot().items.find(
-          (workspace) => workspace.sessionIds.includes(sessionId),
-        )?.workspaceId ?? null;
-      return { sessionId, workspaceId };
-    }
-
-    function installComposerSessionBridge(ctx) {
-      if (window.desktop?.composerOverlay === true) {
-        let target;
-        let disposed = false;
-        let materializingRevision;
-        const root = document.documentElement;
-        const blockStaleSubmit = (event) => {
-          if (root.dataset.dshComposerSessionPending === undefined) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-        };
-        const reconcile = () => {
-          if (disposed || target === undefined) return;
-          const snapshot = ctx.sessions.list.getSnapshot();
-          const targetId = target.sessionId;
-          if (targetId === null) {
-            if (snapshot.current !== undefined) ctx.sessions.clear();
-          } else {
-            if (!snapshot.ids.includes(targetId)) {
-              if (
-                target.workspaceId !== null &&
-                materializingRevision !== target.revision
-              ) {
-                const revision = target.revision;
-                const workspaceId = target.workspaceId;
-                materializingRevision = revision;
-                ctx.sessions.create({
-                  workspaceId,
-                  sessionId: targetId,
-                }).then(
-                  () => {
-                    if (materializingRevision === revision) {
-                      materializingRevision = undefined;
-                    }
-                    reconcile();
-                  },
-                  (error) => {
-                    console.warn("foreground Composer Session sync failed:", error);
-                  },
-                );
-              }
-              return;
-            }
-            if (snapshot.current !== targetId) ctx.sessions.open(targetId);
-          }
-          const current = ctx.sessions.list.getSnapshot().current ?? null;
-          if (current !== targetId) return;
-          root.dataset.dshComposerSessionRevision = String(target.revision);
-          delete root.dataset.dshComposerSessionPending;
-        };
-        const receive = (context) => {
-          if (
-            context === null ||
-            typeof context !== "object" ||
-            !Number.isSafeInteger(context.revision) ||
-            context.revision < 1 ||
-            (context.sessionId !== null && typeof context.sessionId !== "string") ||
-            (context.workspaceId !== null && typeof context.workspaceId !== "string")
-          ) {
-            return;
-          }
-          if (target !== undefined && context.revision <= target.revision) return;
-          target = context;
-          materializingRevision = undefined;
-          root.dataset.dshComposerSessionPending = "";
-          reconcile();
-        };
-        root.dataset.dshComposerSessionPending = "";
-        document.addEventListener("submit", blockStaleSubmit, true);
-        document.addEventListener("keydown", blockStaleSubmit, true);
-        const unsubscribeList = ctx.sessions.list.subscribe(reconcile);
-        const unsubscribeDesktop = window.desktop.onComposerSessionContext(receive);
-        window.desktop.requestComposerSessionContext();
-        return () => {
-          disposed = true;
-          unsubscribeList();
-          unsubscribeDesktop();
-          document.removeEventListener("submit", blockStaleSubmit, true);
-          document.removeEventListener("keydown", blockStaleSubmit, true);
-          delete root.dataset.dshComposerSessionPending;
-          delete root.dataset.dshComposerSessionRevision;
-        };
-      }
-
-      let previous;
-      const publish = () => {
-        const next = currentComposerSessionContext(ctx);
-        const serialized = JSON.stringify(next);
-        if (serialized === previous) return;
-        previous = serialized;
-        window.desktop?.publishComposerSessionContext?.(next);
-      };
-      const unsubscribeSessions = ctx.sessions.list.subscribe(publish);
-      const unsubscribeWorkspaces = ctx.workspaces.list.subscribe(publish);
-      publish();
-      return () => {
-        unsubscribeSessions();
-        unsubscribeWorkspaces();
-      };
-    }
-
     function apply(ctx) {
       ctx.effect(() => {
         const existing = document.querySelector(
@@ -3480,17 +2612,9 @@ window.__ModuleLoader__.load({
 
         document.documentElement.dataset.dshDesktopUi = "jesse-composer";
         document.documentElement.dataset.dshDesktopPlatform = desktopPlatform();
-        if (window.desktop?.composerOverlay === true) {
-          document.documentElement.dataset.dshComposerOverlay = "";
-        }
-        if (supportsNativeComposerGlass()) {
-          document.documentElement.dataset.dshNativeGlass = "";
-        }
+        document.documentElement.dataset.dshWindowRole = "main";
         const iconDecorations = new Map();
         const injectedIconDecorations = new Map();
-        const disposeComposerSessionBridge = installComposerSessionBridge(ctx);
-        const disposeComposerOverlayDialogOwnership =
-          installComposerOverlayDialogOwnership();
         markDesktopUi(iconDecorations, injectedIconDecorations);
 
         const mutationObserverOptions = {
@@ -3524,50 +2648,25 @@ window.__ModuleLoader__.load({
           }
         });
         observer.observe(document.body, mutationObserverOptions);
-        if (supportsNativeComposerGlass()) {
-          window.addEventListener("resize", scheduleNativeComposerGlass);
-          window.addEventListener("scroll", scheduleNativeComposerGlass, true);
-        }
         window.addEventListener("resize", scheduleFixedComposerLayout);
-        if (window.desktop?.composerOverlay === true) {
-          window.addEventListener("resize", syncComposerOverlayInteraction);
-          window.addEventListener("scroll", syncComposerOverlayInteraction, true);
-        }
 
         return () => {
           observer.disconnect();
-          if (supportsNativeComposerGlass()) {
-            window.removeEventListener("resize", scheduleNativeComposerGlass);
-            window.removeEventListener("scroll", scheduleNativeComposerGlass, true);
-          }
           window.removeEventListener("resize", scheduleFixedComposerLayout);
-          if (window.desktop?.composerOverlay === true) {
-            window.removeEventListener("resize", syncComposerOverlayInteraction);
-            window.removeEventListener("scroll", syncComposerOverlayInteraction, true);
-          }
-          clearModalOverlayState();
-          clearNativeComposerGlass();
-          nativeTrafficLightSyncScheduled = false;
-          nativeTrafficLightsSynced = false;
+          clearComposerLayout();
           clearIconDecorations(iconDecorations);
           clearInjectedLibraryIcons(injectedIconDecorations);
           clearGeneratingProgress();
           clearComposerMarks();
-          disposeComposerOverlayDialogOwnership();
-          disposeComposerSessionBridge();
           style.remove();
           delete document.documentElement.dataset.dshDesktopUi;
           delete document.documentElement.dataset.dshDesktopPlatform;
-          delete document.documentElement.dataset.dshNativeGlass;
-          delete document.documentElement.dataset.dshComposerOverlay;
-          delete document.documentElement.dataset.dshModalOverlay;
-          composerOverlayOwnsNewDialogs = false;
+          delete document.documentElement.dataset.dshWindowRole;
         };
       }, "dsh-desktop-ui: install Jesse composer theme");
     }
 
     exports.apply = apply;
-    exports.inject = ["sessions", "workspaces"];
     exports.progress = {
       schema: progressEventSchema,
       summarizeActivity,
