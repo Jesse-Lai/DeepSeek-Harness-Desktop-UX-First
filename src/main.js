@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain, Menu, shell } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
 import { startHarness } from "./harness.js";
 
 const require = createRequire(import.meta.url);
@@ -296,7 +296,7 @@ async function runSmokeTest() {
       state.overlayAttribute ||
       state.foregroundAttribute ||
       state.nativeGlassAttribute ||
-      JSON.stringify(state.desktopBridge) !== JSON.stringify(["restart"])
+      JSON.stringify(state.desktopBridge) !== JSON.stringify(["restart", "setThemeSource"])
     ) {
       throw new Error(`检测到多层渲染残留：${JSON.stringify(state)}`);
     }
@@ -317,12 +317,12 @@ async function runSmokeTest() {
         if (!(trigger instanceof HTMLButtonElement) || !(input instanceof HTMLTextAreaElement)) {
           return { clicked: false, kinds };
         }
-        input.focus();
-        const inputFocused = document.activeElement === input;
+        trigger.focus();
+        const triggerFocused = document.activeElement === trigger;
         trigger.click();
         return {
           clicked: true,
-          inputFocused,
+          triggerFocused,
           kind: trigger.dataset.dshComposerMenuTrigger,
           kinds,
         };
@@ -354,7 +354,7 @@ async function runSmokeTest() {
     const menuKinds = [...new Set(composerBeforeMenu.kinds)].sort();
     if (
       !composerBeforeMenu.clicked ||
-      !composerBeforeMenu.inputFocused ||
+      !composerBeforeMenu.triggerFocused ||
       !menuKinds.includes("workspace") ||
       !composerMenu.opened ||
       composerMenu.expanded !== "true" ||
@@ -409,6 +409,12 @@ if (hasSingleInstanceLock) {
   ipcMain.on("desktop:restart", (event) => {
     if (!event.senderFrame.url.startsWith("file://")) return;
     restartApplication();
+  });
+  ipcMain.on("desktop:set-theme-source", (event, themeSource) => {
+    if (event.sender !== mainWindow?.webContents) return;
+    if (themeSource !== "light" && themeSource !== "dark" && themeSource !== "system") return;
+    if (nativeTheme.themeSource === themeSource) return;
+    nativeTheme.themeSource = themeSource;
   });
 }
 

@@ -37,28 +37,29 @@
         width: 48px;
         height: 48px;
         margin: 0 auto 24px;
-        border: 4px solid color-mix(in srgb, CanvasText 15%, transparent);
-        border-top-color: #4f72ff;
         border-radius: 50%;
         corner-shape: round;
-        animation: spin 900ms linear infinite;
-      }
-      [data-state="error"] .mark {
-        border: 0;
-        animation: none;
-      }
-      [data-state="error"] .mark::before {
-        content: "!";
         display: grid;
         place-items: center;
+        color: #4f72ff;
+      }
+      .mark svg {
+        grid-area: 1 / 1;
         width: 48px;
         height: 48px;
-        border-radius: 50%;
-        corner-shape: round;
-        color: white;
-        background: #d84a4a;
-        font-size: 28px;
-        font-weight: 700;
+      }
+      .mark [data-lucide-animated-icon="loader-circle"] {
+        animation: spin 900ms linear infinite;
+      }
+      .mark [data-lucide-animated-icon="badge-alert"] {
+        display: none;
+        color: #d84a4a;
+      }
+      [data-state="error"] .mark [data-lucide-animated-icon="loader-circle"] {
+        display: none;
+      }
+      [data-state="error"] .mark [data-lucide-animated-icon="badge-alert"] {
+        display: block;
       }
       h1 {
         margin: 0 0 10px;
@@ -76,7 +77,7 @@
         margin: 24px auto 0;
         border: 0;
         border-radius: 9px;
-        corner-shape: squircle;
+        corner-shape: superellipse(1.6);
         padding: 10px 18px;
         color: white;
         background: #315efb;
@@ -94,12 +95,44 @@
       @keyframes spin {
         to { transform: rotate(360deg); }
       }
+      @media (prefers-reduced-motion: reduce) {
+        .mark [data-lucide-animated-icon="loader-circle"] {
+          animation: none;
+        }
+      }
     </style>
     <script src="./loading.js" defer></script>
   </head>
   <body>
     <main>
-      <div class="mark" aria-hidden="true"></div>
+      <div class="mark" aria-hidden="true">
+        <svg
+          data-lucide-animated-icon="loader-circle"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+        <svg
+          data-lucide-animated-icon="badge-alert"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+          <line x1="12" x2="12" y1="8" y2="12" />
+          <line x1="12" x2="12.01" y1="16" y2="16" />
+        </svg>
+      </div>
       <h1 id="title">正在启动 DeepSeek Harness</h1>
       <p id="message">第一次启动可能需要稍等片刻。</p>
       <button id="restart" type="button">重新启动</button>

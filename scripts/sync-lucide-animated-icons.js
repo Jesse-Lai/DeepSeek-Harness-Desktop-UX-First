@@ -32,8 +32,8 @@ const iconMap = {
   IconCordisPluginOutline14: "blocks",
   IconDarkOutline16: "moon",
   IconDataOutline16: "database-backup",
-  IconDislikeFill16: "arrow-big-down",
-  IconDislikeOutline16: "arrow-big-down",
+  IconDislikeFill16: "downvote",
+  IconDislikeOutline16: "downvote",
   IconDownloadOutline16: "download",
   IconEditOutline16: "square-pen",
   IconEllipsisOutline16: "menu",
@@ -47,8 +47,8 @@ const iconMap = {
   IconGoalOutline16: "circle-gauge",
   IconInspectOutline12: "scan-text",
   IconLightOutline16: "sun",
-  IconLikeFill16: "arrow-big-up",
-  IconLikeOutline16: "arrow-big-up",
+  IconLikeFill16: "upvote",
+  IconLikeOutline16: "upvote",
   IconLinkOutline14: "link",
   IconLinkOutline16: "link",
   IconListPenOutline16: "file-pen-line",
@@ -102,6 +102,7 @@ const inlineIconMap = [
   ["circle-check", '<svg><circle cx="7" cy="7" r="6.4"/><path d="M10.9631 5.71411L7.70154 8.97571C7.48011 9.19714 7.27736 9.40099 7.09229 9.54993C6.89742 9.70669 6.66314 9.85279 6.3634 9.90027C6.2049 9.92534 6.04339 9.92534 5.88489 9.90027C5.58515 9.85279 5.35087 9.70669 5.15601 9.54993C4.97093 9.40099 4.76818 9.19714 4.54675 8.97571L3.03516 7.46411L3.96313 6.53613L5.47473 8.04773C5.7169 8.28989 5.86196 8.43389 5.97888 8.52795C6.08597 8.61409 6.10875 8.60701 6.08997 8.604C6.11259 8.60758 6.13571 8.60758 6.15833 8.604C6.13954 8.60701 6.16232 8.61409 6.26941 8.52795C6.38633 8.43389 6.53139 8.28989 6.77356 8.04773L10.0352 4.78613L10.9631 5.71411Z"/></svg>'],
   ["loader-circle", '<svg><circle cx="7" cy="7" r="6.4"/></svg>'],
   ["circle-dashed", '<svg><circle cx="7" cy="7" r="6.4" stroke-dasharray="2.4 2.4"/></svg>'],
+  ["loader-circle", '<svg><rect x="0" y="0" width="2" height="2"/><rect x="4" y="0" width="2" height="2"/><rect x="8" y="0" width="2" height="2"/><rect x="8" y="4" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/><rect x="4" y="8" width="2" height="2"/><rect x="0" y="8" width="2" height="2"/><rect x="0" y="4" width="2" height="2"/></svg>'],
 ];
 
 // These icons are injected into text, CSS, or native-browser affordances and
@@ -324,6 +325,9 @@ for (const slug of slugs) {
   icons[slug] = extractStaticSvg(source, slug);
 }
 icons.bot = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><line x1="15" x2="15" y1="13" y2="15"/><line x1="9" x2="9" y1="13" y2="15"/></svg>';
+/* circle-dashed animates from runtime path data in the source package. Keep
+ * its canonical Lucide resting geometry when extracting a static registry. */
+icons["circle-dashed"] = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></svg>';
 icons.sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M20 12h2"/><path d="m17.66 17.66 1.41 1.41"/><path d="M12 20v2"/><path d="m6.34 17.66-1.41 1.41"/><path d="M2 12h2"/><path d="m4.93 4.93 1.41 1.41"/></svg>';
 
 const generated = `    /* Generated from https://github.com/pqoqubbw/icons (lucide-animated).
