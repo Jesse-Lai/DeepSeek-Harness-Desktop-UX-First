@@ -1,3 +1,5 @@
+<img width="1743" height="1150" alt="Dark" src="https://github.com/user-attachments/assets/c4c5cecc-63ce-4d9c-bf22-7f0a569eb05d" />
+<img width="1792" height="1154" alt="Light" src="https://github.com/user-attachments/assets/8750bf15-fa9d-4e86-a764-ebde212c5990" />
 # DeepSeek Harness UX First
 
 这个以用户体验为先的 DeepSeek Harness 桌面客户端：保留官方完整功能，打磨极致交互体验，开箱即用，持续更新！
