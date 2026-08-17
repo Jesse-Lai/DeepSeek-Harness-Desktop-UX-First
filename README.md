@@ -116,6 +116,7 @@ npm start
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 原始仓库与 DeepSeek AI 团队，为本项目提供 Agent 核心、工具、会话、Web UI 和插件生态。
 - [Cordis](https://github.com/deepseek-ai/deepseek-harness/tree/main/vendor/cordis) 提供的插件化基础，让桌面能力和体验增强可以沿统一的组合路径实现。
 - [Prompt Kit](https://github.com/ibelick/prompt-kit) 提供的交互与视觉模式参考，相关许可信息记录在 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- [lucide-animated](https://github.com/pqoqubbw/icons) 提供的图标资源，让桌面界面在导航、命令和状态表达上保持统一、清晰的视觉语言，相关许可信息记录在 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 - 所有参与讨论、测试、反馈、贡献，以及持续使用和支持本项目的社区成员。
 
 ## License
