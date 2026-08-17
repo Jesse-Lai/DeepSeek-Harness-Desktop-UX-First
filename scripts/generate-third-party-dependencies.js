@@ -24,6 +24,10 @@ function escapeCell(value) {
   return String(value).replaceAll("|", "\\|").replaceAll("\n", " ");
 }
 
+function compareText(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
 const lockfile = JSON.parse(await readFile(lockfilePath, "utf8"));
 const dependencies = [];
 const seen = new Set();
@@ -45,9 +49,9 @@ for (const [packagePath, metadata] of Object.entries(lockfile.packages ?? {})) {
 }
 
 dependencies.sort((left, right) =>
-  left.name.localeCompare(right.name) ||
-  left.version.localeCompare(right.version) ||
-  left.platform.localeCompare(right.platform),
+  compareText(left.name, right.name) ||
+  compareText(left.version, right.version) ||
+  compareText(left.platform, right.platform),
 );
 
 const rows = dependencies.map(({ name, version, license, platform }) =>
