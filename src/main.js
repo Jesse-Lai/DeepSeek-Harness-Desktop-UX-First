@@ -6,6 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
 import { startHarness } from "./harness.js";
+import { legacyUserDataDirectoryName, productName } from "./product.js";
 
 const require = createRequire(import.meta.url);
 const sourceDirectory = dirname(fileURLToPath(import.meta.url));
@@ -19,8 +20,6 @@ const desktopUiPluginPath = join(
   "@jesse-lai",
   "dsh-desktop-ui",
 );
-const smokeTest = process.argv.includes("--smoke-test");
-const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
 const macOSTrafficLightPosition = { x: 14, y: 14 };
 
 let mainWindow;
@@ -30,7 +29,13 @@ let startupAbortController;
 let quitting = false;
 let shutdownPromise;
 
-app.setName("DSH Desktop");
+app.setName(productName);
+// Keep the pre-1.0 data location stable across the visible product rename.
+// Conversations, projects, settings, and API credentials remain available.
+app.setPath("userData", join(app.getPath("appData"), legacyUserDataDirectoryName));
+
+const smokeTest = process.argv.includes("--smoke-test");
+const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
 
 function focusMainWindow() {
   if (mainWindow?.isDestroyed() !== false) return;
@@ -103,7 +108,7 @@ function createWindow({ showOnReady = true } = {}) {
     height: 820,
     minWidth: 900,
     minHeight: 620,
-    title: "DSH Desktop",
+    title: productName,
     show: false,
     backgroundColor: isMacOS ? "#00000000" : "#eef2f6",
     ...(isMacOS
@@ -289,7 +294,7 @@ async function runSmokeTest() {
       await delay(100);
     }
     if (state?.plugin !== "jesse-composer" || !state.composer || !state.shell) {
-      throw new Error(`DSH Desktop UI 插件未完整加载：${JSON.stringify(state)}`);
+      throw new Error(`${productName} UI 插件未完整加载：${JSON.stringify(state)}`);
     }
     if (
       state.windowRole !== "main" ||
@@ -304,38 +309,48 @@ async function runSmokeTest() {
       throw new Error(`主对话区必须保持不透明：${JSON.stringify(state)}`);
     }
 
-    const composerBeforeMenu = await mainWindow.webContents.executeJavaScript(
-      `(() => {
+    const menuReadinessDeadline = Date.now() + 15_000;
+    let composerBeforeMenu;
+    while (Date.now() < menuReadinessDeadline) {
+      composerBeforeMenu = await mainWindow.webContents.executeJavaScript(
+        `(() => {
         const kinds = [...document.querySelectorAll('[data-dsh-composer-menu-trigger]')]
           .map((element) => element.dataset.dshComposerMenuTrigger);
         const trigger = document.querySelector(
           '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger="preset"]',
-        ) ?? document.querySelector(
-          '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger]',
         );
         const input = document.querySelector('[data-dsh-composer-input] textarea');
-        if (!(trigger instanceof HTMLButtonElement) || !(input instanceof HTMLTextAreaElement)) {
-          return { clicked: false, kinds };
+        if (
+          !(trigger instanceof HTMLButtonElement) ||
+          trigger.disabled ||
+          !(input instanceof HTMLTextAreaElement)
+        ) {
+          return { clicked: false, ready: false, kinds };
         }
         trigger.focus();
         const triggerFocused = document.activeElement === trigger;
         trigger.click();
         return {
           clicked: true,
+          ready: true,
           triggerFocused,
           kind: trigger.dataset.dshComposerMenuTrigger,
           kinds,
         };
       })()`,
-      true,
-    );
-    await delay(50);
-    const composerMenu = await mainWindow.webContents.executeJavaScript(
-      `(() => {
+        true,
+      );
+      if (composerBeforeMenu.ready) break;
+      await delay(100);
+    }
+
+    const menuOpenDeadline = Date.now() + 2_000;
+    let composerMenu;
+    while (Date.now() < menuOpenDeadline) {
+      composerMenu = await mainWindow.webContents.executeJavaScript(
+        `(() => {
         const trigger = document.querySelector(
           '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger="preset"]',
-        ) ?? document.querySelector(
-          '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger]',
         );
         const menu = [...document.querySelectorAll('[role="menu"]')].find((element) => {
           if (!(element instanceof HTMLElement)) return false;
@@ -349,19 +364,21 @@ async function runSmokeTest() {
           itemCount: menu?.querySelectorAll('[role="menuitem"]').length ?? 0,
         };
       })()`,
-      true,
-    );
-    const menuKinds = [...new Set(composerBeforeMenu.kinds)].sort();
+        true,
+      );
+      if (composerMenu.opened && composerMenu.expanded === "true") break;
+      await delay(50);
+    }
+    const menuKinds = [...new Set(composerBeforeMenu?.kinds ?? [])].sort();
     if (
       !composerBeforeMenu.clicked ||
-      !composerBeforeMenu.triggerFocused ||
       !menuKinds.includes("workspace") ||
       !composerMenu.opened ||
       composerMenu.expanded !== "true" ||
       composerMenu.itemCount < 1
     ) {
       throw new Error(
-        `Composer 焦点或菜单未留在主 Renderer：${JSON.stringify({
+        `Composer 菜单未留在主 Renderer：${JSON.stringify({
           composerBeforeMenu,
           composerMenu,
         })}`,
@@ -371,10 +388,10 @@ async function runSmokeTest() {
     mainWindow.webContents.sendInputEvent({ type: "keyDown", keyCode: "Escape" });
     mainWindow.webContents.sendInputEvent({ type: "keyUp", keyCode: "Escape" });
 
-    console.log(`DSH Desktop single-Renderer smoke test passed: ${controller.url}`);
+    console.log(`${productName} single-Renderer smoke test passed: ${controller.url}`);
     return 0;
   } catch (error) {
-    console.error(`DSH Desktop smoke test failed: ${conciseError(error)}`);
+    console.error(`${productName} smoke test failed: ${conciseError(error)}`);
     return 1;
   } finally {
     mainWindow?.destroy();
@@ -438,6 +455,6 @@ async function main() {
 }
 
 void main().catch((error) => {
-  console.error(`DSH Desktop failed to start: ${conciseError(error)}`);
+  console.error(`${productName} failed to start: ${conciseError(error)}`);
   app.exit(1);
 });

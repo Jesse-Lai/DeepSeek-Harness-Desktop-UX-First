@@ -4,6 +4,7 @@ import { constants } from "node:fs";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import { macOSBundleIdentifier, productName } from "../src/product.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -17,11 +18,12 @@ const electronApp = join(
 );
 const electronExecutable = join(electronApp, "Contents", "MacOS", "Electron");
 const appIcon = join(projectRoot, "dist", "icon", "app-icon.icns");
-const outputApp = join(projectRoot, "dist", "dev", "DSH Desktop Dev.app");
+const developmentProductName = `${productName} Dev`;
+const outputApp = join(projectRoot, "dist", "dev", `${developmentProductName}.app`);
 const contentsDirectory = join(outputApp, "Contents");
 const executableDirectory = join(contentsDirectory, "MacOS");
 const resourcesDirectory = join(contentsDirectory, "Resources");
-const launcherPath = join(executableDirectory, "DSH Desktop Dev");
+const launcherPath = join(executableDirectory, developmentProductName);
 
 function xmlEscape(value) {
   return value
@@ -55,7 +57,7 @@ project_root=${shellQuote(projectRoot)}
 electron_executable=${shellQuote(electronExecutable)}
 
 if [[ ! -d "$project_root" || ! -x "$electron_executable" ]]; then
-  /usr/bin/osascript -e 'display alert "DSH Desktop Dev 无法启动" message "项目目录或 Electron 依赖不存在，请回到项目目录运行 npm install。" as critical'
+  /usr/bin/osascript -e 'display alert "${developmentProductName} 无法启动" message "项目目录或 Electron 依赖不存在，请回到项目目录运行 npm install。" as critical'
   exit 1
 fi
 
@@ -68,17 +70,17 @@ const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
 <dict>
   <key>CFBundleDisplayName</key>
-  <string>DSH Desktop Dev</string>
+  <string>${developmentProductName}</string>
   <key>CFBundleExecutable</key>
-  <string>DSH Desktop Dev</string>
+  <string>${developmentProductName}</string>
   <key>CFBundleIconFile</key>
   <string>app-icon.icns</string>
   <key>CFBundleIdentifier</key>
-  <string>ai.deepseek.dsh-desktop.dev</string>
+  <string>${macOSBundleIdentifier}.dev</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
-  <string>DSH Desktop Dev</string>
+  <string>${developmentProductName}</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>

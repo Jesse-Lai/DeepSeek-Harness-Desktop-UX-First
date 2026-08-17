@@ -2,7 +2,7 @@
 
 ## Prompt Kit
 
-The DSH Desktop presentation plugin adapts interaction and visual patterns
+The DeepSeek Harness UX First presentation plugin adapts interaction and visual patterns
 from [Prompt Kit](https://github.com/ibelick/prompt-kit), revision `de80375`.
 
 Copyright (c) 2025 Julien Thibeaut
@@ -29,7 +29,7 @@ SOFTWARE.
 
 ## lucide-animated
 
-The DSH Desktop presentation plugin includes icon geometry from
+The DeepSeek Harness UX First presentation plugin includes icon geometry from
 [lucide-animated](https://github.com/pqoqubbw/icons), revision
 `61c4202489f898cccaa2aa64b6a2d5a1a713a32e`.
 

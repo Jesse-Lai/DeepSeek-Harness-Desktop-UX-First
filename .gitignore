@@ -3,3 +3,13 @@ dist/
 release/
 *.log
 .DS_Store
+
+# Signing credentials must never be committed.
+*.cer
+*.p12
+*.p8
+*.pem
+*.pfx
+.env
+.env.*
+!.env.example

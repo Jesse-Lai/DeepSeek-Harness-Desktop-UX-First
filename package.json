@@ -8,6 +8,7 @@
   "main": "src/main.js",
   "scripts": {
     "build:icon:mac": "node scripts/build-macos-icon.js",
+    "build:icon:win": "node scripts/build-windows-icon.js",
     "app:dev:mac": "node scripts/create-macos-dev-app.js",
     "harness": "dsh",
     "harness:web": "dsh web",
@@ -15,9 +16,15 @@
     "licenses:generate": "node scripts/generate-third-party-dependencies.js",
     "package:mac:arm64": "node scripts/package-macos-arm64.js",
     "package:mac:x64": "node scripts/package-macos-arm64.js x64",
+    "package:win:x64": "node scripts/package-windows-x64.js",
+    "smoke:packaged:mac:arm64": "node scripts/run-packaged-smoke.js \"dist/DeepSeek Harness UX First-darwin-arm64/DeepSeek Harness UX First.app/Contents/MacOS/DeepSeek Harness UX First\"",
+    "smoke:packaged:mac:x64": "node scripts/run-packaged-smoke.js \"dist/DeepSeek Harness UX First-darwin-x64/DeepSeek Harness UX First.app/Contents/MacOS/DeepSeek Harness UX First\"",
+    "smoke:packaged:win:x64": "node scripts/run-packaged-smoke.js \"dist/DeepSeek Harness UX First-win32-x64/DeepSeek Harness UX First.exe\"",
     "start": "electron .",
     "test": "node --test",
-    "smoke": "electron . --smoke-test"
+    "smoke": "electron . --smoke-test",
+    "verify:mac:arm64": "node scripts/verify-macos-app.js arm64",
+    "verify:mac:x64": "node scripts/verify-macos-app.js x64"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.1.0-rc.6"

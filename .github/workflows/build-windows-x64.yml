@@ -1,4 +1,4 @@
-name: Build macOS ARM64
+name: Build Windows x64
 
 on:
   push:
@@ -9,8 +9,8 @@ permissions:
 
 jobs:
   build:
-    name: Package macOS ARM64
-    runs-on: macos-15
+    name: Package Windows x64
+    runs-on: windows-latest
 
     steps:
       - name: Check out repository
@@ -31,20 +31,18 @@ jobs:
           npm run licenses:check
 
       - name: Package application
-        run: npm run package:mac:arm64
-
-      - name: Verify ARM64 application
-        run: npm run verify:mac:arm64
+        run: npm run package:win:x64
 
       - name: Smoke test packaged application
-        run: npm run smoke:packaged:mac:arm64
+        run: npm run smoke:packaged:win:x64
 
       - name: Create downloadable archive
-        run: ditto -c -k --sequesterRsrc --keepParent "dist/DeepSeek Harness UX First-darwin-arm64/DeepSeek Harness UX First.app" "dist/DeepSeek-Harness-UX-First-macOS-arm64.zip"
+        shell: pwsh
+        run: Compress-Archive -Path "dist\DeepSeek Harness UX First-win32-x64\*" -DestinationPath "dist\DeepSeek-Harness-UX-First-Windows-x64.zip"
 
-      - name: Upload macOS ARM64 artifact
+      - name: Upload Windows x64 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: DeepSeek-Harness-UX-First-macOS-arm64-${{ github.sha }}
-          path: dist/DeepSeek-Harness-UX-First-macOS-arm64.zip
+          name: DeepSeek-Harness-UX-First-Windows-x64-${{ github.sha }}
+          path: dist/DeepSeek-Harness-UX-First-Windows-x64.zip
           if-no-files-found: error

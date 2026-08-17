@@ -15,7 +15,7 @@ export const PROGRESS_UPDATE_PROMPT = [
 ].join(" ");
 
 /**
- * Host half of the DSH Desktop presentation plugin. The browser behavior is
+ * Host half of the DeepSeek Harness UX First presentation plugin. The browser behavior is
  * shipped through the package's `./client` export.
  */
 export function apply(ctx) {

@@ -19,6 +19,7 @@ const iconTypesPath = join(
   "index.d.ts",
 );
 const mainPath = join(root, "src", "main.js");
+const productPath = join(root, "src", "product.js");
 const preloadPath = join(root, "src", "preload.cjs");
 const syncIconsPath = join(root, "scripts", "sync-lucide-animated-icons.js");
 const loadingPath = join(root, "src", "loading.html");
@@ -1004,10 +1005,10 @@ test("generating progress exposes the milestone contract and human activity summ
   assert.equal(plugin.progress.toolFamily("cordis_research"), "delegate");
   assert.equal(
     plugin.progress.liveStatusCopy(
-      { stage: "operation", family: "run", detail: "open DSH Desktop Dev.app" },
+      { stage: "operation", family: "run", detail: "open DeepSeek Harness UX First Dev.app" },
       "zh",
     ),
-    "正在执行 open DSH Desktop Dev.app",
+    "正在执行 open DeepSeek Harness UX First Dev.app",
   );
   assert.equal(
     plugin.progress.liveStatusCopy({ stage: "working" }, "zh"),
@@ -1105,7 +1106,7 @@ test("live shimmer stays last and follows the latest running operation", async (
   assert.equal(status.dataset.dshLiveStatus, "");
   assert.equal(status.dataset.dshLiveStatusSource, "operation");
   assert.equal(status.style.getPropertyValue("display"), "");
-  assert.equal(statusText.nodeValue, "Running open DSH Desktop Dev.app");
+  assert.equal(statusText.nodeValue, "Running open DeepSeek Harness UX First Dev.app");
 
   toolRoot.dataset.state = "ok";
   theme.flushMutations();
@@ -1814,7 +1815,7 @@ function createProgressFixture(HTMLElementClass) {
     anchor: "tool:1",
     name: "bash",
     state: "running",
-    summaryText: "open DSH Desktop Dev.app",
+    summaryText: "open DeepSeek Harness UX First Dev.app",
   });
   const secondTool = toolCallRow({
     anchor: "tool:2",
@@ -2562,6 +2563,21 @@ test("Electron shell enforces one BrowserWindow and one renderer bridge", async 
   assert.doesNotMatch(clientSource, /composerOverlay|nativeGlass|setComposerGlassFrame/);
   assert.doesNotMatch(clientSource, /publishComposerSessionContext|forwardedHover/);
   assert.doesNotMatch(packageSource, /build:native|build-macos-native|prestart|presmoke/);
+});
+
+test("product rename preserves the legacy user data and application identity", async () => {
+  const [mainSource, product] = await Promise.all([
+    readFile(mainPath, "utf8"),
+    import(pathToFileURL(productPath)),
+  ]);
+
+  assert.equal(product.productName, "DeepSeek Harness UX First");
+  assert.equal(product.legacyUserDataDirectoryName, "DSH Desktop");
+  assert.equal(product.macOSBundleIdentifier, "com.jesselai.dsh-desktop");
+  assert.match(
+    mainSource,
+    /app\.setName\(productName\);[\s\S]*?app\.setPath\("userData", join\(app\.getPath\("appData"\), legacyUserDataDirectoryName\)\);[\s\S]*?app\.requestSingleInstanceLock\(\)/,
+  );
 });
 
 test("Composer controls and DeepSeek menus remain in the main React tree", async () => {

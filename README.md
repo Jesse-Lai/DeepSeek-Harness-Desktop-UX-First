@@ -1,4 +1,4 @@
-# DSH Desktop
+# DeepSeek Harness UX First
 
 ## 目标
 
@@ -97,5 +97,5 @@ ARM64、x64 和 Windows 安装包。
 npm run app:dev:mac
 ```
 
-生成的 `dist/dev/DSH Desktop Dev.app` 直接读取当前项目源码。修改 UI 后退出并重新打开即可看到
+生成的 `dist/dev/DeepSeek Harness UX First Dev.app` 直接读取当前项目源码。修改 UI 后退出并重新打开即可看到
 更新；项目目录被移动、删除，或 `node_modules` 不存在时，开发版将无法启动。
