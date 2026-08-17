@@ -11,8 +11,8 @@ Development artifacts may be generated earlier to validate packaging, but they a
 | macOS Intel | `npm run package:mac:x64` | `build-macos-x64.yml` | Signed and notarized ZIP or DMG |
 | Windows x64 | `npm run package:win:x64` | `build-windows-x64.yml` | Signed portable ZIP initially; installer may follow |
 
-The macOS x64 workflow defaults to the `macos-13` Intel runner. If GitHub retires that label, set the
-repository variable `MACOS_X64_RUNNER` to the current Intel macOS runner label before building.
+The macOS x64 workflow defaults to the `macos-15-intel` runner. If GitHub retires that label, set the
+repository variable `MACOS_X64_RUNNER` to a currently supported Intel macOS runner label before building.
 Do not publish a macOS x64 package cross-built from an ARM64 `node_modules` tree (or the reverse): native
 dependencies such as Koffi must be installed and smoke-tested on the target architecture's runner.
 

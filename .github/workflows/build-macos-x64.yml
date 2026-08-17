@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     name: Package macOS x64
-    runs-on: ${{ vars.MACOS_X64_RUNNER || 'macos-13' }}
+    runs-on: ${{ vars.MACOS_X64_RUNNER || 'macos-15-intel' }}
 
     steps:
       - name: Check out repository
