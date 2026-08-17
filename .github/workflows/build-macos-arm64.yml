@@ -34,7 +34,7 @@ jobs:
 
       - name: Package application
         run: |
-          ulimit -n 10240
+          ulimit -n 65536
           npm run package:mac:arm64
 
       - name: Verify ARM64 application
