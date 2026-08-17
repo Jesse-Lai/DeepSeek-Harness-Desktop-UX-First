@@ -28,6 +28,10 @@ function compareText(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+function normalizeLineEndings(value) {
+  return value.replaceAll("\r\n", "\n");
+}
+
 const lockfile = JSON.parse(await readFile(lockfilePath, "utf8"));
 const dependencies = [];
 const seen = new Set();
@@ -81,7 +85,7 @@ if (checkOnly) {
   } catch {
     throw new Error("THIRD_PARTY_DEPENDENCIES.md is missing; run npm run licenses:generate");
   }
-  if (current !== output) {
+  if (normalizeLineEndings(current) !== output) {
     throw new Error("THIRD_PARTY_DEPENDENCIES.md is stale; run npm run licenses:generate");
   }
   console.log(`Verified ${dependencies.length} third-party dependency entries.`);
