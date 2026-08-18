@@ -1,4 +1,4 @@
-name: Release signed desktop applications
+name: Release ready-to-run desktop applications
 
 on:
   push:
@@ -58,36 +58,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Import Developer ID certificate
-        env:
-          MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
-          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-        run: |
-          certificate_path="$RUNNER_TEMP/release-certificate.p12"
-          keychain_path="$RUNNER_TEMP/release-signing.keychain-db"
-          keychain_password="$(openssl rand -hex 24)"
-          echo "$MACOS_CERTIFICATE_BASE64" | base64 --decode > "$certificate_path"
-          security create-keychain -p "$keychain_password" "$keychain_path"
-          security set-keychain-settings -lut 21600 "$keychain_path"
-          security unlock-keychain -p "$keychain_password" "$keychain_path"
-          security import "$certificate_path" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain_path"
-          security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain_path"
-          security list-keychain -d user -s "$keychain_path"
-
-      - name: Package, sign, and notarize application
-        env:
-          DSH_RELEASE_BUILD: "1"
-          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Package ad-hoc signed application
         run: |
           ulimit -n 65536
           npm run package:mac:${{ matrix.arch }}
 
-      - name: Verify signed application
-        env:
-          DSH_RELEASE_BUILD: "1"
+      - name: Verify packaged application
         run: npm run verify:mac:${{ matrix.arch }}
 
       - name: Smoke test packaged application
@@ -99,7 +75,7 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent "dist/DeepSeek Harness UX First-darwin-${{ matrix.arch }}/DeepSeek Harness UX First.app" "$archive"
           shasum -a 256 "$archive" > "$archive.sha256"
 
-      - name: Upload signed macOS release
+      - name: Upload macOS release
         uses: actions/upload-artifact@v7
         with:
           name: release-macOS-${{ matrix.arch }}
@@ -125,24 +101,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Restore Authenticode certificate
-        shell: pwsh
-        env:
-          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
-        run: |
-          $certificatePath = Join-Path $env:RUNNER_TEMP "release-certificate.pfx"
-          [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64))
-          "WINDOWS_CERTIFICATE_FILE=$certificatePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Package and sign application
-        env:
-          DSH_RELEASE_BUILD: "1"
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      - name: Package portable application
         run: npm run package:win:x64
 
-      - name: Verify signed application
-        env:
-          DSH_RELEASE_BUILD: "1"
+      - name: Verify packaged application
         run: npm run verify:win:x64
 
       - name: Smoke test packaged application
@@ -156,7 +118,7 @@ jobs:
           $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant()
           "$hash  $(Split-Path -Leaf $archive)" | Out-File -LiteralPath "$archive.sha256" -Encoding ascii
 
-      - name: Upload signed Windows release
+      - name: Upload Windows release
         uses: actions/upload-artifact@v7
         with:
           name: release-Windows-x64
@@ -169,6 +131,11 @@ jobs:
     name: Publish GitHub Release
     needs: [macos, windows]
     runs-on: ubuntu-latest
+    env:
+      RELEASE_NOTICE: |
+        Ready-to-run desktop packages are included below; Node.js and npm are not required.
+
+        These community builds do not use commercial code-signing certificates. macOS builds are ad-hoc signed but not Apple-notarized, and Windows builds are unsigned. See the README for the expected Gatekeeper or SmartScreen first-launch steps. Verify downloads with SHA256SUMS.
     permissions:
       contents: write
     steps:
@@ -186,10 +153,10 @@ jobs:
         if: ${{ !contains(github.ref_name, '-') }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --generate-notes --title "DeepSeek Harness UX First ${{ github.ref_name }}"
+        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --generate-notes --notes "$RELEASE_NOTICE" --title "DeepSeek Harness UX First ${{ github.ref_name }}"
 
       - name: Publish preview release
         if: ${{ contains(github.ref_name, '-') }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --prerelease --generate-notes --title "DeepSeek Harness UX First ${{ github.ref_name }}"
+        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --prerelease --generate-notes --notes "$RELEASE_NOTICE" --title "DeepSeek Harness UX First ${{ github.ref_name }}"

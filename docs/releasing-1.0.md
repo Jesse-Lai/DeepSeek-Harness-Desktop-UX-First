@@ -7,16 +7,23 @@ Development artifacts may be generated earlier to validate packaging, but they a
 
 | Target | Development command | CI workflow | Release output |
 | --- | --- | --- | --- |
-| macOS Apple Silicon | `npm run package:mac:arm64` | `build-macos-arm64.yml` | Signed and notarized ZIP or DMG |
-| macOS Intel | `npm run package:mac:x64` | `build-macos-x64.yml` | Signed and notarized ZIP or DMG |
-| Windows x64 | `npm run package:win:x64` | `build-windows-x64.yml` | Signed portable ZIP initially; installer may follow |
+| macOS Apple Silicon | `npm run package:mac:arm64` | `build-macos-arm64.yml` | Ad-hoc signed ZIP |
+| macOS Intel | `npm run package:mac:x64` | `build-macos-x64.yml` | Ad-hoc signed ZIP |
+| Windows x64 | `npm run package:win:x64` | `build-windows-x64.yml` | Unsigned portable ZIP |
 
 The macOS x64 workflow defaults to the `macos-15-intel` runner. If GitHub retires that label, set the
 repository variable `MACOS_X64_RUNNER` to a currently supported Intel macOS runner label before building.
 Do not publish a macOS x64 package cross-built from an ARM64 `node_modules` tree (or the reverse): native
 dependencies such as Koffi must be installed and smoke-tested on the target architecture's runner.
 
-## macOS release signing and notarization
+## Current community release signing
+
+The public tag workflow requires no private certificate secrets. macOS artifacts are ad-hoc signed so their
+bundle integrity can be verified, but they are not Apple-notarized. Windows artifacts are currently unsigned.
+GitHub Actions builds each target from the exact release tag, runs architecture and packaged-startup checks,
+and publishes SHA-256 checksums. The README documents the expected Gatekeeper and SmartScreen prompts.
+
+## Optional production macOS signing and notarization
 
 Normal packaging remains ad-hoc signed for development. A production build must set
 `DSH_RELEASE_BUILD=1`; the packaging script then refuses to run unless all signing and notarization
@@ -41,19 +48,20 @@ npm run package:mac:arm64
 DSH_RELEASE_BUILD=1 npm run verify:mac:arm64
 ```
 
-The tag release workflow uses these GitHub Actions secrets without committing them:
+The packaging script supports the signing identity and notarization credentials below. A future
+certificate-backed GitHub workflow would additionally need the exported certificate and its password:
 
-- `MACOS_CERTIFICATE_BASE64`
-- `MACOS_CERTIFICATE_PASSWORD`
 - `MACOS_SIGN_IDENTITY`
 - `APPLE_ID`
 - `APPLE_APP_SPECIFIC_PASSWORD`
 - `APPLE_TEAM_ID`
+- `MACOS_CERTIFICATE_BASE64` (workflow import only)
+- `MACOS_CERTIFICATE_PASSWORD` (workflow import only)
 
 The release build enables Hardened Runtime, submits the app with Apple's notary service, staples the
 ticket, and fails verification unless Gatekeeper accepts the result.
 
-## Windows signing
+## Optional Windows signing
 
 Development workflows create an unsigned portable test artifact. A production build sets
 `DSH_RELEASE_BUILD=1`; packaging then requires `WINDOWS_CERTIFICATE_FILE` and
@@ -61,7 +69,7 @@ Development workflows create an unsigned portable test artifact. A production bu
 `@electron/windows-sign`, and timestamps the signatures. `npm run verify:win:x64` rejects a release whose
 main executable does not have a valid Authenticode signature.
 
-The tag release workflow reconstructs the PFX only in the temporary runner directory from these secrets:
+An Authenticode-enabled workflow can reconstruct the PFX in a temporary runner directory from these secrets:
 
 - `WINDOWS_CERTIFICATE_BASE64`
 - `WINDOWS_CERTIFICATE_PASSWORD`
@@ -71,9 +79,9 @@ Certificate files and passwords must never be committed or uploaded as build art
 ## Automated tag release
 
 `.github/workflows/release.yml` is the only workflow that publishes a GitHub Release. It runs for `v*`
-tags and first requires the tag to equal `v` plus the version in `package.json`. It then builds, signs,
-verifies, and smoke-tests macOS ARM64, macOS x64, and Windows x64 independently. The release is created
-only after all three jobs pass, and includes a combined `SHA256SUMS` file.
+tags and first requires the tag to equal `v` plus the version in `package.json`. It then builds, verifies,
+and smoke-tests macOS ARM64, macOS x64, and Windows x64 independently. The release is created only after
+all three jobs pass, and includes a combined `SHA256SUMS` file.
 
 Tags containing a hyphen, such as `v1.0.0-rc.1`, are published as GitHub prereleases. Stable tags such as
 `v1.0.0` are published as normal releases.
@@ -85,6 +93,6 @@ Tags containing a hyphen, such as `v1.0.0-rc.1`, are published as GitHub prerele
    publishing a public Stable release.
 3. Test each artifact on a clean machine without Node or npm.
 4. Fix release-only failures, then set version `1.0.0`.
-5. Confirm all signing secrets are configured, then create and push tag `v1.0.0`.
-6. Let the tag workflow build signed artifacts from that exact tag, generate SHA-256 checksums, and publish
+5. Create and push tag `v1.0.0`.
+6. Let the tag workflow build artifacts from that exact tag, generate SHA-256 checksums, and publish
    the GitHub Release.

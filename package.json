@@ -1,6 +1,6 @@
 {
   "name": "deepseek-harness-desktop",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "private": true,
   "description": "A polished, ready-to-run desktop experience for DeepSeek Harness.",
   "author": "Jesse Lai",

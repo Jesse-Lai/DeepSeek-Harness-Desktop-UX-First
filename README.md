@@ -17,9 +17,9 @@ DeepSeek Harness UX First 基于官方 DeepSeek Harness 构建，不分叉或长
 - **兼容 Harness 生态**：保持对 Plugins、MCP、Skills 和工具生态的兼容。
 - **多平台支持**：覆盖 macOS Apple Silicon、macOS Intel 和 Windows x64。
 
-## 当前版本：1.0.0-rc.1
+## 当前版本：1.0.0
 
-三平台开发发行物已经通过自动化测试、打包验证和启动冒烟测试：
+三平台发行物均通过自动化测试、打包验证和启动冒烟测试：
 
 | 平台 | 构建验证 |
 | --- | --- |
@@ -27,17 +27,19 @@ DeepSeek Harness UX First 基于官方 DeepSeek Harness 构建，不分叉或长
 | macOS Intel | 已通过 |
 | Windows x64 | 已通过 |
 
-正式 `v1.0.0` 尚未发布。发布前还需使用生产证书完成 macOS 签名与公证、Windows Authenticode 签名，并验证最终下载包。
+`v1.0.0` 提供无需 Node 或 npm 的三平台独立发行包。每个下载包均由 GitHub Actions 从发布标签构建、验证并附带 SHA-256 校验值。
 
 ## 下载与安装
 
-正式发行后，请从 [GitHub Releases](https://github.com/Jesse-Lai/DeepSeek-Harness-Desktop-UX-First/releases) 下载对应平台的文件；不要下载 GitHub 自动生成的 Source code 压缩包。
+请从 [GitHub Releases](https://github.com/Jesse-Lai/DeepSeek-Harness-Desktop-UX-First/releases) 下载对应平台的文件；不要下载 GitHub 自动生成的 Source code 压缩包。
 
-- macOS Apple Silicon：`DeepSeek-Harness-UX-First-macOS-arm64.zip`
-- macOS Intel：`DeepSeek-Harness-UX-First-macOS-x64.zip`
-- Windows x64：`DeepSeek-Harness-UX-First-Windows-x64.zip`
+- macOS Apple Silicon：`DeepSeek-Harness-UX-First-macOS-arm64-v1.0.0.zip`
+- macOS Intel：`DeepSeek-Harness-UX-First-macOS-x64-v1.0.0.zip`
+- Windows x64：`DeepSeek-Harness-UX-First-Windows-x64-v1.0.0.zip`
 
 macOS 用户解压后将应用拖入 `/Applications`，再双击打开。Windows 用户完整解压后，双击 `DeepSeek Harness UX First.exe`。
+
+当前社区发行包没有商业代码签名证书。macOS 包使用 ad-hoc 签名但未经 Apple 公证；如果系统拦截首次启动，请在 Finder 中右键应用并选择“打开”，或前往“系统设置 → 隐私与安全性”选择“仍要打开”。Windows 可能显示 Microsoft Defender SmartScreen 提示，可选择“更多信息 → 仍要运行”。请仅从本仓库 Releases 下载，并可使用随包提供的 `SHA256SUMS` 核对文件完整性。
 
 ## 更新与本地数据
 
