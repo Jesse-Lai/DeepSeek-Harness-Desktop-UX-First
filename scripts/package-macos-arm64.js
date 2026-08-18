@@ -1,66 +1,101 @@
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { packager } from "@electron/packager";
+import { promisify } from "node:util";
+import {
+  applicationVersion,
+  ignoreFromApplication,
+  projectRoot,
+} from "./package-shared.js";
+import { installSerialPackagerCopy } from "./install-serial-packager-copy.js";
+import { macOSBundleIdentifier, productName } from "../src/product.js";
 
-const projectRoot = fileURLToPath(new URL("../", import.meta.url));
+const execFileAsync = promisify(execFile);
 const targetArch = process.argv[2] ?? "arm64";
+const releaseBuild = process.env.DSH_RELEASE_BUILD === "1";
+const appBundleId = macOSBundleIdentifier;
+const defaultBuildVersion = applicationVersion.match(/\d+/g)?.slice(0, 4).join(".");
 if (!new Set(["arm64", "x64"]).has(targetArch)) {
   throw new Error(`Unsupported macOS architecture: ${targetArch}`);
 }
-const lockfile = JSON.parse(
-  await readFile(join(projectRoot, "package-lock.json"), "utf8"),
-);
+await execFileAsync(process.execPath, [
+  join(projectRoot, "scripts", "build-macos-icon.js"),
+]);
 
-const developmentOnlyModules = new Set(
-  Object.entries(lockfile.packages)
-    .filter(([path, metadata]) => path.startsWith("node_modules/") && metadata.dev === true)
-    .map(([path]) => path),
-);
-
-function installedModuleRoot(path) {
-  const segments = path.replaceAll("\\", "/").replace(/^\/+/, "").split("/");
-  if (segments[0] !== "node_modules" || segments[1] === undefined) return undefined;
-  if (!segments[1].startsWith("@")) return `node_modules/${segments[1]}`;
-  if (segments[2] === undefined) return undefined;
-  return `node_modules/${segments[1]}/${segments[2]}`;
+function requireReleaseValue(name) {
+  const value = process.env[name]?.trim();
+  if (!value) throw new Error(`Release packaging requires ${name}`);
+  return value;
 }
 
-function ignoreFromApplication(path) {
-  const normalized = path.replaceAll("\\", "/");
-
-  if (/^\/(?:\.git|\.github|dist|docs|scripts|test)(?:\/|$)/.test(normalized)) {
-    return true;
+function releaseSigningOptions() {
+  if (!releaseBuild) {
+    return {};
   }
-  if (/^\/(?:package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/.test(normalized)) {
-    return true;
-  }
-  if (/^\/node_modules\/\.bin(?:\/|$)/.test(normalized)) return true;
-  if (/\/node_gyp_bins(?:\/|$)/.test(normalized)) return true;
-  if (/\.o(?:bj)?$/.test(normalized)) return true;
 
-  const moduleRoot = installedModuleRoot(normalized);
-  return moduleRoot !== undefined && developmentOnlyModules.has(moduleRoot);
+  const identity = requireReleaseValue("MACOS_SIGN_IDENTITY");
+  const keychainProfile = process.env.MACOS_NOTARY_KEYCHAIN_PROFILE?.trim();
+  const osxNotarize = keychainProfile
+    ? { keychainProfile }
+    : {
+        appleId: requireReleaseValue("APPLE_ID"),
+        appleIdPassword: requireReleaseValue("APPLE_APP_SPECIFIC_PASSWORD"),
+        teamId: requireReleaseValue("APPLE_TEAM_ID"),
+      };
+
+  return {
+    osxSign: {
+      identity,
+      continueOnError: false,
+      optionsForFile: () => ({ hardenedRuntime: true }),
+    },
+    osxNotarize,
+  };
 }
 
-const outputPaths = await packager({
-  dir: projectRoot,
-  name: "DSH Desktop",
-  platform: "darwin",
-  arch: targetArch,
-  electronVersion: "43.4.0",
-  out: join(projectRoot, "dist"),
-  overwrite: true,
-  asar: false,
-  prune: false,
-  appBundleId: "ai.deepseek.dsh-desktop",
-  ignore: ignoreFromApplication,
-  osxSign: {
-    identity: "-",
-    identityValidation: false,
-    continueOnError: false,
-    optionsForFile: () => ({ hardenedRuntime: false }),
-  },
-});
+const restorePackagerCopy = installSerialPackagerCopy(projectRoot);
+let outputPaths;
+try {
+  const { packager } = await import("@electron/packager");
+  outputPaths = await packager({
+    dir: projectRoot,
+    name: productName,
+    platform: "darwin",
+    arch: targetArch,
+    electronVersion: "43.4.0",
+    appVersion: applicationVersion,
+    buildVersion: process.env.MACOS_BUILD_VERSION ?? defaultBuildVersion,
+    out: join(projectRoot, "dist"),
+    overwrite: true,
+    asar: false,
+    prune: false,
+    appBundleId,
+    appCategoryType: "public.app-category.developer-tools",
+    appCopyright: "Copyright © 2026 Jesse Lai",
+    extendInfo: {
+      NSAppTransportSecurity: {
+        NSAllowsArbitraryLoads: false,
+        NSAllowsLocalNetworking: true,
+      },
+    },
+    icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
+    ignore: ignoreFromApplication,
+    ...releaseSigningOptions(),
+  });
+} finally {
+  restorePackagerCopy();
+}
 
-console.log(`Wrote ${targetArch} app to: ${outputPaths[0]}`);
+if (!releaseBuild) {
+  const appPath = join(outputPaths[0], `${productName}.app`);
+  await execFileAsync("/usr/bin/codesign", [
+    "--force",
+    "--deep",
+    "--sign",
+    "-",
+    appPath,
+  ]);
+}
+
+console.log(
+  `Wrote ${releaseBuild ? "signed and notarized " : "development "}${targetArch} app to: ${outputPaths[0]}`,
+);

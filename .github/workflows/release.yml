@@ -1,0 +1,195 @@
+name: Release signed desktop applications
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Match tag to package version
+        run: npm run release:verify-tag -- "${{ github.ref_name }}"
+
+      - name: Run repository checks
+        run: |
+          npm test
+          npm run licenses:check
+
+  macos:
+    name: Signed macOS ${{ matrix.arch }}
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm64, x64]
+    runs-on: ${{ matrix.arch == 'x64' && (vars.MACOS_X64_RUNNER || 'macos-15-intel') || 'macos-15' }}
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Import Developer ID certificate
+        env:
+          MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          certificate_path="$RUNNER_TEMP/release-certificate.p12"
+          keychain_path="$RUNNER_TEMP/release-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 24)"
+          echo "$MACOS_CERTIFICATE_BASE64" | base64 --decode > "$certificate_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import "$certificate_path" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain_path"
+          security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain_path"
+          security list-keychain -d user -s "$keychain_path"
+
+      - name: Package, sign, and notarize application
+        env:
+          DSH_RELEASE_BUILD: "1"
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ulimit -n 65536
+          npm run package:mac:${{ matrix.arch }}
+
+      - name: Verify signed application
+        env:
+          DSH_RELEASE_BUILD: "1"
+        run: npm run verify:mac:${{ matrix.arch }}
+
+      - name: Smoke test packaged application
+        run: npm run smoke:packaged:mac:${{ matrix.arch }}
+
+      - name: Create release archive and checksum
+        run: |
+          archive="dist/DeepSeek-Harness-UX-First-macOS-${{ matrix.arch }}-${{ github.ref_name }}.zip"
+          ditto -c -k --sequesterRsrc --keepParent "dist/DeepSeek Harness UX First-darwin-${{ matrix.arch }}/DeepSeek Harness UX First.app" "$archive"
+          shasum -a 256 "$archive" > "$archive.sha256"
+
+      - name: Upload signed macOS release
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-macOS-${{ matrix.arch }}
+          path: |
+            dist/DeepSeek-Harness-UX-First-macOS-${{ matrix.arch }}-${{ github.ref_name }}.zip
+            dist/DeepSeek-Harness-UX-First-macOS-${{ matrix.arch }}-${{ github.ref_name }}.zip.sha256
+          if-no-files-found: error
+
+  windows:
+    name: Signed Windows x64
+    needs: validate
+    runs-on: windows-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Authenticode certificate
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+        run: |
+          $certificatePath = Join-Path $env:RUNNER_TEMP "release-certificate.pfx"
+          [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64))
+          "WINDOWS_CERTIFICATE_FILE=$certificatePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Package and sign application
+        env:
+          DSH_RELEASE_BUILD: "1"
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: npm run package:win:x64
+
+      - name: Verify signed application
+        env:
+          DSH_RELEASE_BUILD: "1"
+        run: npm run verify:win:x64
+
+      - name: Smoke test packaged application
+        run: npm run smoke:packaged:win:x64
+
+      - name: Create release archive and checksum
+        shell: pwsh
+        run: |
+          $archive = "dist\DeepSeek-Harness-UX-First-Windows-x64-${{ github.ref_name }}.zip"
+          Compress-Archive -Path "dist\DeepSeek Harness UX First-win32-x64\*" -DestinationPath $archive
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant()
+          "$hash  $(Split-Path -Leaf $archive)" | Out-File -LiteralPath "$archive.sha256" -Encoding ascii
+
+      - name: Upload signed Windows release
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-Windows-x64
+          path: |
+            dist/DeepSeek-Harness-UX-First-Windows-x64-${{ github.ref_name }}.zip
+            dist/DeepSeek-Harness-UX-First-Windows-x64-${{ github.ref_name }}.zip.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified release files
+        uses: actions/download-artifact@v7
+        with:
+          pattern: release-*
+          path: release
+          merge-multiple: true
+
+      - name: Combine SHA-256 checksums
+        run: cat release/*.sha256 > release/SHA256SUMS
+
+      - name: Publish stable release
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --generate-notes --title "DeepSeek Harness UX First ${{ github.ref_name }}"
+
+      - name: Publish preview release
+        if: ${{ contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" release/*.zip release/SHA256SUMS --verify-tag --prerelease --generate-notes --title "DeepSeek Harness UX First ${{ github.ref_name }}"

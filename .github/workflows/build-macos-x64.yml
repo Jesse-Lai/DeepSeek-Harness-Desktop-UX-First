@@ -1,4 +1,4 @@
-name: Build macOS ARM64
+name: Build macOS x64
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
 
 jobs:
   build:
-    name: Package macOS ARM64
-    runs-on: macos-15
+    name: Package macOS x64
+    runs-on: ${{ vars.MACOS_X64_RUNNER || 'macos-15-intel' }}
 
     steps:
       - name: Check out repository
@@ -35,20 +35,20 @@ jobs:
       - name: Package application
         run: |
           ulimit -n 65536
-          npm run package:mac:arm64
+          npm run package:mac:x64
 
-      - name: Verify ARM64 application
-        run: npm run verify:mac:arm64
+      - name: Verify x64 application
+        run: npm run verify:mac:x64
 
       - name: Smoke test packaged application
-        run: npm run smoke:packaged:mac:arm64
+        run: npm run smoke:packaged:mac:x64
 
       - name: Create downloadable archive
-        run: ditto -c -k --sequesterRsrc --keepParent "dist/DeepSeek Harness UX First-darwin-arm64/DeepSeek Harness UX First.app" "dist/DeepSeek-Harness-UX-First-macOS-arm64.zip"
+        run: ditto -c -k --sequesterRsrc --keepParent "dist/DeepSeek Harness UX First-darwin-x64/DeepSeek Harness UX First.app" "dist/DeepSeek-Harness-UX-First-macOS-x64.zip"
 
-      - name: Upload macOS ARM64 artifact
+      - name: Upload macOS x64 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: DeepSeek-Harness-UX-First-macOS-arm64-${{ github.sha }}
-          path: dist/DeepSeek-Harness-UX-First-macOS-arm64.zip
+          name: DeepSeek-Harness-UX-First-macOS-x64-${{ github.sha }}
+          path: dist/DeepSeek-Harness-UX-First-macOS-x64.zip
           if-no-files-found: error

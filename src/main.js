@@ -4,8 +4,9 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain, Menu, shell } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
 import { startHarness } from "./harness.js";
+import { legacyUserDataDirectoryName, productName } from "./product.js";
 
 const require = createRequire(import.meta.url);
 const sourceDirectory = dirname(fileURLToPath(import.meta.url));
@@ -19,8 +20,7 @@ const desktopUiPluginPath = join(
   "@jesse-lai",
   "dsh-desktop-ui",
 );
-const smokeTest = process.argv.includes("--smoke-test");
-const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
+const macOSTrafficLightPosition = { x: 14, y: 14 };
 
 let mainWindow;
 let harness;
@@ -29,7 +29,13 @@ let startupAbortController;
 let quitting = false;
 let shutdownPromise;
 
-app.setName("DSH Desktop");
+app.setName(productName);
+// Keep the pre-1.0 data location stable across the visible product rename.
+// Conversations, projects, settings, and API credentials remain available.
+app.setPath("userData", join(app.getPath("appData"), legacyUserDataDirectoryName));
+
+const smokeTest = process.argv.includes("--smoke-test");
+const hasSingleInstanceLock = smokeTest || app.requestSingleInstanceLock();
 
 function focusMainWindow() {
   if (mainWindow?.isDestroyed() !== false) return;
@@ -41,6 +47,29 @@ function focusMainWindow() {
 function conciseError(error) {
   const message = error instanceof Error ? error.message : String(error);
   return message.length > 2_000 ? `${message.slice(0, 2_000)}…` : message;
+}
+
+function syncMacOSTrafficLightPosition(targetWindow = mainWindow) {
+  if (process.platform !== "darwin" || targetWindow?.isDestroyed() !== false) return;
+  targetWindow.setWindowButtonPosition(macOSTrafficLightPosition);
+}
+
+function assertMacOSTrafficLightPosition(label, targetWindow = mainWindow) {
+  if (process.platform !== "darwin" || targetWindow?.isDestroyed() !== false) return;
+  const position = targetWindow.getWindowButtonPosition();
+  if (
+    position?.x !== macOSTrafficLightPosition.x ||
+    position?.y !== macOSTrafficLightPosition.y
+  ) {
+    throw new Error(`${label} Traffic Lights 位置错误：${JSON.stringify(position)}`);
+  }
+}
+
+function assertSingleBrowserWindow(label) {
+  const windows = BrowserWindow.getAllWindows().filter((window) => !window.isDestroyed());
+  if (windows.length !== 1 || windows[0] !== mainWindow) {
+    throw new Error(`${label} 必须只有一个主 BrowserWindow，实际为 ${windows.length}`);
+  }
 }
 
 async function loadStatus(state = "loading", message) {
@@ -72,15 +101,26 @@ function keepNavigationLocal(window, localOrigin) {
   });
 }
 
-function createWindow() {
+function createWindow({ showOnReady = true } = {}) {
+  const isMacOS = process.platform === "darwin";
   const window = new BrowserWindow({
     width: 1280,
     height: 820,
     minWidth: 900,
     minHeight: 620,
-    title: "DSH Desktop",
+    title: productName,
     show: false,
-    backgroundColor: "#ffffff",
+    backgroundColor: isMacOS ? "#00000000" : "#eef2f6",
+    ...(isMacOS
+      ? {
+          titleBarStyle: "hiddenInset",
+          trafficLightPosition: macOSTrafficLightPosition,
+          transparent: true,
+          roundedCorners: true,
+          vibrancy: "under-window",
+          visualEffectState: "active",
+        }
+      : {}),
     webPreferences: {
       preload: join(sourceDirectory, "preload.cjs"),
       contextIsolation: true,
@@ -90,7 +130,14 @@ function createWindow() {
     },
   });
 
-  window.once("ready-to-show", () => window.show());
+  const syncTrafficLights = () => syncMacOSTrafficLightPosition(window);
+  window.webContents.on("did-finish-load", syncTrafficLights);
+  window.on("restore", syncTrafficLights);
+  window.on("leave-full-screen", syncTrafficLights);
+  window.once("ready-to-show", () => {
+    syncTrafficLights();
+    if (showOnReady) window.show();
+  });
   window.webContents.on(
     "did-fail-load",
     (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
@@ -149,6 +196,7 @@ function installApplicationMenu() {
 
 async function launchDesktop() {
   mainWindow = createWindow();
+  assertSingleBrowserWindow("Loading");
   await loadStatus();
 
   try {
@@ -171,6 +219,7 @@ async function launchDesktop() {
 
     keepNavigationLocal(mainWindow, new URL(harness.url).origin);
     await mainWindow.loadURL(harness.url);
+    assertSingleBrowserWindow("Harness");
   } catch (error) {
     if (!quitting) {
       await loadStatus("error", `${conciseError(error)}\n请退出应用后重试。`);
@@ -181,13 +230,40 @@ async function launchDesktop() {
   }
 }
 
+async function inspectSingleRenderer(contents) {
+  return contents.executeJavaScript(
+    `(() => {
+      const root = document.documentElement;
+      const shell = document.querySelector('[data-dsh-desktop-shell]');
+      const center = document.querySelector('[data-dsh-desktop-center]');
+      const sidebar = document.querySelector('[data-dsh-desktop-sidebar-column]');
+      return {
+        plugin: root.dataset.dshDesktopUi,
+        windowRole: root.dataset.dshWindowRole,
+        composer: document.querySelector('[data-composer-card]') instanceof HTMLElement,
+        shell: shell instanceof HTMLElement,
+        centerBackground: center instanceof HTMLElement
+          ? getComputedStyle(center).backgroundColor
+          : null,
+        sidebarBackground: sidebar instanceof HTMLElement
+          ? getComputedStyle(sidebar).backgroundColor
+          : null,
+        overlayAttribute: root.hasAttribute('data-dsh-composer-overlay'),
+        foregroundAttribute: root.hasAttribute('data-dsh-composer-foreground'),
+        nativeGlassAttribute: root.hasAttribute('data-dsh-native-glass'),
+        desktopBridge: Object.keys(window.desktop ?? {}).sort(),
+      };
+    })()`,
+    true,
+  );
+}
+
 async function runSmokeTest() {
   const smokeDirectory = await mkdtemp(join(tmpdir(), "dsh-desktop-smoke-"));
   let controller;
-  let smokeWindow;
 
   try {
-    console.log("Starting DeepSeek Harness smoke test...");
+    console.log("Starting DeepSeek Harness single-Renderer smoke test...");
     controller = await startHarness({
       executablePath: process.execPath,
       cliPath: harnessCliPath,
@@ -204,36 +280,122 @@ async function runSmokeTest() {
       throw new Error("Harness 页面标题不符合预期");
     }
 
-    smokeWindow = new BrowserWindow({
-      show: false,
-      webPreferences: {
-        contextIsolation: true,
-        nodeIntegration: false,
-        sandbox: true,
-        webSecurity: true,
-      },
-    });
-    await smokeWindow.loadURL(controller.url);
+    mainWindow = createWindow({ showOnReady: false });
+    keepNavigationLocal(mainWindow, new URL(controller.url).origin);
+    await mainWindow.loadURL(controller.url);
+    assertSingleBrowserWindow("Smoke");
+    assertMacOSTrafficLightPosition("Smoke", mainWindow);
 
     const deadline = Date.now() + 15_000;
-    let pluginLoaded = false;
-    while (!pluginLoaded && Date.now() < deadline) {
-      pluginLoaded = await smokeWindow.webContents.executeJavaScript(
-        `document.documentElement.dataset.dshDesktopUi === "prompt-kit" &&
-         Boolean(document.querySelector('style[data-plugin="@jesse-lai/dsh-desktop-ui"]'))`,
+    let state;
+    while (Date.now() < deadline) {
+      state = await inspectSingleRenderer(mainWindow.webContents);
+      if (state.plugin === "jesse-composer" && state.composer && state.shell) break;
+      await delay(100);
+    }
+    if (state?.plugin !== "jesse-composer" || !state.composer || !state.shell) {
+      throw new Error(`${productName} UI 插件未完整加载：${JSON.stringify(state)}`);
+    }
+    if (
+      state.windowRole !== "main" ||
+      state.overlayAttribute ||
+      state.foregroundAttribute ||
+      state.nativeGlassAttribute ||
+      JSON.stringify(state.desktopBridge) !== JSON.stringify(["restart", "setThemeSource"])
+    ) {
+      throw new Error(`检测到多层渲染残留：${JSON.stringify(state)}`);
+    }
+    if (state.centerBackground === "rgba(0, 0, 0, 0)") {
+      throw new Error(`主对话区必须保持不透明：${JSON.stringify(state)}`);
+    }
+
+    const menuReadinessDeadline = Date.now() + 15_000;
+    let composerBeforeMenu;
+    while (Date.now() < menuReadinessDeadline) {
+      composerBeforeMenu = await mainWindow.webContents.executeJavaScript(
+        `(() => {
+        const kinds = [...document.querySelectorAll('[data-dsh-composer-menu-trigger]')]
+          .map((element) => element.dataset.dshComposerMenuTrigger);
+        const trigger = document.querySelector(
+          '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger="preset"]',
+        );
+        const input = document.querySelector('[data-dsh-composer-input] textarea');
+        if (
+          !(trigger instanceof HTMLButtonElement) ||
+          trigger.disabled ||
+          !(input instanceof HTMLTextAreaElement)
+        ) {
+          return { clicked: false, ready: false, kinds };
+        }
+        trigger.focus();
+        const triggerFocused = document.activeElement === trigger;
+        trigger.click();
+        return {
+          clicked: true,
+          ready: true,
+          triggerFocused,
+          kind: trigger.dataset.dshComposerMenuTrigger,
+          kinds,
+        };
+      })()`,
         true,
       );
-      if (!pluginLoaded) await delay(100);
+      if (composerBeforeMenu.ready) break;
+      await delay(100);
     }
-    if (!pluginLoaded) throw new Error("DSH Desktop UI 插件未在页面中加载");
 
-    console.log(`DSH Desktop smoke test passed: ${controller.url}`);
+    const menuOpenDeadline = Date.now() + 2_000;
+    let composerMenu;
+    while (Date.now() < menuOpenDeadline) {
+      composerMenu = await mainWindow.webContents.executeJavaScript(
+        `(() => {
+        const trigger = document.querySelector(
+          '[data-dsh-hero-workspace-row] button[data-dsh-composer-menu-trigger="preset"]',
+        );
+        const menu = [...document.querySelectorAll('[role="menu"]')].find((element) => {
+          if (!(element instanceof HTMLElement)) return false;
+          const style = getComputedStyle(element);
+          return style.display !== 'none' && style.visibility !== 'hidden' &&
+            element.getClientRects().length > 0;
+        });
+        return {
+          opened: menu instanceof HTMLElement,
+          expanded: trigger?.getAttribute('aria-expanded') ?? null,
+          itemCount: menu?.querySelectorAll('[role="menuitem"]').length ?? 0,
+        };
+      })()`,
+        true,
+      );
+      if (composerMenu.opened && composerMenu.expanded === "true") break;
+      await delay(50);
+    }
+    const menuKinds = [...new Set(composerBeforeMenu?.kinds ?? [])].sort();
+    if (
+      !composerBeforeMenu.clicked ||
+      !menuKinds.includes("workspace") ||
+      !composerMenu.opened ||
+      composerMenu.expanded !== "true" ||
+      composerMenu.itemCount < 1
+    ) {
+      throw new Error(
+        `Composer 菜单未留在主 Renderer：${JSON.stringify({
+          composerBeforeMenu,
+          composerMenu,
+        })}`,
+      );
+    }
+    assertSingleBrowserWindow("Composer menu");
+    mainWindow.webContents.sendInputEvent({ type: "keyDown", keyCode: "Escape" });
+    mainWindow.webContents.sendInputEvent({ type: "keyUp", keyCode: "Escape" });
+
+    console.log(`${productName} single-Renderer smoke test passed: ${controller.url}`);
     return 0;
   } catch (error) {
-    console.error(`DSH Desktop smoke test failed: ${conciseError(error)}`);
+    console.error(`${productName} smoke test failed: ${conciseError(error)}`);
     return 1;
   } finally {
-    smokeWindow?.destroy();
+    mainWindow?.destroy();
+    mainWindow = undefined;
     await controller?.stop();
     await rm(smokeDirectory, { recursive: true, force: true });
   }
@@ -265,6 +427,12 @@ if (hasSingleInstanceLock) {
     if (!event.senderFrame.url.startsWith("file://")) return;
     restartApplication();
   });
+  ipcMain.on("desktop:set-theme-source", (event, themeSource) => {
+    if (event.sender !== mainWindow?.webContents) return;
+    if (themeSource !== "light" && themeSource !== "dark" && themeSource !== "system") return;
+    if (nativeTheme.themeSource === themeSource) return;
+    nativeTheme.themeSource = themeSource;
+  });
 }
 
 async function main() {
@@ -287,6 +455,6 @@ async function main() {
 }
 
 void main().catch((error) => {
-  console.error(`DSH Desktop failed to start: ${conciseError(error)}`);
+  console.error(`${productName} failed to start: ${conciseError(error)}`);
   app.exit(1);
 });
