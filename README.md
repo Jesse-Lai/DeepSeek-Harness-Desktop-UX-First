@@ -1,6 +1,6 @@
 # DeepSeek Harness UX First
 
-一个以用户体验为先的 DeepSeek Harness 桌面客户端：保留官方完整功能，打磨视觉、交互、Reasoning 和复杂任务执行体验，并将运行环境一并打包，下载后即可双击使用。
+一个以用户体验为先的 DeepSeek Harness 桌面客户端：保留官方完整功能，重点优化了产品交互体验，以及生成过程中的 Reasoning、执行进度和工具活动呈现，让复杂 Coding 任务更加清晰、自然、易于掌控。后续也将基于 DeepSeek Harness 的插件理念进行产品功能优化和创新。
 
 > A polished, ready-to-run desktop experience for DeepSeek Harness.
 
