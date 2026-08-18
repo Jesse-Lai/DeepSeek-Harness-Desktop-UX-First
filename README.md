@@ -3,6 +3,8 @@
 一个以用户体验为先的 DeepSeek Harness 桌面客户端：保留官方完整功能，重点优化了产品交互体验，以及生成过程中的 Reasoning、执行进度和工具活动呈现，让复杂 Coding 任务更加清晰、自然、易于掌控。后续也将基于 DeepSeek Harness 的插件理念进行产品功能优化和创新。
 
 > A polished, ready-to-run desktop experience for DeepSeek Harness.
+<img width="1792" height="1154" alt="Light" src="https://github.com/user-attachments/assets/52cf6cfd-decb-4196-ab19-278440be3818" />
+<img width="1743" height="1150" alt="Dark" src="https://github.com/user-attachments/assets/87a05864-969a-4ec3-9a6d-c40dde27b940" />
 
 ## 项目介绍
 
