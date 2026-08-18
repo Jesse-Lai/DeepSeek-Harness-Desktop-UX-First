@@ -29,14 +29,7 @@ function requireReleaseValue(name) {
 
 function releaseSigningOptions() {
   if (!releaseBuild) {
-    return {
-      osxSign: {
-        identity: "-",
-        identityValidation: false,
-        continueOnError: false,
-        optionsForFile: () => ({ hardenedRuntime: false }),
-      },
-    };
+    return {};
   }
 
   const identity = requireReleaseValue("MACOS_SIGN_IDENTITY");
@@ -90,6 +83,17 @@ try {
   });
 } finally {
   restorePackagerCopy();
+}
+
+if (!releaseBuild) {
+  const appPath = join(outputPaths[0], `${productName}.app`);
+  await execFileAsync("/usr/bin/codesign", [
+    "--force",
+    "--deep",
+    "--sign",
+    "-",
+    appPath,
+  ]);
 }
 
 console.log(
