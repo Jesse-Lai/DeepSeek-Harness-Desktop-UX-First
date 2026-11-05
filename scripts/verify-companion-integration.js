@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import { startHarness } from '../src/harness.js';
+import { resolve } from 'node:path';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+const data = await mkdtemp('/tmp/dsh-companion-integration-');
+const token = 'a'.repeat(64);
+const patch=await readFile(resolve('src/dsh-desktop.patch.yml'),'utf8');
+await writeFile(data+'/patch.yml',patch+`    - id: companion-test-model\n      name: '${resolve('scripts/fixtures/companion-model.js')}'\n- id: agent-default-model\n  config:\n    provider: companion-fixture\n    model: fixture\n`);
+const h = await startHarness({ executablePath: process.execPath, cliPath:resolve('node_modules/@deepseek-ai/dsh/lib/bin.js'), patchPath:data+'/patch.yml', pluginSourcePath:resolve('plugins/@jesse-lai/dsh-desktop-ui'), userDataPath:data, companion:{token,dataRoot:data+'/companion'}, onOutput:({text})=>process.stdout.write(text) });
+try {
+ for(let i=0;i<100&&!h.companionUrl;i++) await new Promise(r=>setTimeout(r,50));
+ assert.ok(h.companionUrl);
+ const request = (path, body) => fetch(h.companionUrl+path,{ method:body?'POST':'GET', headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}, ...(body?{body:JSON.stringify(body)}:{}) });
+ assert.equal((await fetch(h.companionUrl+'/api/agent-status')).status,403);
+ const status = await request('/api/agent-status').then(r=>r.json()); assert.equal(status.busy,false);
+ const r = await request('/api/do-anything',{prompt:'Reply hello',context:{}});
+ const started = await r.json();
+ assert.equal(r.status,200,JSON.stringify(started));
+ const list = await fetch(h.url+'/api/session.list',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'client-request',rpcId:'verify',method:'session.list',payload:{}})}).then(r=>r.json());
+ assert.ok(list.result.value.items.some(s=>s.sessionId===started.sessionId),'Companion must create a real DSH session');
+ const events = await request(`/api/runs/events?runId=${started.runId}&after=0`);
+ const chunks=[];
+ const timer=setTimeout(()=>request('/api/cancel',{runId:started.runId}),5000);
+ for await (const chunk of events.body) chunks.push(Buffer.from(chunk));
+ clearTimeout(timer);
+ const stream=Buffer.concat(chunks).toString();
+ assert.match(stream,/"type":"done"/);
+ assert.match(stream,/"status":"completed"/);
+ assert.match(stream,/assistant_delta/);
+ const quick=await request('/api/quick-tasks',{action:'polish',selectedText:'test'}).then(r=>r.text());
+ assert.match(quick,/"type":"done"/);
+ console.log('PASS: authenticated native service → real DSH session → streamed completion and quick tasks (deterministic test model).');
+} finally { await h.stop(); }

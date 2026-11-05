@@ -1,0 +1,45 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js
+index 6d41a58..14fbcd8 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js
+@@ -174,7 +174,7 @@ window.__ModuleLoader__.load({
+ 		* @returns the settings shell element tree.
+ 		*/
+ 		function SettingsRoot(props) {
+-			const { wide, useSections, useOnboardingSteps, useSessions, renderSlot } = props;
++			const { wide, useSections, useOnboardingSteps, useSessions, useSettingsNavigation, renderSlot } = props;
+ 			const [open, setOpen] = (0, react.useState)(false);
+ 			const [activeId, setActiveId] = (0, react.useState)(void 0);
+ 			const [completedOnboarding, setCompletedOnboarding] = (0, react.useState)(() => /* @__PURE__ */ new Set());
+@@ -186,6 +186,13 @@ window.__ModuleLoader__.load({
+ 				setActiveId(id);
+ 				setOpen(true);
+ 			}, []);
++			const navigation = useSettingsNavigation((request) => request);
++			const handledNavigation = (0, react.useRef)(0);
++			(0, react.useEffect)(() => {
++				if (navigation.sequence === 0 || navigation.sequence === handledNavigation.current || navigation.sectionId === void 0) return;
++				handledNavigation.current = navigation.sequence;
++				openSection(navigation.sectionId);
++			}, [navigation, openSection]);
+ 			const rows = useSections((s) => s);
+ 			const onboardingSteps = useOnboardingSteps((s) => s);
+ 			const onboardingActive = useSessions((state) => state.phase === "ready" && (state.current === void 0 || state.byId[state.current]?.blank === true));
+@@ -465,7 +472,8 @@ window.__ModuleLoader__.load({
+ 		const inject = [
+ 			"slots",
+ 			"locale",
+-			"connection"
++			"connection",
++			"settingsNavigation"
+ 		];
+ 		/**
+ 		* Register the `settings` dictionaries, the chrome content, and the General
+@@ -496,6 +504,7 @@ window.__ModuleLoader__.load({
+ 			let onboardingVersion = -1;
+ 			let onboardingSteps = [];
+ 			const shellInjected = () => ({ hooks: {
++				settingsNavigation: ctx.settingsNavigation.store,
+ 				sections: {
+ 					getSnapshot: () => {
+ 						const version = ctx.slots.getVersion("settings.section");

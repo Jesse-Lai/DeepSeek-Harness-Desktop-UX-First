@@ -1,0 +1,418 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/client.js
+index 53be4bb..25ce114 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/client.js
+@@ -73,8 +73,8 @@ window.__ModuleLoader__.load({
+ 			for (var e, t, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
+ 			return n;
+ 		}
+-		/** Display label for the ungrouped bucket row. */
+-		const UNGROUPED_LABEL = "Ungrouped";
++		/** Display label for sessions outside every registered Workspace. */
++		const TASKS_LABEL = "Tasks";
+ 		/**
+ 		* Directory display label: basename of the path (both separators accepted).
+ 		* Ungrouped-bucket fallback for surfaces without a workspace title.
+@@ -82,7 +82,7 @@ window.__ModuleLoader__.load({
+ 		* @returns basename, the raw cwd when it has no basename, or the ungrouped label.
+ 		*/
+ 		function workspaceLabel(cwd) {
+-			if (cwd === void 0 || cwd === "") return UNGROUPED_LABEL;
++			if (cwd === void 0 || cwd === "") return TASKS_LABEL;
+ 			const base = cwd.replace(/[/\\]+$/, "").split(/[/\\]/).pop();
+ 			return base !== void 0 && base !== "" ? base : cwd;
+ 		}
+@@ -159,7 +159,7 @@ window.__ModuleLoader__.load({
+ 				groups.push(buildGroup(workspace.workspaceId, workspace.workspaceId, workspace.path, Date.parse(workspace.createdAt), workspace.title, members, "account"));
+ 			}
+ 			const stray = list.ids.map((id) => list.byId[id]).filter((s) => s !== void 0 && !accounted.has(s.id) && sessionVisible(s, list.current, archived));
+-			if (stray.length > 0) groups.push(buildGroup("", void 0, void 0, void 0, UNGROUPED_LABEL, ungroupedOrder === void 0 ? stray : orderedUngrouped(stray, ungroupedOrder), ungroupedOrder === void 0 ? "recency" : "account"));
++			if (stray.some((session) => !session.blank)) groups.push(buildGroup("", void 0, void 0, void 0, TASKS_LABEL, ungroupedOrder === void 0 ? stray : orderedUngrouped(stray, ungroupedOrder), ungroupedOrder === void 0 ? "recency" : "account"));
+ 			return groups;
+ 		}
+ 		function sessionNode(s, descendants) {
+@@ -195,7 +195,7 @@ window.__ModuleLoader__.load({
+ 			const currentGroup = list.current === void 0 ? void 0 : workspaces.find((w) => w.sessionIds.includes(list.current))?.workspaceId ?? "";
+ 			const groups = [];
+ 			for (const g of groupByWorkspace(list, workspaces, archived, view.ungroupedOrder)) {
+-				const expanded = expandedGroups.has(g.key);
++				const expanded = g.workspaceId === void 0 || expandedGroups.has(g.key);
+ 				groups.push({
+ 					key: g.key,
+ 					workspaceId: g.workspaceId,
+@@ -434,9 +434,9 @@ window.__ModuleLoader__.load({
+ 			});
+ 		}
+ 		/** Pointer-position half of a row (insert line above or below). */
+-		function rowHalf(e) {
++		function rowHalf(e, orientation = "vertical") {
+ 			const rect = e.currentTarget.getBoundingClientRect();
+-			return e.clientY < rect.top + rect.height / 2 ? "before" : "after";
++			return orientation === "horizontal" ? e.clientX < rect.left + rect.width / 2 ? "before" : "after" : e.clientY < rect.top + rect.height / 2 ? "before" : "after";
+ 		}
+ 		/**
+ 		* Project (workspace) header row: folder + title;
+@@ -689,7 +689,7 @@ window.__ModuleLoader__.load({
+ 		* @param props.t - the browser root's locale seat.
+ 		* @returns the session row.
+ 		*/
+-		function SessionNodeItem({ node, currentId, now, onOpen, onRename, onFork, onArchive, drag, flat = false, t }) {
++		function SessionNodeItem({ node, currentId, now, onOpen, onRename, onFork, onArchive, drag, flat = false, orientation = "vertical", t }) {
+ 			const row = node;
+ 			const title = displayTitle(node, t);
+ 			const selected = node.id === currentId;
+@@ -718,6 +718,7 @@ window.__ModuleLoader__.load({
+ 					className: clsx(Rows_module_css_default.sessionRow, selected && Rows_module_css_default.selected, menuOpen && Rows_module_css_default.menuOpen, flat && !showStatus && Rows_module_css_default.flatSessionRowWithoutStatus, drag?.marker === "before" && Rows_module_css_default.dropBefore, drag?.marker === "after" && Rows_module_css_default.dropAfter),
+ 					role: "treeitem",
+ 					"aria-selected": selected,
++					"data-dsh-session-id": node.id,
+ 					onClick: () => {
+ 						onOpen(node.id);
+ 					},
+@@ -732,12 +733,12 @@ window.__ModuleLoader__.load({
+ 						if (!drag.active) return;
+ 						e.preventDefault();
+ 						e.dataTransfer.dropEffect = "move";
+-						drag.hover(rowHalf(e));
++						drag.hover(rowHalf(e, orientation));
+ 					},
+ 					onDrop: drag === void 0 ? void 0 : (e) => {
+ 						if (!drag.active) return;
+ 						e.preventDefault();
+-						drag.drop(rowHalf(e));
++						drag.drop(rowHalf(e, orientation));
+ 					},
+ 					children: [
+ 						(!flat || showStatus) && (0, react_jsx_runtime.jsx)("span", {
+@@ -966,12 +967,14 @@ window.__ModuleLoader__.load({
+ 		//#endregion
+ 		//#region \0dsh-css:/home/runner/work/deepseek-harness/deepseek-harness/packages/client/ui-workspace/src/client/WorkspaceBrowser.module.css.mjs
+ 		const css = ".qDHVXG_root{--dsh-session-list-edge-inset:var(--dsh-sidebar-inline-padding);--dsh-session-list-scrollbar-width:8px;--dsh-session-list-scrollbar-offset:2px;box-sizing:border-box;min-height:0;padding-right:var(--dsh-session-list-edge-inset);flex-direction:column;flex:1;display:flex}.qDHVXG_root.qDHVXG_rail{padding-right:0}.qDHVXG_iconButton{cursor:pointer;width:28px;height:28px;color:var(--dsw-alias-label-secondary);background:0 0;border:none;border-radius:50%;flex:none;justify-content:center;align-items:center;padding:0;display:inline-flex}.qDHVXG_iconButton:hover{background:var(--dsw-alias-interactive-bg-hover)}.qDHVXG_sectionHeader{box-sizing:border-box;height:36px;color:var(--dsw-alias-label-tertiary);border-radius:12px;flex:none;justify-content:flex-end;align-items:center;gap:4px;margin-bottom:4px;padding-left:4px;display:flex;overflow:hidden}.qDHVXG_root:not(.qDHVXG_rail) .qDHVXG_sectionHeader{margin-top:2px;margin-right:-4px}.qDHVXG_sectionLabel{white-space:nowrap;opacity:1;visibility:visible;min-width:0;max-width:45%;transition:max-width .18s var(--ds-ease-in-out), margin-right .18s var(--ds-ease-in-out), opacity .12s var(--ds-ease-in-out), transform .18s var(--ds-ease-in-out), visibility 0s linear;flex:none;line-height:20px;overflow:hidden}.qDHVXG_sectionLabelHidden{opacity:0;visibility:hidden;max-width:0;margin-right:-4px;transition-delay:0s,0s,0s,0s,.18s;transform:translate(-4px)}.qDHVXG_searchSlot{box-sizing:border-box;min-width:0;max-width:28px;transition:max-width .18s var(--ds-ease-in-out), padding-left .18s var(--ds-ease-in-out);flex:1;align-items:center;margin-left:auto;padding-left:0;display:flex}.qDHVXG_searchSlotExpanded{max-width:100%;padding-left:0}.qDHVXG_headerActions{opacity:1;visibility:visible;max-width:60px;transition:max-width .18s var(--ds-ease-in-out), opacity .12s var(--ds-ease-in-out), transform .18s var(--ds-ease-in-out), visibility 0s linear;flex:none;align-items:center;gap:4px;display:flex;overflow:hidden}.qDHVXG_headerActionsHidden{opacity:0;visibility:hidden;pointer-events:none;max-width:0;transition-delay:0s,0s,0s,.18s;transform:translate(4px)}.qDHVXG_search{box-sizing:border-box;cursor:text;width:100%;height:28px;color:var(--dsw-alias-label-secondary);transition:width .18s var(--ds-ease-in-out), padding .18s var(--ds-ease-in-out), border-color .18s var(--ds-ease-in-out), background-color .18s var(--ds-ease-in-out);background:0 0;border:none;border-radius:50%;flex:none;align-items:center;gap:0;margin:0;padding:0;display:flex;overflow:hidden}.qDHVXG_searchExpanded{border:1px solid var(--dsw-alias-border-l2);width:calc(100% + 4px);height:30px;color:var(--dsw-alias-label-caption);background:0 0;border-radius:10px;margin-inline:-2px;padding:0 4px 0 0}.qDHVXG_searchButton{cursor:pointer;width:28px;height:28px;color:inherit;background:0 0;border:none;border-radius:50%;flex:none;justify-content:center;align-items:center;padding:0;display:inline-flex}.qDHVXG_searchExpanded .qDHVXG_searchButton{width:28px;height:30px}.qDHVXG_searchButton:hover{background:var(--dsw-alias-interactive-bg-hover)}.qDHVXG_searchExpanded .qDHVXG_searchButton:hover{background:0 0}.qDHVXG_searchInput{opacity:0;pointer-events:none;width:0;min-width:0;color:var(--dsw-alias-label-primary);transition:opacity .12s var(--ds-ease-in-out);background:0 0;border:none;outline:none;flex:1;font-size:13px;line-height:18px}.qDHVXG_searchExpanded .qDHVXG_searchInput{opacity:1;pointer-events:auto;margin-left:-2px}.qDHVXG_searchInput::placeholder{color:var(--dsw-alias-label-tertiary)}.qDHVXG_clearButton{cursor:pointer;width:24px;height:24px;color:var(--dsw-alias-label-secondary);background:0 0;border:none;border-radius:50%;flex:none;justify-content:center;align-items:center;padding:0;display:inline-flex}.qDHVXG_clearButton:hover{background:var(--dsw-alias-interactive-bg-hover)}.qDHVXG_rail .qDHVXG_sectionHeader{justify-content:flex-start;gap:0;margin-bottom:12px;padding-left:0}.qDHVXG_rail .qDHVXG_headerActions{max-width:none}.qDHVXG_rail .qDHVXG_iconButton{width:36px;height:36px;color:var(--dsw-alias-label-primary)}.qDHVXG_rail .qDHVXG_search{background:0 0;border-color:#0000;gap:0;width:36px;height:36px;margin:0 0 12px;padding:0}.qDHVXG_rail .qDHVXG_searchButton{width:36px;height:36px;color:var(--dsw-alias-label-primary)}.qDHVXG_rail .qDHVXG_searchButton:hover{background:var(--dsw-alias-interactive-bg-hover)}.qDHVXG_listArea{min-height:0;margin-left:-4px;margin-right:calc(-1 * var(--dsh-session-list-edge-inset));flex-direction:column;flex:1;padding-left:4px;display:flex;overflow:visible}.qDHVXG_rail .qDHVXG_listArea{margin-left:0;margin-right:0;padding-left:0}.qDHVXG_treeBody{flex-direction:column;flex:1;min-height:0;display:flex;position:relative}.qDHVXG_fade{left:0;right:var(--dsh-session-list-edge-inset);background:linear-gradient(to bottom, transparent, var(--dsw-specific-sidebar-fill));pointer-events:none;height:24px;position:absolute;bottom:0}.qDHVXG_wide{animation:qDHVXG_wide-in .2s var(--ds-ease-in-out)}@keyframes qDHVXG_wide-in{0%{opacity:0}}.qDHVXG_list{min-height:0;margin-left:-4px;margin-right:var(--dsh-session-list-scrollbar-offset);padding-left:4px;padding-right:calc(var(--dsh-session-list-edge-inset) - var(--dsh-session-list-scrollbar-width) - var(--dsh-session-list-scrollbar-offset));scrollbar-gutter:stable;flex:1;padding-bottom:16px;overflow-y:auto}.qDHVXG_flatList>*+*,.qDHVXG_searchTree>[role=treeitem]+[role=treeitem],.qDHVXG_groupSection>*+*{margin-top:2px}.qDHVXG_searchStatus,.qDHVXG_searchWarning{color:var(--dsw-alias-label-tertiary);padding:10px 12px;font-size:12px;line-height:18px}.qDHVXG_searchWarning{color:var(--dsw-alias-label-secondary)}.qDHVXG_groupSection{position:relative}.qDHVXG_groupSection+.qDHVXG_groupSection{margin-top:4px}.qDHVXG_listTopDropIndicator,.qDHVXG_workspaceDropBefore:before,.qDHVXG_workspaceDropAfter:after{content:\"\";z-index:1;background:linear-gradient(55deg, transparent calc(50% - 1px), var(--dsw-alias-state-business-primary) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 0 0 / 5px 7px no-repeat, linear-gradient(125deg, transparent calc(50% - 1px), var(--dsw-alias-state-business-primary) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 0 5px / 5px 7px no-repeat, linear-gradient(var(--dsw-alias-state-business-primary) 0 0) 4px 5px / calc(100% - 4px) 2px no-repeat;pointer-events:none;height:12px;position:absolute;left:0;right:0}.qDHVXG_listTopDropIndicator{top:-8px;left:0;right:var(--dsh-session-list-edge-inset)}.qDHVXG_listTopDropActive>.qDHVXG_workspaceDropBefore:first-child:before{display:none}.qDHVXG_workspaceDropBefore:before{top:-8px}.qDHVXG_workspaceDropAfter:after{bottom:-8px}.qDHVXG_sessionOverflowButton{cursor:pointer;text-align:left;width:100%;height:28px;color:var(--dsw-alias-label-tertiary);background:0 0;border:none;border-radius:8px;padding:0 12px 0 28px;font-size:12px}.qDHVXG_groupSection>.qDHVXG_sessionOverflowButton{margin-top:0}.qDHVXG_sessionOverflowButton:hover{color:var(--dsw-alias-label-secondary);background:0 0}.qDHVXG_empty{color:var(--dsw-alias-label-tertiary);padding:16px 12px;font-size:13px}.qDHVXG_renameInput{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);width:100%;height:44px;color:var(--dsw-alias-label-primary);background:0 0;border-radius:22px;outline:none;padding:7px 14px;font-size:14px;font-weight:400;line-height:22px}.qDHVXG_renameInput:disabled{color:var(--dsw-alias-label-dimmed)}.qDHVXG_renameError{color:var(--dsw-alias-state-error-primary);margin-top:8px;font-size:12px;line-height:18px}.qDHVXG_deleteAction:not(:disabled){color:var(--dsw-alias-state-error-primary)}.qDHVXG_deleteStatus{color:var(--dsw-alias-label-secondary);font-size:12px;line-height:18px}@media (prefers-reduced-motion:reduce){.qDHVXG_wide{animation:none}.qDHVXG_search,.qDHVXG_sectionLabel,.qDHVXG_searchSlot,.qDHVXG_searchInput,.qDHVXG_headerActions{transition:none}}";
++		const tasksSectionCss = ".qDHVXG_root:not(.qDHVXG_rail) .qDHVXG_tasksSectionHeader{justify-content:flex-start;margin-top:8px;margin-right:0}";
++		const horizontalCss = ".qDHVXG_root[data-orientation=horizontal]{position:relative;min-width:0;height:100%;padding:0;flex-direction:row;align-items:center;overflow:visible}.qDHVXG_root[data-orientation=horizontal]>.qDHVXG_sectionHeader{width:132px;height:100%;margin:0!important;padding:0 4px;flex:none;overflow:visible}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_sectionLabel{display:none}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_searchSlot{max-width:28px;flex:none}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_searchSlotExpanded{position:absolute;z-index:40;left:0;top:8px;width:min(420px,calc(100vw - 32px));max-width:420px;padding:0;background:var(--dsw-specific-sidebar-fill);border-radius:10px}.qDHVXG_root[data-orientation=horizontal]>.qDHVXG_listArea{min-width:0;height:100%;margin:0;padding:0;flex:1;overflow:visible}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_treeBody{height:100%;min-width:0;flex-direction:row}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_list{display:flex;align-items:center;gap:2px;min-width:0;height:100%;margin:0;padding:0 4px;overflow-x:auto;overflow-y:hidden;scrollbar-gutter:auto;white-space:nowrap}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_groupSection{display:flex;align-items:center;gap:2px;height:100%;margin:0!important}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_groupSection>*+*,.qDHVXG_root[data-orientation=horizontal] .qDHVXG_flatList>*+*{margin:0}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_sectionHeader.qDHVXG_tasksSectionHeader{height:34px;min-width:72px;margin:0!important;padding:0 8px}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_fade{display:none}.qDHVXG_root[data-orientation=horizontal] .qDHVXG_sessionOverflowButton{width:auto;min-width:112px;padding:0 8px}.qDHVXG_searchPopover{position:absolute;z-index:80;top:48px;left:0;width:min(420px,calc(100vw - 32px));max-height:60vh;padding:6px;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-button-elevated-fill);box-shadow:var(--ds-shadow-3);overflow:auto}.qDHVXG_searchPopover .qDHVXG_treeBody,.qDHVXG_searchPopover .qDHVXG_list{display:flex;height:auto;max-height:calc(60vh - 12px);flex-direction:column;align-items:stretch;white-space:normal;overflow-y:auto}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_projectRow{width:auto;min-width:96px;max-width:180px;height:34px}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_sessionRow{width:clamp(112px,14vw,220px);min-width:112px;max-width:220px;height:34px}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_time{display:none}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_sessionRow.YDXeBa_dropBefore:before,.qDHVXG_root[data-orientation=horizontal] .YDXeBa_sessionRow.YDXeBa_dropAfter:after{top:4px;bottom:4px;width:2px;height:auto;background:var(--dsw-alias-state-business-primary);right:auto}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_sessionRow.YDXeBa_dropBefore:before{left:-2px}.qDHVXG_root[data-orientation=horizontal] .YDXeBa_sessionRow.YDXeBa_dropAfter:after{left:auto;right:-2px}";
+ 		const tagId = "@deepseek-ai/dsh-client-ui-workspace/WorkspaceBrowser.module.css";
+ 		if (typeof document !== "undefined" && document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId) + "]") === null) {
+ 			const tag = document.createElement("style");
+ 			tag.dataset.plugin = "@deepseek-ai/dsh-client-ui-workspace";
+ 			tag.dataset.pluginCss = tagId;
+-			tag.textContent = css;
++			tag.textContent = css + tasksSectionCss + horizontalCss;
+ 			document.head.appendChild(tag);
+ 		}
+ 		var WorkspaceBrowser_module_css_default = {
+@@ -1009,8 +1012,10 @@ window.__ModuleLoader__.load({
+ 			"flatList": "qDHVXG_flatList",
+ 			"searchTree": "qDHVXG_searchTree",
+ 			"sectionHeader": "qDHVXG_sectionHeader",
++			"tasksSectionHeader": "qDHVXG_tasksSectionHeader",
+ 			"headerActionsHidden": "qDHVXG_headerActionsHidden",
+ 			"renameError": "qDHVXG_renameError"
++			,"searchPopover": "qDHVXG_searchPopover"
+ 		};
+ 		//#endregion
+ 		//#region lib/types/client/WorkspaceBrowser.js
+@@ -1191,12 +1196,12 @@ window.__ModuleLoader__.load({
+ 			});
+ 		}
+ 		/** Resolve an insertion side from the full rendered workspace group. */
+-		function workspaceGroupHalf(e) {
++		function workspaceGroupHalf(e, orientation = "vertical") {
+ 			const rect = e.currentTarget.getBoundingClientRect();
+-			return e.clientY < rect.top + rect.height / 2 ? "before" : "after";
++			return orientation === "horizontal" ? e.clientX < rect.left + rect.width / 2 ? "before" : "after" : e.clientY < rect.top + rect.height / 2 ? "before" : "after";
+ 		}
+ 		/** The scrolling session tree; unmounting drops the sessions subscription and expand-all state. */
+-		function SessionTree({ useSessions, startSession, open, forkSession, workspaces, archivedSessionIds, onRenameRequest, onDeleteRequest, onSessionRename, onSessionArchive, insertWorkspaceBefore, insertSessionBefore, orderBy, groupExpansion, setGroupExpanded, sessionOrderByAccount, sessionUpdatedAtByAccount, syncSessionOrderAccount, setSessionOrder, t }) {
++		function SessionTree({ useSessions, startSession, open, forkSession, workspaces, archivedSessionIds, onRenameRequest, onDeleteRequest, onSessionRename, onSessionArchive, insertWorkspaceBefore, insertSessionBefore, orderBy, groupExpansion, setGroupExpanded, sessionOrderByAccount, sessionUpdatedAtByAccount, syncSessionOrderAccount, setSessionOrder, orientation = "vertical", t }) {
+ 			const list = useSessions((s) => s);
+ 			const current = list.current;
+ 			const [expandedSessionGroups, setExpandedSessionGroups] = (0, react.useState)([]);
+@@ -1367,14 +1372,22 @@ window.__ModuleLoader__.load({
+ 								onDragOver: workspaceDrag === null || hoverWorkspace === void 0 ? void 0 : (e) => {
+ 									e.preventDefault();
+ 									e.dataTransfer.dropEffect = "move";
+-									hoverWorkspace(workspaceGroupHalf(e));
++									hoverWorkspace(workspaceGroupHalf(e, orientation));
+ 								},
+ 								onDrop: workspaceDrag === null || dropWorkspace === void 0 ? void 0 : (e) => {
+ 									e.preventDefault();
+-									dropWorkspace(workspaceGroupHalf(e));
++									dropWorkspace(workspaceGroupHalf(e, orientation));
+ 								},
+ 								children: [
+-									(0, react_jsx_runtime.jsx)(ProjectRowItem, {
++									group.workspaceId === void 0 ? (0, react_jsx_runtime.jsx)("div", {
++										className: clsx(WorkspaceBrowser_module_css_default.sectionHeader, WorkspaceBrowser_module_css_default.tasksSectionHeader),
++										children: (0, react_jsx_runtime.jsx)("span", {
++											className: WorkspaceBrowser_module_css_default.sectionLabel,
++											role: "heading",
++											"aria-level": 2,
++											children: t("section.tasks")
++										})
++									}) : (0, react_jsx_runtime.jsx)(ProjectRowItem, {
+ 										group,
+ 										t,
+ 										onToggle: () => {
+@@ -1408,7 +1421,9 @@ window.__ModuleLoader__.load({
+ 											onOpen: open,
+ 											onRename: onSessionRename,
+ 											onFork: forkSession,
+-											onArchive: onSessionArchive,
++										onArchive: onSessionArchive,
++										flat: group.workspaceId === void 0,
++										orientation,
+ 											drag: {
+ 												start: () => {
+ 													sessionDropCommitted.current = false;
+@@ -1465,7 +1480,7 @@ window.__ModuleLoader__.load({
+ 			});
+ 		}
+ 		/** The flat "In one list" body: every session is one draggable top-level row. */
+-		function FlatList({ useSessions, open, forkSession, onSessionRename, onSessionArchive, archivedSessionIds, orderBy, sessionOrderByAccount, sessionUpdatedAtByAccount, syncSessionOrderAccount, setSessionOrder, t }) {
++		function FlatList({ useSessions, open, forkSession, onSessionRename, onSessionArchive, archivedSessionIds, orderBy, sessionOrderByAccount, sessionUpdatedAtByAccount, syncSessionOrderAccount, setSessionOrder, orientation = "vertical", t }) {
+ 			const list = useSessions((s) => s);
+ 			const baseRows = (0, react.useMemo)(() => deriveFlat(list, archivedSessionIds), [list, archivedSessionIds]);
+ 			const sessionIds = (0, react.useMemo)(() => baseRows.map((row) => row.id), [baseRows]);
+@@ -1544,6 +1559,7 @@ window.__ModuleLoader__.load({
+ 							onFork: forkSession,
+ 							onArchive: onSessionArchive,
+ 							flat: true,
++							orientation,
+ 							drag: {
+ 								start: () => {
+ 									dropCommitted.current = false;
+@@ -1644,7 +1660,7 @@ window.__ModuleLoader__.load({
+ 		* @param props - composed slot props (shell owner share + store + injected actions).
+ 		* @returns the region element tree.
+ 		*/
+-		function WorkspaceBrowser({ wide, expandSidebar, useSessions, useWorkspaces, useStore, actions, startSession, open, renameSession, forkSession, renameWorkspace, deleteWorkspace, insertWorkspaceBefore, archiveSession, insertSessionBefore, createWorkspace, searchSessions, searchResultLimit, useDirectoryFlow, renderSlot, t }) {
++		function WorkspaceBrowser({ wide, expandSidebar, orientation = "vertical", useSessions, useWorkspaces, useStore, actions, startSession, open, renameSession, forkSession, renameWorkspace, deleteWorkspace, insertWorkspaceBefore, archiveSession, insertSessionBefore, createWorkspace, searchSessions, searchResultLimit, useDirectoryFlow, renderSlot, t }) {
+ 			const workspaces = useWorkspaces((state) => state.items);
+ 			const workspacePhase = useWorkspaces((state) => state.phase);
+ 			const archivedSessionIds = useWorkspaces((state) => state.archivedSessionIds);
+@@ -1846,14 +1862,71 @@ window.__ModuleLoader__.load({
+ 					setDeleteError(reason instanceof Error ? reason.message : String(reason));
+ 				});
+ 			};
++			const browseTree = groupBy === "flat" ? (0, react_jsx_runtime.jsx)(FlatList, {
++				useSessions,
++				open,
++				forkSession,
++				onSessionRename,
++				onSessionArchive,
++				archivedSessionIds,
++				orderBy,
++				sessionOrderByAccount,
++				sessionUpdatedAtByAccount,
++				syncSessionOrderAccount: actions.syncSessionOrderAccount,
++				setSessionOrder: actions.setSessionOrder,
++				orientation,
++				t
++			}) : (0, react_jsx_runtime.jsx)(SessionTree, {
++				useSessions,
++				onSessionRename,
++				onSessionArchive,
++				forkSession,
++				workspaces,
++				groupExpansion,
++				setGroupExpanded: actions.setGroupExpanded,
++				sessionOrderByAccount,
++				sessionUpdatedAtByAccount,
++				syncSessionOrderAccount: actions.syncSessionOrderAccount,
++				setSessionOrder: actions.setSessionOrder,
++				archivedSessionIds,
++				startSession,
++				open,
++				insertWorkspaceBefore,
++				insertSessionBefore,
++				orderBy,
++				orientation,
++				t,
++				onRenameRequest: (workspaceId, currentTitle) => {
++					setRenameTarget({ workspaceId, currentTitle });
++					setRenameDraft(currentTitle);
++					setRenameError(null);
++				},
++				onDeleteRequest: (workspaceId, title) => {
++					setDeleteTarget({ workspaceId, title });
++					setDeleteError(null);
++				}
++			});
++			const searchResults = normalizedQuery === "" ? null : (0, react_jsx_runtime.jsx)(SearchResults, {
++				useSessions,
++				open,
++				workspaces,
++				archivedSessionIds,
++				query: normalizedQuery,
++				remote: remoteSearch,
++				resultLimit: searchResultLimit,
++				t
++			});
+ 			return (0, react_jsx_runtime.jsxs)("div", {
+ 				className: clsx(WorkspaceBrowser_module_css_default.root, !wide && WorkspaceBrowser_module_css_default.rail),
++				"data-orientation": orientation,
+ 				children: [
+ 					(0, react_jsx_runtime.jsxs)("div", {
+ 						className: WorkspaceBrowser_module_css_default.sectionHeader,
+ 						children: [
+ 							wide && (0, react_jsx_runtime.jsx)("span", {
+ 								className: clsx(WorkspaceBrowser_module_css_default.sectionLabel, WorkspaceBrowser_module_css_default.wide, searchExpanded && WorkspaceBrowser_module_css_default.sectionLabelHidden),
++								role: "heading",
++								"aria-level": 2,
+ 								children: groupBy === "flat" ? t("section.sessions") : t("section.workspaces")
+ 							}),
+ 							wide && (0, react_jsx_runtime.jsx)("div", {
+@@ -1982,63 +2055,12 @@ window.__ModuleLoader__.load({
+ 					}),
+ 					(0, react_jsx_runtime.jsx)("div", {
+ 						className: WorkspaceBrowser_module_css_default.listArea,
+-						children: wide && (normalizedQuery !== "" ? (0, react_jsx_runtime.jsx)(SearchResults, {
+-							useSessions,
+-							open,
+-							workspaces,
+-							archivedSessionIds,
+-							query: normalizedQuery,
+-							remote: remoteSearch,
+-							resultLimit: searchResultLimit,
+-							t
+-						}) : groupBy === "flat" ? (0, react_jsx_runtime.jsx)(FlatList, {
+-							useSessions,
+-							open,
+-							forkSession,
+-							onSessionRename,
+-							onSessionArchive,
+-							archivedSessionIds,
+-							orderBy,
+-							sessionOrderByAccount,
+-							sessionUpdatedAtByAccount,
+-							syncSessionOrderAccount: actions.syncSessionOrderAccount,
+-							setSessionOrder: actions.setSessionOrder,
+-							t
+-						}) : (0, react_jsx_runtime.jsx)(SessionTree, {
+-							useSessions,
+-							onSessionRename,
+-							onSessionArchive,
+-							forkSession,
+-							workspaces,
+-							groupExpansion,
+-							setGroupExpanded: actions.setGroupExpanded,
+-							sessionOrderByAccount,
+-							sessionUpdatedAtByAccount,
+-							syncSessionOrderAccount: actions.syncSessionOrderAccount,
+-							setSessionOrder: actions.setSessionOrder,
+-							archivedSessionIds,
+-							startSession,
+-							open,
+-							insertWorkspaceBefore,
+-							insertSessionBefore,
+-							orderBy,
+-							t,
+-							onRenameRequest: (workspaceId, currentTitle) => {
+-								setRenameTarget({
+-									workspaceId,
+-									currentTitle
+-								});
+-								setRenameDraft(currentTitle);
+-								setRenameError(null);
+-							},
+-							onDeleteRequest: (workspaceId, title) => {
+-								setDeleteTarget({
+-									workspaceId,
+-									title
+-								});
+-								setDeleteError(null);
+-							}
+-						}))
++						children: wide && (orientation === "horizontal" ? (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, {
++							children: [browseTree, searchResults !== null && (0, react_jsx_runtime.jsx)("div", {
++								className: WorkspaceBrowser_module_css_default.searchPopover,
++								children: searchResults
++							})]
++						}) : searchResults ?? browseTree)
+ 					}),
+ 					(0, react_jsx_runtime.jsxs)(_deepseek_ai_dsh_client_ui_primitives.Modal, {
+ 						open: renameTarget !== null,
+@@ -2182,9 +2204,10 @@ window.__ModuleLoader__.load({
+ 		*/
+ 		/** Simplified Chinese dictionary (the key-set source of truth). */
+ 		const zh = {
+-			"group.ungrouped": "未分组",
++			"group.ungrouped": "任务",
+ 			"session.new": "新会话",
+ 			"section.workspaces": "工作区",
++			"section.tasks": "任务",
+ 			"section.sessions": "会话",
+ 			"viewOptions.label": "视图选项",
+ 			"groupBy.label": "分组方式",
+@@ -2198,8 +2221,8 @@ window.__ModuleLoader__.load({
+ 			"empty.none": "暂无会话",
+ 			"empty.noMatches": "无匹配结果",
+ 			"workspace.add": "添加工作区",
+-			"search.sessions.aria": "搜索会话",
+-			"search.placeholder": "搜索会话…",
++			"search.sessions.aria": "搜索工作区和任务",
++			"search.placeholder": "搜索工作区和任务",
+ 			"search.clear": "清除搜索",
+ 			"search.results.aria": "搜索结果",
+ 			"search.pending": "正在搜索会话历史…",
+@@ -2217,7 +2240,7 @@ window.__ModuleLoader__.load({
+ 			"field.workspaceName": "工作区名称",
+ 			"field.sessionName": "会话名称",
+ 			"delete.workspace": "删除工作区",
+-			"delete.desc": "将把“{name}”从工作区列表中移除。文件夹与会话记录会保留，其会话将显示在“未分组”下。",
++			"delete.desc": "将把“{name}”从工作区列表中移除。文件夹与会话记录会保留，其会话将显示在“任务”下。",
+ 			"delete.pending": "正在删除工作区…",
+ 			"menu.fork": "分叉会话",
+ 			"menu.archiveSession": "归档会话",
+@@ -2247,9 +2270,10 @@ window.__ModuleLoader__.load({
+ 		};
+ 		/** English dictionary, checked complete against the zh key set. */
+ 		const en = {
+-			"group.ungrouped": "Ungrouped",
++			"group.ungrouped": "Tasks",
+ 			"session.new": "New Session",
+ 			"section.workspaces": "Workspaces",
++			"section.tasks": "Tasks",
+ 			"section.sessions": "Sessions",
+ 			"viewOptions.label": "View options",
+ 			"groupBy.label": "Group by",
+@@ -2263,8 +2287,8 @@ window.__ModuleLoader__.load({
+ 			"empty.none": "No sessions yet",
+ 			"empty.noMatches": "No matches",
+ 			"workspace.add": "Add workspace",
+-			"search.sessions.aria": "Search sessions",
+-			"search.placeholder": "Search sessions...",
++			"search.sessions.aria": "Search workspaces and tasks",
++			"search.placeholder": "Search workspaces and tasks",
+ 			"search.clear": "Clear search",
+ 			"search.results.aria": "Search results",
+ 			"search.pending": "Searching session history…",
+@@ -2282,7 +2306,7 @@ window.__ModuleLoader__.load({
+ 			"field.workspaceName": "Workspace name",
+ 			"field.sessionName": "Session name",
+ 			"delete.workspace": "Delete workspace",
+-			"delete.desc": "This removes “{name}” from the workspace list. The folder and session logs will be kept. Its sessions will appear under Ungrouped.",
++			"delete.desc": "This removes “{name}” from the workspace list. The folder and session logs will be kept. Its sessions will appear under Tasks.",
+ 			"delete.pending": "Deleting workspace…",
+ 			"menu.fork": "Fork session",
+ 			"menu.archiveSession": "Archive session",
+@@ -2422,4 +2446,4 @@ window.__ModuleLoader__.load({
+ 	}
+ });
+ 
+-//# sourceMappingURL=client.js.map
+\ No newline at end of file
++//# sourceMappingURL=client.js.map
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/types/client/WorkspaceBrowser.d.ts b/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/types/client/WorkspaceBrowser.d.ts
+index f685d26..d01c233 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/types/client/WorkspaceBrowser.d.ts
++++ b/node_modules/@deepseek-ai/dsh-client-ui-workspace/lib/types/client/WorkspaceBrowser.d.ts
+@@ -4,5 +4,5 @@ import type { WorkspaceBrowserProps } from './contract/slots.ts';
+  * @param props - composed slot props (shell owner share + store + injected actions).
+  * @returns the region element tree.
+  */
+-export declare function WorkspaceBrowser({ wide, expandSidebar, useSessions, useWorkspaces, useStore, actions, startSession, open, renameSession, forkSession, renameWorkspace, deleteWorkspace, insertWorkspaceBefore, archiveSession, insertSessionBefore, createWorkspace, searchSessions, searchResultLimit, useDirectoryFlow, renderSlot, t, }: WorkspaceBrowserProps): import("react").JSX.Element;
+-//# sourceMappingURL=WorkspaceBrowser.d.ts.map
+\ No newline at end of file
++export declare function WorkspaceBrowser({ wide, expandSidebar, orientation, useSessions, useWorkspaces, useStore, actions, startSession, open, renameSession, forkSession, renameWorkspace, deleteWorkspace, insertWorkspaceBefore, archiveSession, insertSessionBefore, createWorkspace, searchSessions, searchResultLimit, useDirectoryFlow, renderSlot, t, }: WorkspaceBrowserProps): import("react").JSX.Element;
++//# sourceMappingURL=WorkspaceBrowser.d.ts.map

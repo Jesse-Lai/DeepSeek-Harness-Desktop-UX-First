@@ -1,0 +1,30 @@
+{
+  "source": "JesseAgent/jesse-agent/macos/JesseCompanion",
+  "importedAt": "2026-09-26",
+  "sha256": {
+    "AccessibilityService.swift": "2a9fcdb2df3d6edc5a3a5b066b572771856e6c99113ab8ac4cb0f7e7f7304576",
+    "AgentClient.swift": "90057a39cdbe5b04beef1d4a3550f5bfc61c4436df0ba75642e7f6fff5f4be4c",
+    "CompanionModels.swift": "608ab986f8382f17b775c3e45eb9e3e4729554ac930487e36155e494d40d2738",
+    "CompanionViewModel.swift": "1346ac2eab32321bd8df005a7f232d6df4c96df21da68c38000bfdb0174e39f5",
+    "CompanionViews.swift": "1c96321fbc45ebc3f6e891a1486615ac994d00fe020ddca6123ce4608ae8a7c3",
+    "FluentIcon.swift": "735e2db2fcae314f07e25ce3bb0cb830a6e84256e9aa5d28e10beb6eddbe4bf5",
+    "GlobalHotKey.swift": "be2a066cab805c844f985f41b0ba7bf06b56d3c1c874ce466af25cbb0fa5fe98",
+    "InterfaceLanguage.swift": "d9ece8c589a5cc006582f8103ce3295aac8d4783edbd968e47addd53dc5ecd1b",
+    "MainAppModels.swift": "d9a7b1bc511eb292117ae12e3ab1099de67d5667053361cabd254dd0ed9e8e56",
+    "Models.swift": "0acf290a71596cb43adc654889ca4b0a50ce077e1afd70f938dc8bc4e6768461",
+    "ResultStore.swift": "7f25bce69493275127e3e3dfc6bae04d61df30c343e1b5869c77a62d1045b14a",
+    "RingGeometry.swift": "116907e7a64e9aecf757f0f1d3bc4314fc3564e7dc49bd27d9a7f92910b40685",
+    "RingWindowController.swift": "01120cdf21b0e6051628b04ae3ea3759db7cd8d50fd9a15684120abd1e4c693c",
+    "ScreenshotCoordinator.swift": "fd57f35a92fd5358ad43871f16765e1ee73f0a2b835c1a1fef29aff257e6e4b3"
+  },
+  "visualSha256": {
+    "CompanionViews.swift": "9b53b7db7a9550ee9d0bbc03a2ea9bf160119c1c2d0eb59040d32e5d082b9b91",
+    "CompanionModels.swift": "608ab986f8382f17b775c3e45eb9e3e4729554ac930487e36155e494d40d2738",
+    "CompanionViewModel.swift": "7b5510ef7581c217cbf1f0f75978feab97d7c62ca54bbf6791164946ef6ccf47",
+    "RingGeometry.swift": "116907e7a64e9aecf757f0f1d3bc4314fc3564e7dc49bd27d9a7f92910b40685",
+    "FluentIcon.swift": "735e2db2fcae314f07e25ce3bb0cb830a6e84256e9aa5d28e10beb6eddbe4bf5",
+    "GlobalHotKey.swift": "0840eea1d5814220257ecfe3a92e120b89bde016e8e66da55e13dea14e1ba9e5",
+    "AccessibilityService.swift": "ee2c62cc40035179dbdc90673822b4de08fc5b7c5b78de4fd7e6ae2680b6d838",
+    "ScreenshotCoordinator.swift": "2065083d4971e5b024fa40029a7c2729fefbb9797a385f36e2c9fae358137f1d"
+  }
+}

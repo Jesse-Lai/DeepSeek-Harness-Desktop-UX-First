@@ -6,6 +6,10 @@ import vm from "node:vm";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const desktopPatchPath = join(root, "src", "dsh-desktop.patch.yml");
+const pluginDirectory = join(root, "plugins", "@jesse-lai", "dsh-desktop-ui");
+const pluginManifestPath = join(pluginDirectory, "package.json");
+const pluginPatchPath = join(pluginDirectory, "cordis.patch.yml");
 const hostPluginPath = join(root, "plugins", "@jesse-lai", "dsh-desktop-ui", "lib", "index.js");
 const clientPath = join(root, "plugins", "@jesse-lai", "dsh-desktop-ui", "lib", "client.js");
 const iconTypesPath = join(
@@ -36,6 +40,24 @@ const trajectorySourcePath = join(
   "lib",
   "client.js",
 );
+const workspaceSourcePath = join(
+  deepseekModulesPath,
+  "dsh-client-ui-workspace",
+  "lib",
+  "client.js",
+);
+const layoutSourcePath = join(
+  deepseekModulesPath,
+  "dsh-client-ui-layout",
+  "lib",
+  "client.js",
+);
+const sidebarSourcePath = join(
+  deepseekModulesPath,
+  "dsh-client-ui-sidebar",
+  "lib",
+  "client.js",
+);
 const slotRendererPath = join(
   root,
   "node_modules",
@@ -49,6 +71,7 @@ async function installTheme(
   platform,
   userAgent = "",
   {
+    desktopHost = true,
     includeIcon = false,
     includeShell = false,
     includeSidebarSessions = false,
@@ -59,8 +82,11 @@ async function installTheme(
     includeFinalDividerFlow = false,
     includeFeedback = false,
     includeHeroHeadline = false,
+    includeOnboarding = false,
     includeSteerSession = false,
     steerSessionRunning = false,
+    language = "",
+    workspaceItems,
     themePreference = "system",
     colorScheme = "light",
   } = {},
@@ -83,6 +109,10 @@ async function installTheme(
   let steerCancelCalls = 0;
   const nativeThemeSources = [];
   const themeChangeListeners = new Set();
+  const workspaceListListeners = new Set();
+  let workspaceSnapshot = workspaceItems === undefined
+    ? null
+    : { items: workspaceItems, phase: "ready" };
   let themeSnapshot = {
     preference: themePreference,
     active: { colorScheme },
@@ -377,7 +407,9 @@ async function installTheme(
   }
 
   const shellFixture = includeShell ? createShellFixture(FakeHTMLElement) : null;
-  const composerFixture = includeComposer ? createComposerFixture(FakeHTMLElement) : null;
+  const composerFixture = includeComposer
+    ? createComposerFixture(FakeHTMLElement, FakeSVGElement)
+    : null;
   const heroHeadlineFixture = includeHeroHeadline
     ? (() => {
         const headline = new FakeHTMLElement("span");
@@ -385,6 +417,38 @@ async function installTheme(
         headline.setAttribute("class", "pXSMma_headlineText");
         headline.textContent = "Into the Unknown";
         return { headline };
+      })()
+    : null;
+  const onboardingFixture = includeOnboarding
+    ? (() => {
+        const dialog = new FakeHTMLElement("div");
+        dialog.isConnected = true;
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        const title = new FakeHTMLElement("h2");
+        title.textContent = "Add an API key to get started";
+        const description = new FakeHTMLElement("p");
+        description.textContent =
+          "Configure the official DeepSeek provider to start building.";
+        const body = new FakeHTMLElement("div");
+        const editor = new FakeHTMLElement("div");
+        const field = new FakeHTMLElement("div");
+        const fieldLabel = new FakeHTMLElement("span");
+        fieldLabel.setAttribute("class", "zGbnIq_fieldLabel");
+        fieldLabel.textContent = "API key";
+        const input = new FakeHTMLElement("input");
+        input.setAttribute("type", "password");
+        input.setAttribute("placeholder", "Enter your API key");
+        input.setAttribute("aria-label", "API key");
+        field.append(fieldLabel, input);
+        const later = new FakeHTMLElement("button");
+        later.textContent = "Configure later";
+        const save = new FakeHTMLElement("button");
+        save.textContent = "Save and continue";
+        editor.append(field, later, save);
+        body.append(description, editor);
+        dialog.append(title, body);
+        return { body, description, dialog, editor, fieldLabel, input, later, save, title };
       })()
     : null;
   const progressFixture = includeProgressFlow
@@ -625,10 +689,11 @@ async function installTheme(
     ...(progressFixture === null ? [] : collectElements(progressFixture.flow)),
     ...(feedbackFixture === null ? [] : collectElements(feedbackFixture.actionRow)),
     ...(heroHeadlineFixture === null ? [] : [heroHeadlineFixture.headline]),
+    ...(onboardingFixture === null ? [] : collectElements(onboardingFixture.dialog)),
   ];
   const body = new FakeHTMLElement("body");
   body.isConnected = true;
-  const documentElement = { dataset: {}, lang: "" };
+  const documentElement = { dataset: {}, lang: language };
   const document = {
     activeElement: body,
     body,
@@ -668,6 +733,9 @@ async function installTheme(
       }
       if (selector === '[class*="_headlineText"]') {
         return heroHeadlineFixture === null ? [] : [heroHeadlineFixture.headline];
+      }
+      if (selector === '[role="dialog"][aria-modal="true"]') {
+        return onboardingFixture === null ? [] : [onboardingFixture.dialog];
       }
       if (feedbackFixture !== null) {
         if (selector === 'span[class*="_noteEditor"]') {
@@ -737,7 +805,7 @@ async function installTheme(
             ];
       }
       if (selector.startsWith("svg:not([data-lucide-animated-icon])")) {
-        return [sourceIcon, hiddenStateFixture?.ongoing].filter(
+        return [sourceIcon, hiddenStateFixture?.ongoing, composerFixture?.primaryIcon].filter(
           (icon) => icon?.isConnected === true,
         );
       }
@@ -758,7 +826,7 @@ async function installTheme(
         });
         return template;
       }
-      if (["button", "div", "h2", "span", "textarea"].includes(tagName)) {
+      if (["a", "button", "div", "h2", "input", "p", "span", "textarea"].includes(tagName)) {
         return new FakeHTMLElement(tagName);
       }
       assert.equal(tagName, "style");
@@ -778,12 +846,16 @@ async function installTheme(
   };
   const sandbox = {
     window: {
-      desktop: {
-        restart() {},
-        setThemeSource(themeSource) {
-          nativeThemeSources.push(themeSource);
-        },
-      },
+      ...(desktopHost
+        ? {
+            desktop: {
+              restart() {},
+              setThemeSource(themeSource) {
+                nativeThemeSources.push(themeSource);
+              },
+            },
+          }
+        : {}),
       requestAnimationFrame(callback) {
         callback();
       },
@@ -797,6 +869,7 @@ async function installTheme(
     },
     document,
     navigator: { platform, userAgent },
+    URL,
     MutationObserver: FakeMutationObserver,
     HTMLElement: FakeHTMLElement,
     SVGElement: FakeSVGElement,
@@ -869,6 +942,19 @@ async function installTheme(
           },
         }
       : undefined,
+    workspaces: workspaceSnapshot === null
+      ? undefined
+      : {
+          list: {
+            getSnapshot() {
+              return workspaceSnapshot;
+            },
+            subscribe(listener) {
+              workspaceListListeners.add(listener);
+              return () => workspaceListListeners.delete(listener);
+            },
+          },
+        },
   });
 
   return {
@@ -921,6 +1007,7 @@ async function installTheme(
     },
     hiddenStateFixture,
     heroHeadlineFixture,
+    onboardingFixture,
     plugin,
     progressFixture,
     shellFixture,
@@ -956,6 +1043,14 @@ async function installTheme(
         active: { colorScheme: activeColorScheme },
       };
       for (const listener of themeChangeListeners) listener(themeSnapshot);
+    },
+    setWorkspaces(items, phase = "ready") {
+      assert.notEqual(workspaceSnapshot, null);
+      workspaceSnapshot = { items, phase };
+      for (const listener of workspaceListListeners) listener();
+    },
+    workspaceSubscriberCount() {
+      return workspaceListListeners.size;
     },
   };
 }
@@ -1098,6 +1193,29 @@ test("desktop host asks the model for concise user-facing progress updates", asy
   assert.match(section.text, /Use the user's language/);
 });
 
+test("desktop UI package is an installable Harness profile bundle", async () => {
+  const [manifestSource, pluginPatch, desktopPatch] = await Promise.all([
+    readFile(pluginManifestPath, "utf8"),
+    readFile(pluginPatchPath, "utf8"),
+    readFile(desktopPatchPath, "utf8"),
+  ]);
+  const manifest = JSON.parse(manifestSource);
+
+  assert.equal(manifest.name, "@jesse-lai/dsh-desktop-ui");
+  assert.equal(manifest.version, "0.1.0");
+  assert.equal(manifest.private, undefined);
+  assert.equal(manifest.publishConfig.access, "public");
+  assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
+  assert.equal(manifest.exports["./cordis.patch.yml"], "./cordis.patch.yml");
+  assert.ok(manifest.files.includes("lib"));
+  assert.ok(manifest.files.includes("cordis.patch.yml"));
+  assert.ok(desktopPatch.trim().startsWith(pluginPatch.trim()));
+  assert.match(desktopPatch, /@jesse-lai\/dsh-desktop-ui\/companion/);
+  assert.doesNotMatch(pluginPatch, /dsh-desktop-companion/);
+  assert.match(pluginPatch, /id: dsh-desktop-ui/);
+  assert.match(pluginPatch, /name: '@jesse-lai\/dsh-desktop-ui'/);
+});
+
 test("live shimmer stays last and follows the latest running operation", async () => {
   const theme = await installTheme("MacIntel", "", { includeProgressFlow: true });
   const { flow, status, statusText, toolRoot } = theme.progressFixture;
@@ -1164,7 +1282,7 @@ test("Steer from here opens inline, closes outside, and discards only on submit"
   assert.match(theme.appendedStyle.textContent, /data-dsh-steer-discarded/);
   assert.match(
     theme.appendedStyle.textContent,
-    /data-dsh-progress-update\]:has\(\[data-dsh-steer-action\]\):hover,[\s\S]*?data-dsh-progress-update\]:has\(\[data-dsh-steer-action\]\):focus-within,[\s\S]*?background: color-mix\([\s\S]*?interactive-bg-hover\) 45%/,
+    /data-dsh-progress-update\]:has\(\[data-dsh-steer-action\]\):hover,[\s\S]*?data-dsh-progress-update\]:has\(\[data-dsh-steer-action\]\):focus-within,[\s\S]*?background: color-mix\([\s\S]*?interactive-bg-hover\) 55%/,
   );
   assert.doesNotMatch(
     theme.appendedStyle.textContent,
@@ -1176,18 +1294,31 @@ test("Steer from here opens inline, closes outside, and discards only on submit"
   assert.ok(toolbarRule);
   assert.match(toolbarRule, /position: absolute/);
   assert.match(toolbarRule, /z-index: 2147482900/);
-  assert.match(toolbarRule, /bottom: calc\(100% - 2px\)/);
+  assert.match(toolbarRule, /bottom: calc\(100% \+ 8px\)/);
+  assert.match(toolbarRule, /right: auto/);
+  assert.match(toolbarRule, /left: 50%/);
   assert.match(toolbarRule, /width: max-content/);
   assert.match(toolbarRule, /border-radius: 999px/);
   assert.match(toolbarRule, /pointer-events: none/);
+  assert.match(toolbarRule, /transform: translateX\(-50%\)/);
+  assert.match(toolbarRule, /transition: background-color 120ms ease/);
+  assert.doesNotMatch(toolbarRule, /translate\([^)]*,/);
   assert.doesNotMatch(toolbarRule, /margin|min-height/);
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-steer-action\]::after\s*\{[^}]*content: "";[^}]*position: absolute;[^}]*top: 100%;[^}]*right: 0;[^}]*left: 0;[^}]*height: 8px;/,
+  );
   assert.match(
     theme.appendedStyle.textContent,
     /:is\([\s\S]*?data-dsh-scroll-button[\s\S]*?data-dsh-steer-action[\s\S]*?\)\s*\{[^}]*border: 1px solid var\(--dsw-alias-border-l2\);[^}]*background: var\(--dsw-alias-button-floating-fill\);[^}]*box-shadow: var\(--dsw-shadow-lv2\);/,
   );
   assert.match(
     theme.appendedStyle.textContent,
-    /data-dsh-steer-action\]:hover,[\s\S]*?data-dsh-steer-action\]:focus-within[^{]*\{[^}]*opacity: 1;[^}]*pointer-events: auto;/,
+    /data-dsh-steer-action\]:hover,[\s\S]*?data-dsh-steer-action\]:focus-within[^{]*\{[^}]*opacity: 1;[^}]*pointer-events: auto;[^}]*transform: translateX\(-50%\)/,
+  );
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-steer-action\]:hover,\s*\[data-dsh-steer-action\]:focus-within\s*\{[^}]*background: var\(--dsw-alias-interactive-bg-hover-solid\)/,
   );
   const triggerRule = theme.appendedStyle.textContent.match(
     /\[data-dsh-steer-trigger\],[\s\S]*?\[data-dsh-steer-submit\]\s*\{([^}]*)\}/,
@@ -1198,9 +1329,20 @@ test("Steer from here opens inline, closes outside, and discards only on submit"
   assert.match(triggerRule, /font-size: 14px/);
   assert.match(triggerRule, /background: transparent/);
   assert.match(triggerRule, /box-shadow: none/);
+  assert.match(triggerRule, /color: var\(--dsw-alias-label-primary\)/);
+  const triggerHoverRule = theme.appendedStyle.textContent.match(
+    /\[data-dsh-steer-trigger\]:hover,\s*\[data-dsh-steer-trigger\]:focus-visible\s*\{([^}]*)\}/,
+  )?.[1];
+  assert.ok(triggerHoverRule);
+  assert.match(triggerHoverRule, /background: transparent/);
+  assert.doesNotMatch(triggerHoverRule, /interactive-bg-hover/);
   assert.match(
     theme.appendedStyle.textContent,
     /\[data-dsh-steer-submit\]\s*\{[^}]*border-radius: 999px;[^}]*background: var\(--dsw-alias-button-primary-fill\);[^}]*color: var\(--dsw-alias-label-primary-foreground\)/,
+  );
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-steer-input\]\s*\{[^}]*min-height: 32px;[^}]*padding: 5px 0;/,
   );
 
   theme.dispatchClick(trigger);
@@ -1267,6 +1409,25 @@ test("Steer from here opens inline, closes outside, and discards only on submit"
     theme.steerSession.storageValues.get("dsh-steer-cuts:v1:session:1"),
   );
   assert.deepEqual(continuedRecord.internalKeys, ["user:steer"]);
+
+  theme.cleanup();
+});
+
+test("Steer from here uses Chinese copy in Chinese mode", async () => {
+  const theme = await installTheme("MacIntel", "", {
+    includeProgressFlow: true,
+    includeSteerSession: true,
+    language: "zh-CN",
+  });
+  const trigger = theme.progressFixture.progressRow.querySelector("[data-dsh-steer-trigger]");
+
+  assert.equal(trigger?.textContent, "从此处重新思考");
+  theme.dispatchClick(trigger);
+  const input = theme.progressFixture.progressRow.querySelector("[data-dsh-steer-input]");
+  const submit = theme.progressFixture.progressRow.querySelector("[data-dsh-steer-submit]");
+  assert.equal(input?.getAttribute("placeholder"), "请输入调整要求");
+  assert.equal(input?.getAttribute("aria-label"), "请输入调整要求");
+  assert.equal(submit?.textContent, "重新思考");
 
   theme.cleanup();
 });
@@ -1428,6 +1589,58 @@ test("desktop hero headline uses sentence case", async () => {
   assert.equal(headline.dataset.dshHeroHeadline, undefined);
 });
 
+test("DeepSeek onboarding uses the product copy and official API-key link", async () => {
+  const theme = await installTheme("MacIntel", "", { includeOnboarding: true });
+  const { body, description, dialog, editor, fieldLabel, input, later, save, title } =
+    theme.onboardingFixture;
+
+  assert.equal(title.textContent, "Add your DeepSeek API key to get started");
+  assert.equal(description.dataset.dshOnboardingDescription, "");
+  assert.equal(body.dataset.dshOnboardingBody, "");
+  assert.equal(editor.dataset.dshOnboardingEditor, "");
+  assert.equal(fieldLabel.textContent, "DeepSeek API key");
+  assert.equal(input.getAttribute("placeholder"), "Enter your DeepSeek API key");
+  assert.equal(input.getAttribute("aria-label"), "DeepSeek API key");
+  assert.equal(later.textContent, "Later");
+  assert.equal(save.textContent, "Save");
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-deepseek-onboarding\] \[data-dsh-onboarding-description\] \{[^}]*display: none !important;/,
+  );
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-deepseek-onboarding\] \[data-dsh-onboarding-body\] \{[^}]*margin-top: 12px !important;/,
+  );
+  assert.match(
+    theme.appendedStyle.textContent,
+    /\[data-dsh-deepseek-onboarding\] \[data-dsh-onboarding-editor\] \{[^}]*margin-top: 0 !important;/,
+  );
+
+  let links = dialog.querySelectorAll("[data-dsh-onboarding-api-link]");
+  assert.equal(links.length, 1);
+  assert.equal(links[0].textContent, "Get API key ↗");
+  assert.equal(links[0].getAttribute("href"), "https://platform.deepseek.com/api_keys");
+  assert.equal(links[0].getAttribute("target"), "_blank");
+  assert.equal(links[0].getAttribute("rel"), "noreferrer");
+
+  theme.flushMutations();
+  links = dialog.querySelectorAll("[data-dsh-onboarding-api-link]");
+  assert.equal(links.length, 1);
+
+  theme.cleanup();
+  assert.equal(title.textContent, "Add an API key to get started");
+  assert.equal(description.dataset.dshOnboardingDescription, undefined);
+  assert.equal(body.dataset.dshOnboardingBody, undefined);
+  assert.equal(editor.dataset.dshOnboardingEditor, undefined);
+  assert.equal(fieldLabel.textContent, "API key");
+  assert.equal(dialog.querySelectorAll("[data-dsh-onboarding-api-link]").length, 0);
+  assert.equal(input.getAttribute("placeholder"), "Enter your API key");
+  assert.equal(input.getAttribute("aria-label"), "API key");
+  assert.equal(later.textContent, "Configure later");
+  assert.equal(save.textContent, "Save and continue");
+  assert.equal(dialog.dataset.dshDeepseekOnboarding, undefined);
+});
+
 test("Composer tooltip cannot move Workspace Write above the input", async () => {
   const theme = await installTheme("MacIntel", "", { includeComposer: true });
   const { extra, modes, tooltip, tools } = theme.composerFixture;
@@ -1455,19 +1668,39 @@ test("Composer tooltip cannot move Workspace Write above the input", async () =>
   theme.cleanup();
 });
 
-test("active Composer reserves the stats dock before data arrives", async () => {
+test("Composer keeps Do anything across hero and active chat states", async () => {
+  const theme = await installTheme("MacIntel", "", { includeComposer: true });
+  const { textarea } = theme.composerFixture;
+
+  assert.equal(textarea.getAttribute("placeholder"), "Do anything");
+
+  const upstreamStates = [
+    ["hero without a workspace", "Choose a workspace to start"],
+    ["hero with a workspace", "Describe what you want to build"],
+    ["active chat", "Message the agent"],
+    ["active chat while running", ""],
+  ];
+  for (const [state, upstreamPlaceholder] of upstreamStates) {
+    theme.resetMutationObserverWrites();
+    textarea.setAttribute("placeholder", upstreamPlaceholder);
+    assert.equal(theme.mutationObserverState().observedWriteCount, 1, state);
+    theme.flushMutations();
+    assert.equal(textarea.getAttribute("placeholder"), "Do anything", state);
+  }
+
+  theme.cleanup();
+  assert.equal(textarea.getAttribute("placeholder"), "Message the agent");
+});
+
+test("active Composer hides the aggregate stats dock", async () => {
   const theme = await installTheme("MacIntel");
   const slotRendererSource = await readFile(slotRendererPath, "utf8");
 
   assert.match(slotRendererSource, /const ANCHOR_STYLE = \{ display: "contents" \};/);
-  assert.match(theme.appendedStyle.textContent, /--dsh-desktop-composer-stats-height: 24px/);
+  assert.doesNotMatch(theme.appendedStyle.textContent, /--dsh-desktop-composer-stats-height/);
   assert.match(
     theme.appendedStyle.textContent,
-    /data-phase="active"\] \[data-composer-seat\][\s\S]*?data-slot="conversation\.composer\.dock"\][^{]*\{[^}]*display: block !important;[^}]*width: 100%;[^}]*max-width: var\(--dsh-desktop-composer-width\);[^}]*align-self: center;[^}]*margin-inline: auto;[^}]*min-height: var\(--dsh-desktop-composer-stats-height\)/,
-  );
-  assert.match(
-    theme.appendedStyle.textContent,
-    /data-slot="conversation\.composer\.dock"\] > :not\(\[role="tooltip"\]\)[^{]*\{[^}]*width: 100%;[^}]*max-width: 100% !important;[^}]*overflow: hidden;[^}]*text-overflow: ellipsis;[^}]*white-space: nowrap;/,
+    /data-phase="active"\] \[data-composer-seat\][\s\S]*?data-slot="conversation\.composer\.dock"\][^{]*\{[^}]*display: none !important/,
   );
   assert.doesNotMatch(theme.appendedStyle.textContent, /\[data-composer-card\]:last-child/);
 
@@ -1485,31 +1718,27 @@ test("queued follow-up bar spans only the Composer's flat top edge", async () =>
   theme.cleanup();
 });
 
-test("new-query Composer moves from its hero card position into the fixed seat", async () => {
+test("new-query Composer paints directly in its fixed seat without entry motion", async () => {
   const theme = await installTheme("MacIntel");
   const source = await readFile(clientPath, "utf8");
 
   assert.match(
     theme.appendedStyle.textContent,
-    /data-composer-seat\]\[data-dsh-composer-fixed\][^{]*\{[^}]*translate:\s*var\(--dsh-desktop-composer-enter-x, 0px\)\s*var\(--dsh-desktop-composer-enter-y, 0px\) !important/,
+    /data-composer-seat\]\[data-dsh-composer-fixed\][^{]*\{[^}]*translate: none !important/,
   );
   assert.match(
     theme.appendedStyle.textContent,
-    /data-dsh-composer-entering\][^{]*\{[^}]*transition: translate 420ms var\(--dsh-desktop-ease\) !important/,
-  );
-  assert.match(theme.appendedStyle.textContent, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(
-    source,
-    /const deltaX = heroRect\.left - activeRect\.left;\s*const deltaY = heroRect\.top - activeRect\.top;/,
+    /data-phase="hero"\] \*[\s\S]*?transition: none !important/,
   );
   assert.match(
-    source,
-    /seat\.getBoundingClientRect\(\);[\s\S]*?seat\.dataset\.dshComposerEntering = "";[\s\S]*?--dsh-desktop-composer-enter-y", "0px"/,
+    theme.appendedStyle.textContent,
+    /data-chat-flow-kind\][^{]*\{[^}]*animation: none !important/,
   );
   assert.match(
-    source,
-    /window\.matchMedia\("\(prefers-reduced-motion: reduce\)"\)\.matches/,
+    theme.appendedStyle.textContent,
+    /data-dsh-desktop-sidebar\]\[class\*="_railIn"\] \*[\s\S]*?animation: none !important/,
   );
+  assert.doesNotMatch(source, /dshComposerEntering|composer-enter-[xy]|animateFixedComposerFromHero/);
 
   theme.cleanup();
 });
@@ -1651,6 +1880,10 @@ function createShellFixture(HTMLElementClass) {
   logo.append(element("button"), element("button"));
   const newSession = element("button");
   const region = element();
+  const search = element("button");
+  search.setAttribute("class", "qDHVXG_searchButton");
+  search.setAttribute("aria-label", "Search workspaces and tasks");
+  region.append(search);
   const foot = element();
   sidebarRoot.append(logo, newSession, region, foot);
   sidebarSlotWrapper.append(sidebarRoot);
@@ -1659,11 +1892,12 @@ function createShellFixture(HTMLElementClass) {
   const details = element();
   const overlay = element();
   shell.append(sidebarColumn, center, details, overlay);
-  return { shell, sidebarColumn, sidebarSlotWrapper, sidebarRoot, logo, newSession, region, foot, center, details, overlay };
+  return { shell, sidebarColumn, sidebarSlotWrapper, sidebarRoot, logo, newSession, region, search, foot, center, details, overlay };
 }
 
-function createComposerFixture(HTMLElementClass) {
+function createComposerFixture(HTMLElementClass, SVGElementClass) {
   const element = (tagName = "div") => new HTMLElementClass(tagName);
+  const svgElement = (tagName, attributes = {}) => new SVGElementClass(tagName, attributes);
   const card = element();
   card.dataset.composerCard = "";
   const input = element();
@@ -1689,9 +1923,34 @@ function createComposerFixture(HTMLElementClass) {
   const model = element("button");
   model.setAttribute("aria-haspopup", "menu");
   const primary = element("button");
+  const primaryIcon = svgElement("svg", {
+    "aria-hidden": "true",
+    height: "16",
+    viewBox: "0 0 16 16",
+    width: "16",
+  });
+  const renderPrimarySend = () => {
+    primaryIcon.replaceChildren(svgElement("path", {
+      d: "M8.3125 0.980183C8.66767 1.0531 8.97902 1.20418 9.2627 1.43233C9.48724 1.61297 9.73029 1.85793 9.97949 2.10714L14.707 6.83468L13.293 8.24874L9 3.95577V15.0417H7V3.95577L2.70703 8.24874L1.29297 6.83468L6.02051 2.10714C6.26971 1.85793 6.51277 1.61297 6.7373 1.43233C6.97662 1.23986 7.28445 1.04402 7.6875 0.980183C7.8973 0.947006 8.1031 0.95516 8.3125 0.980183Z",
+      fill: "currentColor",
+    }));
+  };
+  const renderPrimaryStop = () => {
+    primaryIcon.replaceChildren(svgElement("rect", {
+      fill: "currentColor",
+      height: "10",
+      rx: "3",
+      width: "10",
+      x: "3",
+      y: "3",
+    }));
+  };
+  renderPrimarySend();
+  primary.append(primaryIcon);
   trailing.append(model, primary);
   row.append(tools, trailing);
   card.append(input, row);
+  primaryIcon.isConnected = true;
 
   const commandMenu = element();
   commandMenu.setAttribute("role", "listbox");
@@ -1743,13 +2002,19 @@ function createComposerFixture(HTMLElementClass) {
       trailing,
       model,
       primary,
+      primaryIcon,
       commandMenu,
       commandGroup,
       ...commandMenuItems.flatMap((item) => [item.button, item.label]),
     ],
     extra,
     modes,
+    primary,
+    primaryIcon,
+    renderPrimarySend,
+    renderPrimaryStop,
     tooltip,
+    textarea,
     tools,
   };
 }
@@ -1930,6 +2195,7 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   const source = await readFile(clientPath, "utf8");
 
   assert.equal(documentElement.dataset.dshDesktopUi, "jesse-composer");
+  assert.equal(documentElement.dataset.dshDesktopHost, "macos");
   assert.equal(documentElement.dataset.dshDesktopPlatform, "macos");
   assert.equal(documentElement.dataset.dshWindowRole, "main");
   assert.doesNotMatch(appendedStyle.textContent, /backdrop-filter: blur\(/);
@@ -1995,10 +2261,15 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
     /0 0 var\(--dsh-desktop-composer-shadow-blur\) 0\s*var\(--dsh-desktop-composer-shadow\)/,
   );
   assert.match(appendedStyle.textContent, /--dsh-desktop-composer-shadow: rgb\(63 156 255 \/ 30%\)/);
+  assert.match(appendedStyle.textContent, /--dsh-desktop-composer-active-shadow: rgb\(159 159 159 \/ 20%\)/);
   assert.match(appendedStyle.textContent, /--dsh-desktop-composer-shadow-blur: 48px/);
   assert.match(
     appendedStyle.textContent,
-    /data-phase="active"\] \[data-composer-card\][^{]*\{[^}]*--dsh-desktop-composer-shadow: var\(--dsh-desktop-composer-active-shadow\);[^}]*--dsh-desktop-composer-shadow-blur: 24px/,
+    /data-phase="active"\] \[data-composer-card\][^{]*\{[^}]*--dsh-desktop-composer-shadow: var\(--dsh-desktop-composer-active-shadow\);[^}]*--dsh-desktop-composer-shadow-blur: 16px/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /transition:\s*box-shadow 160ms var\(--dsh-desktop-ease\)/,
   );
   assert.doesNotMatch(appendedStyle.textContent, /drop-shadow\(8px 8px 54px/);
   assert.doesNotMatch(appendedStyle.textContent, /0 18px 54px/);
@@ -2022,6 +2293,32 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.match(source, /source\.append\(libraryIcon\)/);
   assert.match(appendedStyle.textContent, /data-dsh-desktop-sidebar-region/);
   assert.match(appendedStyle.textContent, /data-dsh-desktop-center/);
+  assert.match(
+    source,
+    /data-dsh-atom-pane\][^{]*\{[^}]*border-radius: var\(--dsh-desktop-panel-radius\)/,
+  );
+  assert.match(
+    source,
+    /data-dsh-atom-pane\][^{]*\{[^}]*overflow: hidden;[^}]*clip-path: inset\(0 round var\(--dsh-desktop-panel-radius\)\);[^}]*isolation: isolate;/,
+  );
+  assert.doesNotMatch(
+    source,
+    /\[data-dsh-atom-pane\]\[data-focused\][^{]*\{[^}]*border-color/,
+  );
+  assert.match(
+    source,
+    /html\[data-dsh-atom-frame-root\] \[data-dsh-desktop-center\][^\n]*border: 0 !important;[^\n]*outline: 0 !important;[^\n]*box-shadow: none !important/,
+  );
+  assert.match(source, /\[data-dsh-atom-frame\][^\n]*outline: 0;[^\n]*box-shadow: none/);
+  assert.match(source, /const ATOM_DIVIDER_SIZE = 8;/);
+  assert.match(
+    source,
+    /\[data-dsh-desktop-center\]:has\(> \[data-dsh-atom-host\]\)[^\n]*background: transparent !important/,
+  );
+  assert.match(
+    source,
+    /\[data-dsh-atom-divider\][^\n]*background: transparent/,
+  );
   assert.match(
     appendedStyle.textContent,
     /data-conversation-scroll\][^{]*\{[^}]*scroll-behavior: auto/,
@@ -2073,25 +2370,34 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-sidebar-new\][^{]*\{[^}]*height: 36px !important[^}]*border-radius: 12px !important/,
+    /data-dsh-session-header\][^{]*\{[^}]*padding-top: 6px !important;[^}]*padding-bottom: 6px !important;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-new\][^{]*\{[^}]*height: 34px !important[^}]*border-radius: 24px !important/,
   );
   const newSessionRule = appendedStyle.textContent.match(
     /\[data-dsh-desktop-sidebar-new\]\s*\{([^}]*)\}/,
   )?.[1];
+  assert.match(newSessionRule ?? "", /align-self: stretch !important/);
+  assert.match(newSessionRule ?? "", /justify-content: flex-start !important/);
+  assert.match(newSessionRule ?? "", /width: auto !important/);
+  assert.match(newSessionRule ?? "", /margin: 0 14px 2px -8px !important/);
+  assert.match(newSessionRule ?? "", /padding: 0 8px 0 0 !important/);
+  assert.match(newSessionRule ?? "", /gap: 6px !important/);
   assert.match(newSessionRule ?? "", /border: 0 !important/);
-  assert.match(
-    newSessionRule ?? "",
-    /background: rgb\(\s*var\(--dsh-desktop-sidebar-new-rgb\) \/\s*var\(--dsh-desktop-sidebar-new-alpha\)\s*\) !important/,
-  );
+  assert.match(newSessionRule ?? "", /border-left: 8px solid transparent !important/);
+  assert.match(newSessionRule ?? "", /background: transparent !important/);
+  assert.match(newSessionRule ?? "", /font-weight: 400 !important/);
   assert.match(newSessionRule ?? "", /box-shadow: none !important/);
   assert.doesNotMatch(newSessionRule ?? "", /linear-gradient/);
   assert.match(
     appendedStyle.textContent,
-    /\[data-dsh-desktop-sidebar-new\]:hover[^{]*\{[^}]*background: rgb\(\s*var\(--dsh-desktop-sidebar-new-rgb\) \/\s*var\(--dsh-desktop-sidebar-new-hover-alpha\)\s*\) !important/,
+    /\[data-dsh-desktop-sidebar-new\]:hover[^{]*\{[^}]*background: var\(--dsw-alias-interactive-bg-hover\) !important/,
   );
   assert.match(
     appendedStyle.textContent,
-    /data-sidebar-collapsed\][\s\S]*?data-dsh-desktop-sidebar-new\][^{]*\{[^}]*width: max\(36px, calc\(100% - 14px\)\) !important;[^}]*height: 36px !important;[^}]*margin: 0 0 12px !important;[^}]*padding: 0 !important;[^}]*gap: 0 !important;[^}]*border: 0 !important;[^}]*border-radius: 50% !important;[^}]*background: transparent !important;[^}]*box-shadow: none !important/,
+    /data-sidebar-collapsed\][\s\S]*?data-dsh-desktop-sidebar-new\][^{]*\{[^}]*justify-content: center !important;[^}]*width: 36px !important;[^}]*height: 36px !important;[^}]*margin: 0 0 2px !important;[^}]*padding: 0 !important;[^}]*gap: 0 !important;[^}]*border: 0 !important;[^}]*border-left-width: 0 !important;[^}]*border-radius: 50% !important;[^}]*background: transparent !important;[^}]*box-shadow: none !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -2132,7 +2438,7 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-sidebar-new\][^{]*\{[^}]*align-self: flex-start !important;[^}]*width: max\(36px, calc\(100% - 14px\)\) !important;[^}]*margin: 0 0 12px !important/,
+    /data-dsh-desktop-sidebar-new\][^{]*\{[^}]*align-self: stretch !important;[^}]*justify-content: flex-start !important;[^}]*width: auto !important;[^}]*margin: 0 14px 2px -8px !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -2160,7 +2466,71 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-sidebar-region\] \[class\*="_searchExpanded"\][^{]*\{[^}]*width: 100% !important;[^}]*margin-inline: 0 !important/,
+    /data-dsh-desktop-sidebar-region\] \[class\*="_sectionLabelHidden"\][^{]*\{[^}]*margin-right: -2px !important/,
+  );
+  assert.doesNotMatch(
+    appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-region\] \[class\*="_searchExpanded"\][^{]*\{[^}]*margin-inline: 0 !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_treeBody"\] > \[role="tree"\] > \[class\*="_empty"\][^{]*\{[^}]*display: flex;[^}]*align-items: center;[^}]*height: 32px;[^}]*padding: 0 !important;[^}]*line-height: 20px;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_root"\]:not\(\[class\*="_rail"\]\)[\s\S]*?> \[class\*="_sectionHeader"\]:first-child[^{]*\{[^}]*display: grid !important;[^}]*grid-template-rows: 34px 36px;[^}]*row-gap: 12px !important;[^}]*height: 82px !important;[^}]*margin: 0 0 4px !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /> \[class\*="_searchSlot"\][^{]*\{[^}]*margin: 0 0 0 -8px !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-search\]::after[^{]*\{[^}]*content: attr\(data-dsh-desktop-sidebar-search-label\);[^}]*max-width: var\(--dsh-desktop-sidebar-search-prefix-width, 100%\);[^}]*font-size: 14px;[^}]*font-weight: 400;[^}]*opacity: 1;[^}]*transition:[^}]*max-width[^}]*opacity/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /> \[class\*="_searchSlot"\]\s*> \[class\*="_search"\][^{]*\{[^}]*position: relative;[^}]*width: 100% !important;[^}]*margin: 0 !important;[^}]*border-left: 8px solid transparent !important;[^}]*box-shadow: inset 0 0 0 0 transparent;[^}]*transition:[^}]*width[^}]*margin-left[^}]*padding-left[^}]*border-left-width[^}]*border-radius[^}]*box-shadow/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_sectionHeader"\]:first-child:has\(\[class\*="_searchExpanded"\]\)[^{]*\{[^}]*grid-template-rows: 34px 0;[^}]*height: 34px !important;[^}]*margin-bottom: 12px !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-search\][^{]*\{[^}]*width: 100% !important;[^}]*color: var\(--dsw-alias-label-primary\) !important;[^}]*transition:[^}]*padding-right 240ms[^}]*color 160ms/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /> \[class\*="_searchExpanded"\][^{]*\{[^}]*width: calc\(100% - 8px\) !important;[^}]*margin-left: 8px !important;[^}]*padding-left: 8px !important;[^}]*border-left-width: 0 !important;[^}]*border-radius: 24px !important;[^}]*box-shadow: inset 0 0 0 1px var\(--dsw-alias-border-l2\)/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /> \[class\*="_searchExpanded"\][\s\S]*?\[data-dsh-desktop-sidebar-search\][^{]*\{[^}]*justify-content: flex-start !important;[^}]*width: 100% !important;[^}]*height: 34px !important;[^}]*padding-right: 32px !important;[^}]*gap: 6px !important;[^}]*color: var\(--dsw-alias-label-tertiary\) !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-search\]::after[^{]*\{[^}]*color: inherit;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /\[class\*="_searchInput"\][^{]*\{[^}]*position: absolute;[^}]*inset: 0 32px 0 30px;[^}]*width: auto !important;[^}]*margin: 0 !important;[^}]*opacity: 0;[^}]*pointer-events: none;[\s\S]*?> \[class\*="_searchExpanded"\][\s\S]*?\[class\*="_searchInput"\][^{]*\{[^}]*opacity: 1;[^}]*pointer-events: auto/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /> \[class\*="_searchExpanded"\][\s\S]*?\[data-dsh-desktop-sidebar-search\]::after[^{]*\{[^}]*max-width: calc\(100% - 54px\)/,
+  );
+  assert.doesNotMatch(
+    appendedStyle.textContent,
+    /\[data-dsh-desktop-sidebar-search\]::after\s*\{[^}]*content: none/,
+  );
+  assert.doesNotMatch(
+    appendedStyle.textContent,
+    /\[data-dsh-desktop-sidebar-search\]::after\s*\{[^}]*text-overflow: ellipsis/,
+  );
+  assert.doesNotMatch(
+    appendedStyle.textContent,
+    /> \[class\*="_searchExpanded"\]\s*\[data-dsh-desktop-sidebar-search\]::after[^{]*\{[^}]*opacity: 0/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -2180,6 +2550,14 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
+    /class\*="_groupSection"\]:has\(> \[class\*="_tasksSectionHeader"\]\)[\s\S]*?class\*="_sessionRow"\][^{]*\{[^}]*padding-left: 0 !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_groupSection"\]:has\(> \[class\*="_tasksSectionHeader"\]\)[\s\S]*?class\*="_flatSessionRowWithoutStatus"\] > \[class\*="_title"\][^{]*\{[^}]*margin-left: 0 !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
     /class\*="_sessionRow"\]:has\([\s\S]*?> \[class\*="_slot"\] > \[data-state\][\s\S]*?\) > \[class\*="_slot"\][^{]*\{[^}]*order: 1/,
   );
   assert.match(
@@ -2196,7 +2574,15 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
+    /class\*="_tasksSectionHeader"\][^{]*\{[^}]*justify-content: flex-start !important;[^}]*margin-right: 0 !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
     /class\*="_groupSection"\] > \[class\*="_sessionOverflowButton"\][^{]*\{[^}]*padding-left: 22px !important/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_groupSection"\]:has\(> \[class\*="_tasksSectionHeader"\]\)[\s\S]*?> \[class\*="_sessionOverflowButton"\][^{]*\{[^}]*padding-left: 0 !important/,
   );
   assert.match(
     appendedStyle.textContent,
@@ -2268,7 +2654,7 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   );
   assert.match(
     appendedStyle.textContent,
-    /role="treeitem"\]\:hover,[\s\S]*?role="treeitem"\]\[aria-selected="true"\][^{]*\{[^}]*background: var\(--dsw-alias-interactive-bg-hover\) !important/,
+    /role="treeitem"\]\:hover[^{]*\{[^}]*color-mix[\s\S]*?role="treeitem"\]\[aria-selected="true"\][^{]*\{[^}]*background: var\(--dsw-alias-interactive-bg-hover\) !important/,
   );
   assert.match(
     source,
@@ -2278,17 +2664,39 @@ test("desktop UI installs the Jesse composer treatment without replacing Harness
   assert.doesNotMatch(appendedStyle.textContent, /radial-gradient\(ellipse 112% 152%/);
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-platform="macos"[^}]*\[data-dsh-desktop-shell\]::before[^{]*\{[^}]*height: 44px;[^}]*app-region: drag;[^}]*-webkit-app-region: drag/,
+    /data-dsh-desktop-host="macos"[^}]*\[data-dsh-desktop-shell\]::before[^{]*\{[^}]*height: 44px;[^}]*app-region: drag;[^}]*-webkit-app-region: drag/,
   );
 
   cleanup();
   assert.equal(appendedStyle.removed, true);
   assert.equal(documentElement.dataset.dshDesktopUi, undefined);
+  assert.equal(documentElement.dataset.dshDesktopHost, undefined);
   assert.equal(documentElement.dataset.dshDesktopPlatform, undefined);
   assert.equal(documentElement.dataset.dshWindowRole, undefined);
 });
 
-test("sidebar collapse keeps rail icons on one continuous squeeze path", async () => {
+test("standard macOS Harness plugin host always uses the opaque fallback", async () => {
+  const fixture = await installTheme("MacIntel", "", { desktopHost: false });
+  const css = fixture.appendedStyle.textContent;
+
+  assert.equal(fixture.documentElement.dataset.dshDesktopPlatform, "macos");
+  assert.equal(fixture.documentElement.dataset.dshDesktopHost, undefined);
+  assert.equal(fixture.nativeThemeSources.length, 0);
+  assert.match(
+    css,
+    /html:not\(\[data-dsh-desktop-host="macos"\]\),[\s\S]*?#root[^{]*\{[^}]*background: var\(--dsw-alias-bg-base\) !important/,
+  );
+  assert.match(
+    css,
+    /html:not\(\[data-dsh-desktop-host="macos"\]\) \[data-composer-card\][^{]*\{[^}]*backdrop-filter: none/,
+  );
+  assert.doesNotMatch(css, /data-dsh-desktop-platform="macos"[^}]*app-region: drag/);
+
+  fixture.cleanup();
+  assert.equal(fixture.documentElement.dataset.dshDesktopHost, undefined);
+});
+
+test("sidebar collapse aligns rail actions and omits compact search", async () => {
   const { appendedStyle, cleanup } = await installTheme("MacIntel");
   const css = appendedStyle.textContent;
 
@@ -2310,12 +2718,13 @@ test("sidebar collapse keeps rail icons on one continuous squeeze path", async (
   );
   assert.match(
     css,
-    /data-sidebar-collapsed\][\s\S]*?class\*="_rail"\][\s\S]*?class\*="_search"\][^{]*\{[^}]*animation: dsh-desktop-sidebar-search-settle 150ms var\(--ds-ease-in-out\) both !important/,
+    /data-sidebar-collapsed\][\s\S]*?class\*="_rail"\][\s\S]*?> \[class\*="_sectionHeader"\][^{]*\{[^}]*justify-content: flex-start !important;[^}]*gap: 0 !important/,
   );
   assert.match(
     css,
-    /@keyframes dsh-desktop-sidebar-search-settle\s*\{\s*from \{ transform: translate\(14px, -42px\); \}\s*to \{ transform: translate\(0, 0\); \}/,
+    /data-sidebar-collapsed\][\s\S]*?class\*="_searchSlot"\],[\s\S]*?data-sidebar-collapsed\][\s\S]*?class\*="_rail"\][\s\S]*?> \[class\*="_search"\][^{]*\{[^}]*display: none !important/,
   );
+  assert.doesNotMatch(css, /dsh-desktop-sidebar-search-settle/);
   assert.match(
     css,
     /data-sidebar-collapsed\][\s\S]*?button\[class\*="_wide"\],[\s\S]*?class\*="_sectionLabel"\][^{]*\{[^}]*transform: translateX\(-100%\)/,
@@ -2340,20 +2749,17 @@ test("sidebar collapse keeps rail icons on one continuous squeeze path", async (
   cleanup();
 });
 
-test("New Session action uses theme-specific white and black alpha surfaces", async () => {
+test("New Task action stays quiet in light and dark themes", async () => {
   const { appendedStyle, cleanup } = await installTheme("MacIntel", "", {
     themePreference: "dark",
     colorScheme: "dark",
   });
   const css = appendedStyle.textContent;
 
+  assert.doesNotMatch(css, /--dsh-desktop-sidebar-new-(?:rgb|alpha|hover-alpha)/);
   assert.match(
     css,
-    /body\s*\{[^}]*--dsh-desktop-sidebar-new-rgb: 255 255 255;[^}]*--dsh-desktop-sidebar-new-alpha: 72%;[^}]*--dsh-desktop-sidebar-new-hover-alpha: 84%/,
-  );
-  assert.match(
-    css,
-    /body\[data-ds-dark-theme\][^{]*\{[^}]*--dsh-desktop-sidebar-new-rgb: 0 0 0;[^}]*--dsh-desktop-sidebar-new-alpha: 40%;[^}]*--dsh-desktop-sidebar-new-hover-alpha: 50%/,
+    /data-dsh-desktop-sidebar-new\][^{]*\{[^}]*background: transparent !important/,
   );
   assert.doesNotMatch(
     css,
@@ -2370,7 +2776,7 @@ test("Composer glass and native material follow the Harness theme source", async
   });
   const css = theme.appendedStyle.textContent;
 
-  assert.deepEqual(Array.from(theme.plugin.inject), ["theme", "sessions"]);
+  assert.deepEqual(Array.from(theme.plugin.inject), ["theme", "sessions", "workspaces", "layout"]);
   assert.deepEqual(theme.nativeThemeSources, ["system"]);
   assert.match(
     css,
@@ -2382,7 +2788,11 @@ test("Composer glass and native material follow the Harness theme source", async
   );
   assert.match(
     css,
-    /--dsh-desktop-send-disabled-bg: var\(--dsw-alias-button-primary-dimmed\)/,
+    /:root\s*\{[^}]*--dsh-desktop-send-disabled-bg: rgb\(235 238 242\)/,
+  );
+  assert.match(
+    css,
+    /body\[data-ds-dark-theme\][^{]*\{[^}]*--dsh-desktop-send-disabled-bg: rgb\(67 69 74\)/,
   );
   assert.match(
     css,
@@ -2391,6 +2801,10 @@ test("Composer glass and native material follow the Harness theme source", async
   assert.match(
     css,
     /data-dsh-composer-primary\][^{]*\{[^}]*color: var\(--dsw-alias-label-primary-foreground\) !important;[^}]*background: var\(--dsw-alias-button-primary-fill\) !important/,
+  );
+  assert.match(
+    css,
+    /data-dsh-composer-primary\]:disabled\s*\{[^}]*background: var\(--dsh-desktop-send-disabled-bg\) !important;[^}]*opacity: 1 !important/,
   );
   assert.doesNotMatch(css, /@media \(prefers-color-scheme: dark\)/);
 
@@ -2420,6 +2834,41 @@ test("workspace grouping and sorting control is removed from the desktop sidebar
   cleanup();
 });
 
+test("inactive workspace icons inherit the workspace label color", async () => {
+  const { appendedStyle, cleanup } = await installTheme("MacIntel");
+
+  assert.match(
+    appendedStyle.textContent,
+    /class\*="_projectRow"\] > \[class\*="_folder"\]:not\(\[class\*="_folderActive"\]\)[^{]*\{[^}]*color: inherit;/,
+  );
+
+  cleanup();
+});
+
+test("sidebar leaves Tasks visible independently of the Workspace registry", async () => {
+  const fixture = await installTheme("MacIntel", "", {
+    includeShell: true,
+    includeSidebarSessions: true,
+    workspaceItems: [{ workspaceId: "workspace:1" }],
+  });
+
+  assert.equal(fixture.workspaceSubscriberCount(), 0);
+  assert.doesNotMatch(
+    fixture.appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-region\][\s\S]*?class\*="_groupSection"\]:has\([\s\S]*?> \[class\*="_projectRow"\]\[draggable="false"\][\s\S]*?\)[^{]*\{[^}]*display: none !important/,
+  );
+  assert.doesNotMatch(
+    fixture.appendedStyle.textContent,
+    /data-dsh-desktop-sidebar-region\]\[data-dsh-workspaces-empty\][\s\S]*?class\*="_listArea"\] > \*[^{]*\{[^}]*display: none !important/,
+  );
+
+  fixture.setWorkspaces([]);
+  fixture.setWorkspaces([{ workspaceId: "workspace:2" }]);
+
+  fixture.cleanup();
+  assert.equal(fixture.workspaceSubscriberCount(), 0);
+});
+
 test("modal mask remains entirely inside the Chromium renderer", async () => {
   const fixture = await installTheme("MacIntel");
   const mainSource = await readFile(mainPath, "utf8");
@@ -2443,9 +2892,10 @@ test("Windows keeps the Jesse composer geometry while disabling glass", async ()
   const { appendedStyle, cleanup, documentElement } = await installTheme("Win32");
 
   assert.equal(documentElement.dataset.dshDesktopPlatform, "windows");
+  assert.equal(documentElement.dataset.dshDesktopHost, undefined);
   assert.match(
     appendedStyle.textContent,
-    /data-dsh-desktop-platform="windows"\] \[data-composer-card\][\s\S]*?backdrop-filter: none/,
+    /html:not\(\[data-dsh-desktop-host="macos"\]\) \[data-composer-card\][\s\S]*?backdrop-filter: none/,
   );
   assert.match(appendedStyle.textContent, /--dsh-desktop-card-radius: 28px/);
   assert.match(
@@ -2486,6 +2936,30 @@ test("Windows keeps the Jesse composer geometry while disabling glass", async ()
   );
   assert.match(
     appendedStyle.textContent,
+    /grid-template-columns:\s*24px minmax\(0, 1fr\) minmax\(0, max-content\)\s*minmax\(0, max-content\)/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-composer-trailing\][^{]*\{[^}]*min-width: 0;[^}]*max-width: 100%;[^}]*justify-content: flex-end;[^}]*justify-self: end;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-composer-trailing\][\s\S]*?> :has\(> button\[data-dsh-composer-menu-trigger="model"\]\)[^{]*\{[^}]*flex: 1 1 auto;[^}]*min-width: 0;[^}]*max-width: 220px;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /button\[data-dsh-composer-menu-trigger="model"\][^{]*\{[^}]*width: 100% !important;[^}]*max-width: 220px;[^}]*padding-right: 0 !important;[^}]*overflow: hidden;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /data-dsh-composer-trailing\]:not\(:has\([\s\S]*?button\[aria-haspopup="dialog"\]:not\(\[data-dsh-composer-menu-trigger="model"\]\)[\s\S]*?button\[data-dsh-composer-menu-trigger="model"\][^{]*\{[^}]*padding-right: 7px !important;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
+    /button\[data-dsh-composer-menu-trigger="model"\] > span:first-of-type[^{]*\{[^}]*text-overflow: ellipsis;[^}]*white-space: nowrap;[^}]*overflow: hidden;/,
+  );
+  assert.match(
+    appendedStyle.textContent,
     /button\[data-dsh-composer-menu-trigger="model"\] :is\(span, strong\)[^{]*\{[^}]*color: inherit !important;[^}]*font-size: inherit !important;[^}]*font-weight: inherit !important;[^}]*opacity: 1 !important/,
   );
   assert.match(
@@ -2506,27 +2980,59 @@ test("Windows keeps the Jesse composer geometry while disabling glass", async ()
   );
   assert.match(
     appendedStyle.textContent,
-    /html:not\(\[data-dsh-desktop-platform="macos"\]\) \[data-dsh-desktop-shell\][\s\S]*?backdrop-filter: none/,
+    /html:not\(\[data-dsh-desktop-host="macos"\]\) \[data-dsh-desktop-shell\][\s\S]*?backdrop-filter: none/,
   );
 
   cleanup();
 });
 
-test("Electron shell enforces one BrowserWindow and one renderer bridge", async () => {
-  const [mainSource, preloadSource, clientSource, packageSource] = await Promise.all([
+test("Electron shell provides a registered multi-window atom bridge", async () => {
+  const [mainSource, preloadSource, clientSource, packageSource, workspaceSource] = await Promise.all([
     readFile(mainPath, "utf8"),
     readFile(preloadPath, "utf8"),
     readFile(clientPath, "utf8"),
     readFile(join(root, "package.json"), "utf8"),
+    readFile(workspaceSourcePath, "utf8"),
   ]);
 
   assert.equal((mainSource.match(/new BrowserWindow\(/g) ?? []).length, 1);
   assert.match(mainSource, /BrowserWindow\.getAllWindows\(\)/);
-  assert.match(mainSource, /windows\.length !== 1 \|\| windows\[0\] !== mainWindow/);
+  assert.match(mainSource, /const atomWindows = new Map\(\)/);
+  assert.match(mainSource, /const atomWindowZOrder = \[\]/);
+  assert.match(mainSource, /const pendingAtomMerges = new Map\(\)/);
+  assert.match(mainSource, /async function createAtomWindow/);
+  assert.match(mainSource, /const partition = `dsh-atom-\$\{windowId\.replace/);
+  assert.match(mainSource, /createWindow\(\{[\s\S]*?role: "atom",[\s\S]*?partition,/);
+  assert.match(mainSource, /const width = Math\.min\(514, area\.width\)/);
+  assert.match(mainSource, /const height = Math\.min\(532, area\.height\)/);
+  assert.match(mainSource, /Math\.max\(420, bounds\.width \?\? 514\)/);
+  assert.match(mainSource, /showOnReady: true,[\s\S]*?role: "atom"/);
+  assert.doesNotMatch(mainSource, /dshAtomSessionReady[\s\S]*?data-phase=\"active\"/);
+  assert.match(mainSource, /await window\.loadURL\(url\.href\);[\s\S]*?if \(!window\.isVisible\(\)\) window\.show\(\)/);
+  assert.match(mainSource, /url\.searchParams\.set\("dshAtomWindow", windowId\)/);
+  assert.doesNotMatch(mainSource, /url\.searchParams\.set\("dshAtomPane", "1"\)/);
+  assert.match(mainSource, /screen\.getDisplayNearestPoint/);
+  assert.match(mainSource, /desktop:atom-create-window/);
+  assert.match(mainSource, /desktop:atom-detach-session/);
+  assert.match(mainSource, /screen\.getCursorScreenPoint\(\)/);
+  assert.match(mainSource, /const sourceBounds = source\.window\.getBounds\(\)[\s\S]*?return \{ detached: false, merged: false, moved: false, windowId: source\.id \}/);
+  assert.match(mainSource, /function atomWindowAtPoint\(/);
+  assert.match(mainSource, /function requestAtomMerge\(/);
+  assert.ok(
+    mainSource.indexOf("const target = atomWindowAtPoint(point, source.id)") <
+      mainSource.indexOf("const sourceBounds = source.window.getBounds()"),
+  );
+  assert.match(mainSource, /type: "merge-pane"/);
+  assert.match(mainSource, /message\.type === "merge-result"/);
+  assert.match(mainSource, /target\.window\.getContentBounds\(\)/);
+  assert.match(mainSource, /desktop:atom-publish/);
+  assert.match(mainSource, /const persisted = persistedAtomWindows\.get\(entry\.id\)[\s\S]*?layout: persisted\?\.layout/);
+  assert.match(mainSource, /atom-workbench\.json/);
+  assert.match(mainSource, /screen\.getDisplayMatching/);
   assert.doesNotMatch(mainSource, /parent: mainWindow|additionalArguments|setIgnoreMouseEvents/);
   assert.doesNotMatch(mainSource, /composerForegroundWindow|composerOverlayInteraction/);
   assert.doesNotMatch(mainSource, /desktop:(?:composer|modal-overlay|sidebar-button|scroll-button)/);
-  assert.match(mainSource, /event\.sender !== mainWindow\?\.webContents/);
+  assert.match(mainSource, /if \(!atomEntryFor\(event\.sender\)\) return/);
   assert.match(mainSource, /nativeTheme\.themeSource = themeSource/);
 
   let exposed;
@@ -2542,19 +3048,55 @@ test("Electron shell enforces one BrowserWindow and one renderer bridge", async 
           },
         },
         ipcRenderer: {
+          invoke(...args) {
+            sent.push(args);
+            if (args[0] === "desktop:atom-detach-session") {
+              return Promise.resolve({ detached: true, windowId: "atom:1" });
+            }
+            return Promise.resolve({ sessionId: "session-test", cwd: "/tmp/session-test" });
+          },
           send(...args) {
             sent.push(args);
           },
+          on() {},
+          removeListener() {},
         },
       };
     },
   }, { filename: preloadPath });
-  assert.deepEqual(Object.keys(exposed), ["restart", "setThemeSource"]);
+  assert.deepEqual(Object.keys(exposed), [
+    "onCompanionOpen",
+    "companionOpened",
+    "atomContext",
+    "closeAtomWindow",
+    "createAtomWindow",
+    "detachAtomSession",
+    "createTaskScope",
+    "focusAtomWindow",
+    "onAtomEvent",
+    "publishAtomEvent",
+    "restart",
+    "setThemeSource",
+  ]);
+  await exposed.atomContext();
+  exposed.closeAtomWindow();
+  await exposed.createAtomWindow({ sessionId: "session-test" });
+  await exposed.detachAtomSession({ sessionId: "session-test", layout: { root: { type: "pane" } } });
+  await exposed.createTaskScope();
+  exposed.focusAtomWindow("main");
+  exposed.publishAtomEvent("focus-session", { sessionId: "session-test" });
   exposed.restart();
   exposed.setThemeSource("dark");
   exposed.setThemeSource("system");
   exposed.setThemeSource("sepia");
-  assert.deepEqual(sent, [
+  assert.deepEqual(JSON.parse(JSON.stringify(sent)), [
+    ["desktop:atom-context"],
+    ["desktop:atom-close-window"],
+    ["desktop:atom-create-window", { sessionId: "session-test" }],
+    ["desktop:atom-detach-session", { sessionId: "session-test", layout: { root: { type: "pane" } } }],
+    ["desktop:create-task-scope"],
+    ["desktop:atom-focus-window", "main"],
+    ["desktop:atom-publish", { type: "focus-session", detail: { sessionId: "session-test" } }],
     ["desktop:restart"],
     ["desktop:set-theme-source", "dark"],
     ["desktop:set-theme-source", "system"],
@@ -2562,7 +3104,217 @@ test("Electron shell enforces one BrowserWindow and one renderer bridge", async 
 
   assert.doesNotMatch(clientSource, /composerOverlay|nativeGlass|setComposerGlassFrame/);
   assert.doesNotMatch(clientSource, /publishComposerSessionContext|forwardedHover/);
-  assert.doesNotMatch(packageSource, /build:native|build-macos-native|prestart|presmoke/);
+  assert.match(clientSource, /function atomInsert\(/);
+  assert.match(clientSource, /function atomReplace\(/);
+  assert.match(clientSource, /function atomRemove\(/);
+  assert.match(clientSource, /function atomFirstPane\(/);
+  assert.match(clientSource, /function atomPruneSessions\(/);
+  assert.match(clientSource, /data-dsh-atom-zone=\"top\"/);
+  assert.doesNotMatch(clientSource, /data-dsh-atom-zone=\"center\"/);
+  assert.match(clientSource, /function atomDropDirectionAt\(/);
+  assert.match(clientSource, /const ATOM_PANE_MIN_WIDTH = 320;/);
+  assert.match(clientSource, /const ATOM_PANE_MIN_HEIGHT = 240;/);
+  assert.match(clientSource, /function atomMinimumSize\(/);
+  assert.match(clientSource, /\[data-dsh-atom-host\][^\n]*overflow: auto/);
+  assert.match(clientSource, /\[data-dsh-atom-window-header\] \{ box-sizing: border-box; padding-left: 88px !important; \}/);
+  assert.match(clientSource, /const needsWindowControlsInset = window\.self === window\.top/);
+  assert.match(clientSource, /const markWindowHeader = \(\) => \{[\s\S]*?if \(!needsWindowControlsInset\) return/);
+  assert.match(clientSource, /const markWindowHeader = \(\) => \{[\s\S]*?data-conversation-scroll[\s\S]*?dshAtomWindowHeader/);
+  assert.match(clientSource, /header\.style\.setProperty\("padding-left", "88px", "important"\)/);
+  assert.match(clientSource, /new MutationObserver\(markWindowHeader\)[\s\S]*?childList: true, subtree: true/);
+  assert.match(clientSource, /const mountNode = \(parent, node, minimum = atomMinimumSize\(node\)\)/);
+  assert.match(clientSource, /atomApplyMinimumSize\(splitElement, minimum\)/);
+  assert.match(clientSource, /atomApplyMinimumSize\(first, minimum\.first\)/);
+  assert.match(clientSource, /atomApplyMinimumSize\(second, minimum\.second\)/);
+  assert.match(clientSource, /const syncRenderedNode = \(node, minimum = atomMinimumSize\(node\)\)/);
+  assert.match(clientSource, /const paneRecords = new Map\(\)/);
+  assert.match(clientSource, /data-dsh-atom-parking/);
+  assert.match(clientSource, /typeof parent\.moveBefore === "function"[\s\S]*?parent\.moveBefore\(child, null\)/);
+  assert.doesNotMatch(clientSource, /host\.replaceChildren\(renderNode/);
+  assert.match(clientSource, /for \(const record of paneRecords\.values\(\)\)[\s\S]*?movePreservingState\(parking, record\.element\)/);
+  assert.match(clientSource, /application\/x-dsh-session/);
+  assert.match(clientSource, /if \(!globalThis\.location\?\.href\) return \(\) => \{\};[\s\S]*?const style = atomStyle\(\);[\s\S]*?if \(query\.get\("dshAtomPane"\) === "1"\)/);
+  assert.match(clientSource, /if \(!window\.desktop\?\.atomContext\) \{[\s\S]*?style\.remove\(\)/);
+  assert.match(clientSource, /const isAtomWindow = query\.has\("dshAtomWindow"\)/);
+  assert.match(clientSource, /if \(isAtomWindow\) document\.documentElement\.dataset\.dshAtomFrameRoot = ""/);
+  assert.match(clientSource, /const restoreWindowContext = \(\) => \{[\s\S]*?windowContext\.layout\?\.root[\s\S]*?atomPruneSessions\(windowContext\.layout\.root, validSessionIds\)/);
+  assert.match(clientSource, /root = root \?\? restoreWindowContext\(\) \?\? restore\(current\)/);
+  assert.match(clientSource, /sessionHeader\?\.toggleAttribute\("data-dsh-atom-window-header", windowHeader\)/);
+  assert.match(clientSource, /delete document\.documentElement\.dataset\.dshAtomSessionReady;[\s\S]*?style\.remove\(\);/);
+  assert.match(clientSource, /frameDocument\.documentElement\.dataset\.dshAtomFrameRoot = "";[\s\S]*?atomStyle\(frameDocument\)/);
+  assert.doesNotMatch(clientSource, /document\.documentElement\.dataset\.dshAtomPane = ""/);
+  assert.match(clientSource, /frame\.addEventListener\("load", prepareFrame\)/);
+  assert.match(clientSource, /saved\.groups\.flatMap\([\s\S]*?atomPruneSessions\(group\.root, validSessionIds\)/);
+  assert.match(clientSource, /atomPruneSessions\(legacy\.root, validSessionIds\)/);
+  assert.match(clientSource, /const restorableEntries = entries\.filter\(\(entry\) => entry\.durable\)/);
+  assert.match(clientSource, /blank: item\.blank === true/);
+  assert.match(clientSource, /durable: item\.blank !== true/);
+  assert.match(clientSource, /validSessionIds\.has\(fallbackSession\) \? fallbackSession : restorableEntries\[0\]\?\.id/);
+  assert.match(clientSource, /function atomHasSessionDrag\(event\)[\s\S]*?event\.dataTransfer\?\.types/);
+  assert.match(clientSource, /zones\.addEventListener\("dragenter", activateDropTarget\)/);
+  assert.match(clientSource, /zones\.addEventListener\("dragover", activateDropTarget\)/);
+  assert.match(clientSource, /const bounds = record\.element\.getBoundingClientRect\(\)/);
+  assert.doesNotMatch(clientSource, /const bounds = record\.zones\.getBoundingClientRect\(\)/);
+  assert.match(clientSource, /setAtomDragCapture\(true, true, payload\)/);
+  assert.match(clientSource, /document\.addEventListener\("dragend", finishDocumentDrag\)/);
+  assert.match(clientSource, /const warmed = existing \? paneRecords\.get\(existing\.id\) : warmSessionPane\(sessionId, entry\.title\)/);
+  assert.match(clientSource, /const warmed = existing \? paneRecords\.get\(existing\.id\) : warmSessionPane\(sessionId, entry\.title\);[\s\S]*?commit\(\);/);
+  assert.match(clientSource, /data-dsh-atom-frame-state="loading"/);
+  assert.match(clientSource, /revealPending = true;[\s\S]*?dshAtomFrameState = "ready";[\s\S]*?resolveReady\(\)/);
+  assert.doesNotMatch(clientSource, /requestAnimationFrame\(\(\) => requestAnimationFrame\(\(\) => \{[\s\S]*?dshAtomFrameState = "ready"/);
+  assert.match(clientSource, /if \(entry\.blank\) \{[\s\S]*?groupForSession\(sessionId\)[\s\S]*?createSoloLayoutGroup\(entry, requestSequence\)/);
+  assert.match(clientSource, /function atomSessions\([\s\S]*?syncAtomSidebarOpenState[\s\S]*?data-dsh-atom-open/);
+  assert.match(clientSource, /const groupForSession = \(sessionId\) => layoutGroups\.find/);
+  assert.match(clientSource, /const activateLayoutGroup = \(group, sessionId, requestSequence = sidebarOpenSequence\) => \{[\s\S]*?if \(requestSequence !== sidebarOpenSequence\) return;[\s\S]*?root = group\.root;[\s\S]*?render\(\);/);
+  assert.match(clientSource, /focusedRecord\?\.isReady\(\)[\s\S]*?focusedRecord\?\.ready\.then/);
+  assert.doesNotMatch(clientSource, /Promise\.all\(pending\.map\(\(record\) => record\.ready\)\)\.then\(commit\)/);
+  assert.match(clientSource, /data-dsh-atom-frame-state="loading"\]\)::after[\s\S]*?dsh-atom-loading-spin/);
+  assert.match(clientSource, /data-dsh-atom-frame-state="loading"\]\)::after[^}]*corner-shape: round/);
+  assert.match(clientSource, /const createSoloLayoutGroup = \(entry, requestSequence = sidebarOpenSequence\) => \{[\s\S]*?syncActiveGroup\(\);[\s\S]*?layoutGroups\.push\(group\)[\s\S]*?activateLayoutGroup\(group, entry\.id, requestSequence\)/);
+  assert.match(clientSource, /dsh-atom-layout-groups:v\$\{ATOM_LAYOUT_VERSION\}/);
+  assert.match(clientSource, /const ATOM_LAYOUT_VERSION = 2;/);
+  assert.match(clientSource, /legacy\?\.version === 1/);
+  assert.match(clientSource, /\[\.\.\.new Set\(layoutGroups\.flatMap/);
+  assert.match(clientSource, /\[data-composer-card\] textarea:not\(:disabled\)/);
+  const resizeStart = clientSource.indexOf("      const resizeDivider =");
+  const resizeEnd = clientSource.indexOf("      const openSidebarSession =", resizeStart);
+  const resizeSource = clientSource.slice(resizeStart, resizeEnd);
+  assert.match(resizeSource, /divider\.setPointerCapture\(event\.pointerId\)/);
+  assert.match(resizeSource, /divider\.addEventListener\("pointerup", up\)/);
+  assert.match(resizeSource, /divider\.addEventListener\("pointercancel", cancel\)/);
+  assert.match(resizeSource, /first\.style\.flex = `\$\{nextRatio\} 0 0`/);
+  assert.match(resizeSource, /node\.ratio = nextRatio;[\s\S]*?save\(\)/);
+  assert.doesNotMatch(resizeSource, /render\(\)/);
+  assert.doesNotMatch(clientSource, /data-dsh-atom-action/);
+  assert.doesNotMatch(clientSource, /Maximize pane|Move to new window|Close view/);
+  assert.match(clientSource, /const bindAtomHeaderDrag = \(header, getNode, options = \{\}\) => \{/);
+  assert.match(clientSource, /header\.setPointerCapture\(pointerId\)/);
+  assert.match(clientSource, /Math\.hypot\(point\.x - start\.x, point\.y - start\.y\) < 6/);
+  assert.match(clientSource, /currentTarget = pointerDropTargetAt\(point\.x, point\.y\)/);
+  assert.match(clientSource, /dragHandle\.dataset\.dshAtomNativeDragHandle = ""/);
+  assert.match(clientSource, /const bindFrameHeaderDrag = \(\) => \{[\s\S]*?data-dsh-session-header[\s\S]*?\.dsh-session-header-menu[\s\S]*?menuBounds\.left - regionBounds\.left/);
+  assert.match(clientSource, /bindAtomHeaderDrag\(dragHandle, \(\) => record\.node/);
+  assert.doesNotMatch(clientSource, /bindAtomHeaderDrag\(header, \(\) => record\.node\)/);
+  assert.match(clientSource, /const accepted = data \? acceptDrop\(data, record\.node\.id, direction\) : false/);
+  assert.match(clientSource, /readAtomDrag\(event\) \?\? activeAtomDrag/);
+  assert.match(clientSource, /const targetWorkspaceId = atomWorkspaceFor\(ctx, data\.sessionId\)\?\.workspaceId;/);
+  assert.match(clientSource, /workspaceId !== targetWorkspaceId/);
+  assert.doesNotMatch(clientSource, /workspaceId !== targetWorkspace\)/);
+  assert.match(clientSource, /window\.desktop\.publishAtomEvent\("drag-pointer"/);
+  assert.match(clientSource, /window\.desktop\.publishAtomEvent\("pane-transfer-committed", \{[\s\S]*?transferSourceWindowId: data\.sourceWindowId/);
+  assert.match(clientSource, /message\?\.type === "pane-transfer-committed"[\s\S]*?transferSourceWindowId === windowContext\.windowId/);
+  assert.match(clientSource, /message\?\.type === "merge-pane"/);
+  assert.match(clientSource, /publishAtomEvent\("merge-result"/);
+  assert.match(clientSource, /canCreateWindow: windowContext\.role === "main" \|\| root\.type !== "pane"/);
+  assert.match(clientSource, /result\?\.detached \|\| result\?\.merged/);
+  assert.match(clientSource, /if \(host\) host\.replaceChildren\(\);[\s\S]*?renderedStructure = undefined/);
+  assert.doesNotMatch(clientSource, /element\.addEventListener\("pointerdown", \(\) => \{ focusedPaneId = node\.id; render\(\); \}\)/);
+  assert.match(workspaceSource, /"data-dsh-session-id": node\.id/);
+  assert.doesNotMatch(clientSource, /dragenter", \(event\) => \{ if \(readAtomDrag\(event\)\)/);
+  assert.match(clientSource, /dsh-atom-layout-groups:v\$\{ATOM_LAYOUT_VERSION\}/);
+  assert.doesNotMatch(packageSource, /build-macos-native|presmoke/);
+  assert.equal(JSON.parse(packageSource).scripts.prestart, "node scripts/ensure-companion.js");
+
+  const pointStart = mainSource.indexOf("function atomWindowAtPoint");
+  const pointEnd = mainSource.indexOf("function broadcastAtomEvent", pointStart);
+  const pointSandbox = { atomWindows: new Map(), atomWindowZOrder: ["main", "atom:1"] };
+  vm.runInNewContext(
+    `${mainSource.slice(pointStart, pointEnd)}\nthis.atomWindowAtPoint = atomWindowAtPoint;`,
+    pointSandbox,
+  );
+  pointSandbox.atomWindows.set("main", {
+    id: "main",
+    window: {
+      isDestroyed: () => false,
+      isVisible: () => true,
+      getBounds: () => ({ x: 100, y: 80, width: 900, height: 620 }),
+    },
+  });
+  assert.equal(pointSandbox.atomWindowAtPoint({ x: 500, y: 400 }).id, "main");
+  pointSandbox.atomWindows.set("atom:1", {
+    id: "atom:1",
+    role: "atom",
+    window: {
+      isDestroyed: () => false,
+      isVisible: () => true,
+      getBounds: () => ({ x: 300, y: 200, width: 500, height: 400 }),
+    },
+  });
+  assert.equal(pointSandbox.atomWindowAtPoint({ x: 500, y: 400 }).id, "atom:1");
+  assert.equal(pointSandbox.atomWindowAtPoint({ x: 500, y: 400 }, "atom:1").id, "main");
+  assert.equal(pointSandbox.atomWindowAtPoint({ x: 50, y: 50 }), undefined);
+});
+
+test("Sidenav placement moves one mounted workbench between left, right, and top", async () => {
+  const [layoutSource, sidebarSource, workspaceSource, clientSource] = await Promise.all([
+    readFile(layoutSourcePath, "utf8"),
+    readFile(sidebarSourcePath, "utf8"),
+    readFile(workspaceSourcePath, "utf8"),
+    readFile(clientPath, "utf8"),
+  ]);
+
+  assert.match(layoutSource, /const sidebarPlacements = \["left", "right", "top"\]/);
+  assert.match(layoutSource, /setSidebarPlacement: \(d, placement\)/);
+  assert.match(layoutSource, /gridTemplateAreas: '\"sidebar sidebar\" \"center details\"'/);
+  assert.match(layoutSource, /gridTemplateAreas: '\"center details sidebar\"'/);
+  assert.match(layoutSource, /placement === "right" \? -dx : dx/);
+  assert.match(layoutSource, /placement !== "top" && !sidebarCollapsed/);
+  assert.doesNotMatch(layoutSource, /key:\s*placement/);
+
+  assert.match(sidebarSource, /data-dsh-sidebar-placement-handle/);
+  assert.doesNotMatch(sidebarSource, /logoRow,\s*"data-dsh-sidebar-placement-handle"/);
+  assert.match(sidebarSource, /className: clsx\(SidebarRoot_module_css_default\.brand[\s\S]{0,180}"data-dsh-sidebar-placement-handle": true/);
+  assert.match(sidebarSource, /className: clsx\(SidebarRoot_module_css_default\.iconButton, SidebarRoot_module_css_default\.toggle\)[\s\S]{0,180}"data-dsh-sidebar-placement-handle": !wide \? true : void 0/);
+  assert.match(sidebarSource, /orientation: placement === "top" \? "horizontal" : "vertical"/);
+  assert.match(sidebarSource, /data-sidebar-placement=top/);
+
+  assert.match(workspaceSource, /function rowHalf\(e, orientation = "vertical"\)/);
+  assert.match(workspaceSource, /orientation === "horizontal" \? e\.clientX/);
+  assert.match(workspaceSource, /data-orientation/);
+  assert.match(workspaceSource, /width:clamp\(112px,14vw,220px\)/);
+  assert.match(workspaceSource, /max-height:60vh/);
+  assert.match(workspaceSource, /children: \[browseTree, searchResults !== null/);
+
+  assert.match(clientSource, /dsh-sidebar-placement:v1:\$\{windowId\}/);
+  assert.match(clientSource, /query\.get\("dshAtomPane"\) === "1"/);
+  assert.match(clientSource, /Math\.hypot[\s\S]*?< 6/);
+  assert.match(clientSource, /width \* 0\.2/);
+  assert.match(clientSource, /height \* 0\.25/);
+  assert.match(clientSource, /data-dsh-sidebar-placement-preview="left"[\s\S]*?width: var\(--dsh-sidebar-placement-preview-width, 280px\)/);
+  assert.match(clientSource, /data-dsh-sidebar-placement-preview="right"[\s\S]*?width: var\(--dsh-sidebar-placement-preview-width, 280px\)/);
+  assert.match(clientSource, /data-dsh-sidebar-placement-preview="top"[^}]*height: 52px/);
+  assert.doesNotMatch(clientSource, /data-dsh-sidebar-placement-preview="(?:left|right|top)"[^}]*50%/);
+  assert.match(clientSource, /sidebarColumn\.getBoundingClientRect\(\)\.width/);
+  assert.match(clientSource, /window\.addEventListener\("blur", cancelDrag\)/);
+  assert.match(clientSource, /event\.key === "Escape"/);
+  assert.match(clientSource, /ctx\.layout\?\.setSidebarPlacement\?\./);
+  assert.match(clientSource, /data-dsh-atom-focused/);
+  assert.match(clientSource, /data-sidebar-placement="right"\]\[data-dsh-desktop-shell\] \{ padding: 0 0 0 var\(--dsh-desktop-shell-gap\); \}/);
+  assert.doesNotMatch(clientSource, /data-sidebar-placement="right"\][^\n]*data-dsh-desktop-sidebar(?:-logo|-foot)?\]/);
+  assert.match(clientSource, /data-sidebar-placement="top"\][^\n]*data-dsh-desktop-sidebar\][^{]*\{[\s\S]*?grid-template-columns: 166px auto minmax\(0, 1fr\) 36px !important/);
+  assert.match(clientSource, /data-sidebar-placement="top"\][^\n]*data-dsh-desktop-sidebar-new\][^{]*\{[\s\S]*?justify-content: center !important;[\s\S]*?width: 34px !important;[\s\S]*?padding: 0 !important/);
+  assert.match(clientSource, /data-sidebar-placement="top"\][^\n]*data-dsh-desktop-sidebar-new\] > span[^{]*\{[\s\S]*?position: absolute !important;[\s\S]*?clip: rect\(0 0 0 0\)/);
+  assert.match(clientSource, /_listArea[\s\S]*?-webkit-mask-image: linear-gradient\([\s\S]*?transparent 0[\s\S]*?#000 28px[\s\S]*?#000 calc\(100% - 28px\)[\s\S]*?transparent 100%/);
+  assert.match(clientSource, /_searchSlot[\s\S]*?align-self: center !important;[\s\S]*?_headerActions[\s\S]*?justify-content: center;[\s\S]*?_headerActions[\s\S]*?svg[\s\S]*?display: block;[\s\S]*?width: 20px !important/);
+  assert.match(clientSource, /data-dsh-desktop-host="macos"[\s\S]*?data-sidebar-placement="top"[\s\S]*?padding-left: 80px !important/);
+  assert.match(clientSource, /data-sidebar-placement="top"\]\[data-dsh-desktop-shell\]:has\(\[data-dsh-atom-host\]\)[\s\S]*?> \[data-dsh-desktop-sidebar-column\]::before[^{]*\{[\s\S]*?content: none;[\s\S]*?pointer-events: none;[\s\S]*?-webkit-app-region: no-drag;/);
+  assert.match(clientSource, /data-sidebar-placement="top"\][^\n]*data-dsh-desktop-sidebar\] button,[\s\S]*?data-dsh-desktop-sidebar\] input,[\s\S]*?\[role="treeitem"\][^{]*\{[\s\S]*?-webkit-app-region: no-drag; app-region: no-drag;/);
+  assert.match(clientSource, /data-dsh-desktop-shell\]:has\(\[data-dsh-atom-host\]\)[\s\S]*?> \[data-dsh-desktop-sidebar-column\]::before[^{]*\{[\s\S]*?height: 44px;[\s\S]*?-webkit-app-region: drag;/);
+  assert.match(clientSource, /data-orientation="horizontal"[\s\S]*?_sectionHeader[\s\S]*?flex: 0 0 64px/);
+  assert.match(clientSource, /--dsh-top-nav-group-fill: color-mix\([\s\S]*?var\(--dsw-alias-interactive-bg-hover\) 55%[\s\S]*?transparent/);
+  assert.match(clientSource, /data-sidebar-placement="top"\]\[data-dsh-desktop-shell\][^{]*\{[\s\S]*?--dsh-top-nav-group-fill:/);
+  assert.match(clientSource, /data-sidebar-placement="top"\][\s\S]*?_listArea[^{]*\{[^}]*margin: 0 0 0 12px !important;/);
+  assert.match(clientSource, /data-sidebar-placement="top"\]\s+\[data-dsh-desktop-sidebar-region\]\s+\[data-orientation="horizontal"\] \[class\*="_groupSection"\][^{]*\{[\s\S]*?height: 44px;[\s\S]*?margin: 0 2px !important;[\s\S]*?padding: 0 4px;[\s\S]*?background: var\(--dsh-top-nav-group-fill\);/);
+  assert.doesNotMatch(clientSource, /data-sidebar-placement="(?:left|right)"[^\n]*[\s\S]{0,220}_groupSection[\s\S]{0,220}(?:--dsh-top-nav-group-fill|height: 44px|background: var\(--dsh-top-nav-group-fill\))/);
+  assert.match(clientSource, /data-orientation="horizontal"[\s\S]*?_sessionRow[\s\S]*?flex: 0 0 clamp\(112px, 14vw, 220px\)/);
+  assert.match(clientSource, /data-sidebar-placement="top"[\s\S]*?data-dsh-desktop-sidebar-foot[\s\S]*?> div:first-child[^{]*\{[\s\S]*?display: none !important/);
+  assert.match(clientSource, /data-sidebar-placement="top"[\s\S]*?button\[aria-haspopup="dialog"\][^{]*\{[\s\S]*?width: 34px !important[\s\S]*?height: 34px !important/);
+  assert.match(clientSource, /button\[aria-haspopup="dialog"\] span[^{]*\{[\s\S]*?position: absolute !important/);
+  assert.match(clientSource, /let mounting;[\s\S]*?let contextReady = false/);
+  assert.match(clientSource, /if \(mounting\) return mounting/);
+  assert.match(clientSource, /root = root \?\? restoreWindowContext\(\) \?\? restore\(current\)/);
+  assert.match(clientSource, /const attachHost = \(\) => \{[\s\S]*?host\.dataset\.dshAtomHost = ""/);
+  assert.match(clientSource, /const enrichSidebarDrag = \(event\) => \{[\s\S]*?if \(!root\)[\s\S]*?attachHost\(\)[\s\S]*?writeAtomDrag/);
 });
 
 test("product rename preserves the legacy user data and application identity", async () => {
@@ -2580,14 +3332,333 @@ test("product rename preserves the legacy user data and application identity", a
   );
 });
 
+test("Atom session switching releases inactive iframe clients before the fourth open", async () => {
+  const clientSource = await readFile(clientPath, "utf8");
+  const lifecycleStart = clientSource.indexOf("    function atomSessions");
+  const lifecycleEnd = clientSource.indexOf("    function atomFirstPane", lifecycleStart);
+  assert.notEqual(lifecycleStart, -1);
+  assert.notEqual(lifecycleEnd, -1);
+
+  const sandbox = {};
+  vm.runInNewContext(
+    `${clientSource.slice(lifecycleStart, lifecycleEnd)}\nthis.disposeOutside = atomDisposePaneRecordsOutside;`,
+    sandbox,
+  );
+
+  const records = new Map();
+  const disposed = [];
+  for (const id of ["pane:a", "pane:b", "pane:c", "pane:d"]) {
+    const root = { type: "pane", id, sessionId: id.slice(5) };
+    sandbox.disposeOutside(records, root);
+    records.set(id, { dispose: () => disposed.push(id) });
+    assert.equal(records.size, 1);
+  }
+  assert.deepEqual([...records.keys()], ["pane:d"]);
+  assert.deepEqual(disposed, ["pane:a", "pane:b", "pane:c"]);
+
+  records.set("pane:e", { dispose: () => disposed.push("pane:e") });
+  sandbox.disposeOutside(records, {
+    type: "split",
+    first: { type: "pane", id: "pane:d", sessionId: "d" },
+    second: { type: "pane", id: "pane:e", sessionId: "e" },
+  });
+  assert.deepEqual([...records.keys()], ["pane:d", "pane:e"]);
+
+  const activateStart = clientSource.indexOf("      const activateLayoutGroup =");
+  const activateEnd = clientSource.indexOf("      const createSoloLayoutGroup =", activateStart);
+  const activateSource = clientSource.slice(activateStart, activateEnd);
+  assert.match(
+    activateSource,
+    /syncActiveGroup\(\);[\s\S]*?atomDisposePaneRecordsOutside\(paneRecords, group\.root\);[\s\S]*?root = group\.root;[\s\S]*?render\(\);/,
+  );
+  assert.match(
+    clientSource,
+    /const dispose = \(\) => \{[\s\S]*?readyObserver\?\.disconnect\(\);[\s\S]*?frame\.removeEventListener\("load", prepareFrame\);[\s\S]*?element\.remove\(\);/,
+  );
+});
+
+test("Session navigation uses official ids and pane selection waits for the catalog", async () => {
+  const clientSource = await readFile(clientPath, "utf8");
+
+  assert.match(clientSource, /getData\("text\/plain"\)/);
+  assert.match(clientSource, /getSnapshot\?\.\(\)\.current/);
+  assert.doesNotMatch(clientSource, /item\.title === title/);
+
+  const dragStart = clientSource.indexOf("    const ATOM_DRAG_TYPE");
+  const dragEnd = clientSource.indexOf("    function atomUuid", dragStart);
+  const dragSandbox = {};
+  vm.runInNewContext(
+    `${clientSource.slice(dragStart, dragEnd)}\nthis.hasSessionDrag = atomHasSessionDrag; this.dropDirectionAt = atomDropDirectionAt; this.minimumSize = atomMinimumSize;`,
+    dragSandbox,
+  );
+  assert.equal(
+    dragSandbox.hasSessionDrag({ dataTransfer: { types: ["text/plain", "application/x-dsh-session"] } }),
+    true,
+  );
+  assert.equal(dragSandbox.hasSessionDrag({ dataTransfer: { types: ["text/plain"] } }), false);
+  const bounds = { left: 0, top: 0, width: 800, height: 400 };
+  assert.equal(dragSandbox.dropDirectionAt(bounds, { x: 10, y: 200 }), "left");
+  assert.equal(dragSandbox.dropDirectionAt(bounds, { x: 790, y: 200 }), "right");
+  assert.equal(dragSandbox.dropDirectionAt(bounds, { x: 400, y: 10 }), "top");
+  assert.equal(dragSandbox.dropDirectionAt(bounds, { x: 400, y: 390 }), "bottom");
+  assert.equal(dragSandbox.dropDirectionAt(bounds, { x: 400, y: 200 }, "left"), "left");
+
+  const pane = (id) => ({ type: "pane", id, sessionId: id });
+  const horizontal = {
+    type: "split",
+    direction: "horizontal",
+    first: pane("a"),
+    second: pane("b"),
+  };
+  const vertical = {
+    type: "split",
+    direction: "vertical",
+    first: pane("a"),
+    second: pane("b"),
+  };
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(dragSandbox.minimumSize(pane("single")))),
+    { width: 320, height: 240 },
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(dragSandbox.minimumSize(horizontal))),
+    {
+      width: 648,
+      height: 240,
+      first: { width: 320, height: 240 },
+      second: { width: 320, height: 240 },
+    },
+  );
+  assert.equal(dragSandbox.minimumSize(vertical).width, 320);
+  assert.equal(dragSandbox.minimumSize(vertical).height, 488);
+  assert.equal(
+    dragSandbox.minimumSize({ type: "split", direction: "vertical", first: horizontal, second: pane("c") }).width,
+    648,
+  );
+  assert.equal(
+    dragSandbox.minimumSize({ type: "split", direction: "vertical", first: horizontal, second: pane("c") }).height,
+    488,
+  );
+
+  const start = clientSource.indexOf("    function atomSessionIsListed");
+  const end = clientSource.indexOf("    function atomWorkspaceFor", start);
+  assert.notEqual(start, -1);
+  assert.notEqual(end, -1);
+
+  const timers = new Map();
+  let nextTimer = 1;
+  const documentElement = { dataset: {} };
+  const sandbox = {
+    clearTimeout(id) {
+      timers.delete(id);
+    },
+    document: { documentElement },
+    setTimeout(callback) {
+      const id = nextTimer++;
+      timers.set(id, callback);
+      return id;
+    },
+  };
+  vm.runInNewContext(
+    `${clientSource.slice(start, end)}\nthis.openPaneSession = atomOpenPaneSession;`,
+    sandbox,
+  );
+
+  let snapshot = { byId: {}, current: "session-b", phase: "pending" };
+  let sessionState = { openState: "loading" };
+  const listeners = new Set();
+  const opened = [];
+  let unsubscribed = false;
+  const ctx = {
+    sessions: {
+      list: {
+        getSnapshot: () => snapshot,
+        subscribe(listener) {
+          listeners.add(listener);
+          return () => {
+            unsubscribed = true;
+            listeners.delete(listener);
+          };
+        },
+      },
+      open(sessionId) {
+        opened.push(sessionId);
+      },
+      binding() {
+        return { session: { getSnapshot: () => sessionState } };
+      },
+    },
+  };
+
+  sandbox.openPaneSession(ctx, "session-b");
+  assert.deepEqual(opened, []);
+  snapshot = {
+    byId: {
+      "session-a": { id: "session-a", displayTitle: "Duplicate" },
+      "session-b": { id: "session-b", displayTitle: "Duplicate" },
+    },
+    current: "session-a",
+    phase: "ready",
+  };
+  for (const listener of [...listeners]) listener();
+  assert.deepEqual(opened, ["session-b"]);
+  snapshot = { ...snapshot, current: "session-b" };
+  for (const listener of [...listeners]) listener();
+  assert.equal(documentElement.dataset.dshAtomSessionReady, undefined);
+  sessionState = { openState: "open" };
+  for (const callback of [...timers.values()]) callback();
+  assert.equal(documentElement.dataset.dshAtomSessionReady, "session-b");
+  assert.equal(unsubscribed, true);
+  assert.equal(timers.size, 0);
+});
+
+test("Atom panes defer visible conversation chrome to the native header", async () => {
+  const clientSource = await readFile(clientPath, "utf8");
+  const bindStart = clientSource.indexOf("          const bindFrameHeaderDrag =");
+  const bindEnd = clientSource.indexOf("          const prepareFrame =", bindStart);
+  const bindSource = clientSource.slice(bindStart, bindEnd);
+  assert.match(clientSource, /header\.append\(title\);/);
+  assert.match(clientSource, /\[data-dsh-atom-pane\][^\n]*grid-template-rows: minmax\(0, 1fr\)/);
+  assert.match(clientSource, /\[data-dsh-atom-header\] \{ display: none; \}/);
+  assert.match(clientSource, /\[data-dsh-atom-zones\][^\n]*inset: 0;/);
+  assert.match(clientSource, /data-dsh-atom-dragging\] \[data-dsh-atom-zones\][^\n]*pointer-events: auto/);
+  assert.match(clientSource, /data-dsh-atom-drag-source\] > \[data-dsh-atom-zones\][^\n]*dsh-atom-drag-source-safe-top/);
+  assert.match(clientSource, /pane\.toggleAttribute\("data-dsh-atom-drag-source", isLocalSource\)/);
+  assert.match(clientSource, /\[data-dsh-atom-native-drag-handle\][^\n]*position: absolute;[^\n]*z-index: 10/);
+  assert.match(clientSource, /\[data-dsh-atom-title\][^\n]*pointer-events: none/);
+  assert.match(clientSource, /\[data-dsh-desktop-shell\]:has\(\[data-dsh-atom-host\]\)::before \{[\s\S]*?pointer-events: none;[\s\S]*?-webkit-app-region: no-drag;/);
+  assert.match(clientSource, /data-dsh-atom-embedded[^\n]*app-region: no-drag/);
+  assert.match(clientSource, /data-dsh-atom-drag-handle\] button:disabled \{ pointer-events: none; \}/);
+  assert.match(clientSource, /frameDocument\.documentElement\.dataset\.dshAtomEmbedded = ""/);
+  assert.match(clientSource, /frameDocument\?\.querySelector\("\[data-dsh-session-header\]"\)/);
+  assert.match(clientSource, /const titleRegion = menu\?\.parentElement \?\? sessionHeader\?\.firstElementChild \?\? sessionHeader/);
+  assert.match(clientSource, /!titleRegion \|\| typeof titleRegion\.getBoundingClientRect !== "function"/);
+  assert.doesNotMatch(bindSource, /titleRegion instanceof HTMLElement/);
+  assert.match(clientSource, /titleRegion\.dataset\.dshAtomDragHandle = ""/);
+  assert.match(bindSource, /Math\.max\(0, frameBounds\.width - regionBounds\.left\)/);
+  assert.match(bindSource, /--dsh-atom-drag-source-safe-top/);
+  assert.match(clientSource, /element\.append\(header, frame, dragHandle, zones\)/);
+  assert.doesNotMatch(bindSource, /scroll\?\.parentElement\?\.querySelector\(":scope > header"\)/);
+  assert.match(clientSource, /data-dsh-atom-hide-traffic-light-header-context[\s\S]*?data-dsh-session-header[\s\S]*?_titleCluster[^{]*\{ display: none !important; \}/);
+  assert.match(clientSource, /data-dsh-atom-hide-traffic-light-header-context[\s\S]*?data-dsh-session-header[\s\S]*?dsh-session-header-menu[^{]*\{ margin-left: auto; \}/);
+  assert.match(clientSource, /const syncAtomTrafficLightHeaderContext = \(\) => \{[\s\S]*?windowContext\.role === "main"[\s\S]*?dshSidebarPlacement === "right"[\s\S]*?atomFirstPane\(root\)\?\.id/);
+  assert.match(clientSource, /attributeFilter: \["data-dsh-sidebar-placement"\]/);
+  assert.match(clientSource, /sidebarPlacementObserver\.disconnect\(\)/);
+  assert.match(clientSource, /header\.setPointerCapture\(pointerId\)/);
+  assert.doesNotMatch(clientSource, /header\.append\(title, /);
+  assert.doesNotMatch(clientSource, /document\.createElement\("button"\)[\s\S]{0,180}dshAtomAction/);
+  assert.match(clientSource, /\[data-dsh-atom-dismiss\][^{]*\{[^}]*width: 32px;[^}]*height: 32px/);
+  assert.match(bindSource, /const showDismiss = atomSessions\(root\)\.length > 1/);
+  assert.match(bindSource, /dismiss\.dataset\.dshAtomDismiss = ""/);
+  assert.match(bindSource, /dismiss\.addEventListener\("click", \(event\) => \{[\s\S]*?closePane\(record\.node\.id\)/);
+  assert.match(bindSource, /menu\.after\(dismiss\)/);
+  assert.match(clientSource, /for \(const record of paneRecords\.values\(\)\) record\.bindFrameHeaderDrag\?\.\(\)/);
+});
+
+test("Atom pane pointer drag reorders locally and detaches only on pointer release", async () => {
+  const clientSource = await readFile(clientPath, "utf8");
+  const start = clientSource.indexOf("      const bindAtomHeaderDrag =");
+  const end = clientSource.indexOf("      const renderPane =", start);
+  const accepted = [];
+  const detached = [];
+  const closed = [];
+  const dragStates = [];
+  const published = [];
+  const sandbox = {
+    workspaceId: "workspace-a",
+    windowContext: { windowId: "main", role: "main" },
+    root: {
+      type: "split",
+      id: "split:test",
+      direction: "horizontal",
+      first: { type: "pane", id: "pane:a", sessionId: "session-a" },
+      second: { type: "pane", id: "pane:b", sessionId: "session-b" },
+    },
+    atomUuid: () => "transfer:test",
+    dropTarget: { paneId: "pane:b", direction: "right" },
+    pointerDropTargetAt: (...point) => {
+      sandbox.pointerPoints.push(point);
+      return sandbox.dropTarget;
+    },
+    pointerPoints: [],
+    setAtomDragCapture: (...args) => dragStates.push(args),
+    acceptDrop: (...args) => accepted.push(args),
+    closePane: (paneId) => closed.push(paneId),
+    window: {
+      screenX: 20,
+      screenY: 30,
+      desktop: {
+        detachAtomSession(payload) {
+          detached.push(payload);
+          return Promise.resolve({ detached: true });
+        },
+        publishAtomEvent: (...args) => published.push(args),
+      },
+    },
+  };
+  vm.runInNewContext(
+    `${clientSource.slice(start, end)}\nthis.bindAtomHeaderDrag = bindAtomHeaderDrag;`,
+    sandbox,
+  );
+
+  const createHeader = () => ({
+    listeners: new Map(),
+    addEventListener(type, listener) { this.listeners.set(type, listener); },
+    removeEventListener(type) { this.listeners.delete(type); },
+    setPointerCapture() {},
+    hasPointerCapture() { return false; },
+  });
+  const pointer = (clientX, clientY) => ({
+    button: 0,
+    pointerId: 7,
+    clientX,
+    clientY,
+    target: { closest: () => null },
+    preventDefault() {},
+  });
+  const node = { id: "pane:a", sessionId: "session-a", title: "A" };
+  const header = createHeader();
+  let focused = 0;
+  const dispose = sandbox.bindAtomHeaderDrag(header, () => node, {
+    onPointerDown: () => { focused += 1; },
+  });
+  header.listeners.get("pointerdown")(pointer(0, 0));
+  assert.equal(focused, 1);
+  header.listeners.get("pointermove")(pointer(12, 0));
+  assert.equal(detached.length, 0);
+  header.listeners.get("pointerup")(pointer(12, 0));
+  assert.equal(accepted.length, 1);
+  assert.equal(accepted[0][1], "pane:b");
+  assert.equal(accepted[0][2], "right");
+  assert.equal(detached.length, 0);
+  assert.deepEqual(dragStates.map(([active]) => active), [true, false]);
+  assert.equal(published.at(-1)[0], "drag-pointer");
+  dispose();
+  assert.equal(header.listeners.size, 0);
+
+  sandbox.dropTarget = undefined;
+  const outsideHeader = createHeader();
+  sandbox.bindAtomHeaderDrag(outsideHeader, () => node);
+  outsideHeader.listeners.get("pointerdown")(pointer(0, 0));
+  outsideHeader.listeners.get("pointermove")(pointer(12, 0));
+  assert.equal(detached.length, 0);
+  outsideHeader.listeners.get("pointerup")(pointer(900, 700));
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(detached.length, 1);
+  assert.equal(detached[0].canCreateWindow, true);
+  assert.deepEqual(closed, ["pane:a"]);
+});
+
 test("Composer controls and DeepSeek menus remain in the main React tree", async () => {
   const fixture = await installTheme("MacIntel");
   const clientSource = await readFile(clientPath, "utf8");
 
   assert.equal(fixture.documentElement.dataset.dshWindowRole, "main");
-  for (const kind of ["workspace", "preset", "permission", "model"]) {
+  for (const kind of ["workspace", "preset", "model"]) {
     assert.match(clientSource, new RegExp(`dshComposerMenuTrigger = "${kind}"`));
   }
+  assert.doesNotMatch(clientSource, /dshComposerMenuTrigger = "permission"/);
   assert.match(clientSource, /document\.querySelectorAll\("\[data-composer-card\]"\)\.forEach\(markComposer\)/);
   assert.match(clientSource, /markHeroWorkspaceRows\(\)/);
   assert.doesNotMatch(clientSource, /installNativeComposerMenus|showNativeMenu/);
@@ -2617,7 +3688,7 @@ test("macOS transparency exposes vibrancy only around opaque Web content", async
 
   assert.match(
     css,
-    /data-dsh-desktop-platform="macos"[\s\S]*?#root[^{]*\{[^}]*background: transparent !important/,
+    /data-dsh-desktop-host="macos"[\s\S]*?#root[^{]*\{[^}]*background: transparent !important/,
   );
   assert.match(
     css,
@@ -2632,10 +3703,11 @@ test("macOS transparency exposes vibrancy only around opaque Web content", async
   fixture.cleanup();
 });
 
-test("lucide-animated mapping covers every DSH primitive icon export", async () => {
-  const [iconTypes, syncSource] = await Promise.all([
+test("desktop icon policy covers every DSH primitive icon export", async () => {
+  const [iconTypes, syncSource, clientSource] = await Promise.all([
     readFile(iconTypesPath, "utf8"),
     readFile(syncIconsPath, "utf8"),
+    readFile(clientPath, "utf8"),
   ]);
   const names = [...iconTypes.matchAll(/export declare const (Icon[A-Za-z0-9]+)/g)].map(
     (match) => match[1],
@@ -2643,8 +3715,19 @@ test("lucide-animated mapping covers every DSH primitive icon export", async () 
 
   assert.ok(names.length > 50);
   for (const name of names) {
-    assert.match(syncSource, new RegExp(`\\b${name}:`), `${name} is not mapped`);
+    assert.match(syncSource, new RegExp(`\\b${name}(?::|\")`), `${name} is not covered`);
   }
+  assert.match(
+    syncSource,
+    /const nativeIconNames = new Set\(\["IconEllipsisOutline16"\]\)/,
+  );
+  assert.doesNotMatch(syncSource, /IconEllipsisOutline16:\s*"menu"/);
+  assert.doesNotMatch(clientSource, /"menu":\s*"<svg/);
+  assert.doesNotMatch(clientSource, /\[\s*3537975236,\s*"menu"\s*\]/);
+  assert.match(syncSource, /IconTrashOutline16:\s*"delete"/);
+  assert.doesNotMatch(syncSource, /IconTrashOutline16:\s*"shredder"/);
+  assert.match(clientSource, /"delete":\s*"<svg[\s\S]*?M3 6h18/);
+  assert.doesNotMatch(clientSource, /"shredder":\s*"<svg/);
 });
 
 test("raw SVG audit allows only mapped icons and named artwork", async () => {
@@ -2679,14 +3762,13 @@ test("raw SVG audit allows only mapped icons and named artwork", async () => {
     ["dsh-client-ui-attachment/lib/index.js", 2],
     ["dsh-client-ui-conversation/lib/client.js", 12],
     ["dsh-client-ui-primitives/lib/index.js", iconNames.length + 3],
-    ["dsh-client-ui-settings-models/lib/client.js", 2],
     ["dsh-client-ui-trajectory/lib/client.js", 6],
   ];
   assert.deepEqual(actual.sort(([left], [right]) => left.localeCompare(right)), expected);
   assert.deepEqual(
     semanticCssIcons.sort(([left], [right]) => left.localeCompare(right)),
     [
-      ["dsh-client-ui-settings-models/lib/client.js", 2],
+      ["dsh-client-ui-settings-models/lib/client.js", 3],
       ["dsh-client-ui-settings-plugin-inventory/lib/client.js", 1],
     ],
   );
@@ -2883,6 +3965,31 @@ test("Composer send uses the lucide-animated arrow-up icon", async () => {
     clientSource,
     /"arrow-up": "<svg[^\n]*<path d=\\"m5 12 7-7 7 7\\"\/><path d=\\"M12 19V5\\"\/><\/svg>"/,
   );
+});
+
+test("Composer primary icon follows Send and native Stop state changes", async () => {
+  const theme = await installTheme("MacIntel", "", { includeComposer: true });
+  const {
+    primaryIcon,
+    renderPrimarySend,
+    renderPrimaryStop,
+  } = theme.composerFixture;
+
+  assert.equal(primaryIcon.dataset.lucideAnimatedIcon, "arrow-up");
+  assert.equal(primaryIcon.children.at(-1).dataset.lucideLibraryPaint, "");
+
+  renderPrimaryStop();
+  theme.flushMutations();
+  assert.equal(primaryIcon.dataset.lucideAnimatedIcon, undefined);
+  assert.equal(primaryIcon.children.length, 1);
+  assert.equal(primaryIcon.children[0].localName, "rect");
+
+  renderPrimarySend();
+  theme.flushMutations();
+  assert.equal(primaryIcon.dataset.lucideAnimatedIcon, "arrow-up");
+  assert.equal(primaryIcon.children.at(-1).dataset.lucideLibraryPaint, "");
+
+  theme.cleanup();
 });
 
 test("Composer command uses the lucide-animated plus icon", async () => {
@@ -3096,10 +4203,19 @@ test("sidebar markers pass through the slot wrapper and preserve the official ro
   assert.equal(shellFixture.logo.dataset.dshDesktopSidebarLogo, "");
   assert.equal(shellFixture.newSession.dataset.dshDesktopSidebarNew, "");
   assert.equal(shellFixture.region.dataset.dshDesktopSidebarRegion, "");
+  assert.equal(shellFixture.search.dataset.dshDesktopSidebarSearch, "");
+  assert.equal(
+    shellFixture.search.dataset.dshDesktopSidebarSearchLabel,
+    "Search workspaces and tasks",
+  );
+  assert.equal(shellFixture.search.dataset.dshDesktopSidebarSearchPrefix, "Search");
   assert.equal(shellFixture.foot.dataset.dshDesktopSidebarFoot, "");
   assert.equal(shellFixture.center.dataset.dshDesktopCenter, "");
   assert.equal(shellFixture.details.dataset.dshDesktopDetails, "");
   cleanup();
+  assert.equal(shellFixture.search.dataset.dshDesktopSidebarSearch, undefined);
+  assert.equal(shellFixture.search.dataset.dshDesktopSidebarSearchLabel, undefined);
+  assert.equal(shellFixture.search.dataset.dshDesktopSidebarSearchPrefix, undefined);
 });
 
 test("sidebar hides only the provisional session before its first query", async () => {

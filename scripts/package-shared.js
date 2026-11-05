@@ -27,7 +27,7 @@ function installedModuleRoot(path) {
 export function ignoreFromApplication(path) {
   const normalized = path.replaceAll("\\", "/");
 
-  if (/^\/(?:\.git|\.github|build|dist|docs|scripts|test)(?:\/|$)/.test(normalized)) {
+  if (/^\/(?:\.git|\.github|build|dist|docs|scripts|test|native)(?:\/|$)/.test(normalized)) {
     return true;
   }
   if (/^\/(?:package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/.test(normalized)) {

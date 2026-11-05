@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-desktop-ui
+      name: '@jesse-lai/dsh-desktop-ui'

@@ -1,0 +1,151 @@
+diff --git a/node_modules/@deepseek-ai/dsh-llm-pi-ai/lib/index.js b/node_modules/@deepseek-ai/dsh-llm-pi-ai/lib/index.js
+index 195d407..e2dca83 100644
+--- a/node_modules/@deepseek-ai/dsh-llm-pi-ai/lib/index.js
++++ b/node_modules/@deepseek-ai/dsh-llm-pi-ai/lib/index.js
+@@ -1,5 +1,5 @@
+ import { launchEnvironmentOf } from "@deepseek-ai/dsh-launch-environment";
+-import { CONTEXT_WINDOW_EXCEEDED_CODE, CallId, EMPTY_RESPONSE_CODE, INVALID_CREDENTIAL_CODE, LlmAdapter, LlmError, QUOTA_EXCEEDED_CODE, ReasoningEffortId, RetryPolicySchema, assertUsableApiKey, attributionHeaders, contentHasImage, isContextWindowExceededError, isQuotaExceededError, normalizeApiKey, resolveRetryPolicy } from "@deepseek-ai/dsh-llm";
++import { CONTEXT_WINDOW_EXCEEDED_CODE, CallId, EMPTY_RESPONSE_CODE, INVALID_CREDENTIAL_CODE, LlmAdapter, LlmError, QUOTA_EXCEEDED_CODE, ReasoningEffortId, RetryPolicySchema, assertUsableApiKey, attributionHeaders, contentHasImage, createUserMessage, isContextWindowExceededError, isQuotaExceededError, normalizeApiKey, resolveRetryPolicy } from "@deepseek-ai/dsh-llm";
+ import { deepEqualJson, installSettingsSection, settingsNamespace } from "@deepseek-ai/dsh-settings";
+ import { createModels, createProvider, getSupportedThinkingLevels, isContextOverflow } from "@earendil-works/pi-ai";
+ import { MAX_TIMER_DELAY_MS, idleWatchdog, timeoutOf } from "@deepseek-ai/dsh-timeout";
+@@ -1469,6 +1469,34 @@ function resolveProfiles(providers) {
+ 	}
+ 	return resolved;
+ }
++function validationField(error) {
++	const code = error?.code;
++	const message = error instanceof Error ? error.message : String(error);
++	if (code === "AUTH" || code === "MISSING_CREDENTIAL" || code === "INVALID_CREDENTIAL" || /api key|credential|unauthorized/i.test(message)) return "apiKey";
++	if (code === "UNSUPPORTED_REASONING_EFFORT" || /reasoning|thinking/i.test(message)) return "reasoning";
++	if (code === "UNKNOWN_MODEL" || /model|deployment/i.test(message) && (error?.status === 400 || error?.status === 404)) return "model";
++	if (code === "TRANSPORT" || code === "TIMEOUT" || code === "LLM_STREAM_IDLE_TIMEOUT" || /base url|endpoint|fetch failed|network/i.test(message)) return "baseURL";
++	if (/protocol|api implementation/i.test(message)) return "api";
++	return "provider";
++}
++async function validateDraftModel(adapter, provider, model, reasoningEffort, signal) {
++	let replied = false;
++	for await (const chunk of adapter.stream({
++		provider,
++		model,
++		...reasoningEffort === void 0 ? {} : { reasoningEffort: ReasoningEffortId(reasoningEffort) },
++		messages: [createUserMessage({
++			content: [{ type: "text", text: "Reply with OK." }],
++			source: { kind: "plugin", plugin: "dsh-model-validation" }
++		})],
++		maxTokens: 128,
++		signal
++	})) {
++		if (chunk.type === "text-delta" && chunk.text.length > 0 || chunk.type === "block-end" && chunk.block.type === "text" && chunk.block.text.length > 0) replied = true;
++		if (chunk.type === "finish" && (chunk.reason.kind === "error" || chunk.reason.kind === "aborted")) throw new LlmError(chunk.reason.failure?.message ?? "Model validation failed", chunk.reason.failure?.code ?? "VALIDATION_FAILED");
++	}
++	if (!replied) throw new LlmError("The model returned no text response", "EMPTY_RESPONSE");
++}
+ //#endregion
+ //#region lib/types/discovery.js
+ /**
+@@ -1736,6 +1764,33 @@ function registrationFacts(profiles) {
+ 		retryPolicy: profile.retryPolicy
+ 	})).sort((left, right) => left.provider.localeCompare(right.provider));
+ }
++function validationProfileChanges(previous, current) {
++	const changed = /* @__PURE__ */ new Map();
++	for (const provider of new Set([...Object.keys(previous ?? {}), ...Object.keys(current ?? {})])) {
++		const before = previous?.[provider];
++		const after = current?.[provider];
++		if (before === void 0 || after === void 0) {
++			changed.set(provider, void 0);
++			continue;
++		}
++		const { models: beforeModels, modelOverrides: beforeOverrides, ...beforeShared } = before;
++		const { models: afterModels, modelOverrides: afterOverrides, ...afterShared } = after;
++		if (!deepEqualJson(beforeShared, afterShared)) {
++			changed.set(provider, void 0);
++			continue;
++		}
++		if ((beforeModels === void 0) !== (afterModels === void 0)) {
++			changed.set(provider, void 0);
++			continue;
++		}
++		const beforeById = new Map((beforeModels ?? []).map((model) => [model.id, model]));
++		const afterById = new Map((afterModels ?? []).map((model) => [model.id, model]));
++		const ids = new Set([...beforeById.keys(), ...afterById.keys(), ...Object.keys(beforeOverrides ?? {}), ...Object.keys(afterOverrides ?? {})]);
++		const affected = [...ids].filter((id) => !deepEqualJson(beforeById.get(id), afterById.get(id)) || !deepEqualJson(beforeOverrides?.[id], afterOverrides?.[id]));
++		if (affected.length > 0) changed.set(provider, affected);
++	}
++	return changed;
++}
+ /**
+ * The configurable-provider directory: every installed catalog route this
+ * adapter can authenticate, plus every route the current profiles declare. A
+@@ -1768,6 +1823,7 @@ function directoryEntries(profiles) {
+ /** Register one generic pi-ai adapter for all configured provider routes. */
+ function apply(ctx, config) {
+ 	let current = () => config;
++	let validationProfiles = structuredClone(config.providers ?? {});
+ 	let lastRaw;
+ 	let memoized;
+ 	/**
+@@ -1827,6 +1883,52 @@ function apply(ctx, config) {
+ 		return resolveApiKey(provider, profile);
+ 	};
+ 	ctx.llm.registerModelDiscovery(NS, (request) => discoverModels(request, () => storedApiKey(request.provider)));
++	ctx.llm.registerDraftValidator(NS, async (request) => {
++		const profile = {
++			...request.profile,
++			...request.apiKey === void 0 ? {} : { apiKeyEnv: "DRAFT_API_KEY" },
++			models: Array.isArray(request.profile?.models) ? request.profile.models : request.models.map(({ id }) => ({ id })),
++			streamIdleTimeoutMs: 25e3
++		};
++		let profiles;
++		try {
++			profiles = resolveProfiles({ [request.provider]: profile });
++		} catch (error) {
++			const field = validationField(error);
++			return request.models.map((model) => ({
++				model: model.id,
++				ok: false,
++				field,
++				code: typeof error?.code === "string" ? error.code : "INVALID_PROFILE",
++				message: error instanceof Error ? error.message : String(error)
++			}));
++		}
++		const draftAdapter = new PiAiAdapter({
++			profiles: () => profiles,
++			resolveApiKey: async (provider, resolved) => request.apiKey === void 0 ? resolveApiKey(provider, resolved) : assertUsableApiKey(request.apiKey, "llm-pi-ai", resolved.apiKeyEnv ?? "DRAFT_API_KEY")
++		});
++		const results = [];
++		for (const model of request.models) {
++			const timeout = AbortSignal.timeout(25e3);
++			const signal = request.signal === void 0 ? timeout : AbortSignal.any([request.signal, timeout]);
++			try {
++				await validateDraftModel(draftAdapter, request.provider, model.id, model.reasoningEffort, signal);
++				results.push({ model: model.id, ok: true });
++			} catch (error) {
++				results.push({
++					model: model.id,
++					ok: false,
++					field: validationField(error),
++					code: typeof error?.code === "string" ? error.code : "VALIDATION_FAILED",
++					message: error instanceof Error ? error.message : String(error)
++				});
++			}
++		}
++		return results;
++	});
++	ctx.on("credentials/updated", (ref) => {
++		for (const [provider, profile] of profiles()) if (profile.apiKeyEnv === ref) ctx.llm.clearValidation(provider);
++	});
+ 	let registration;
+ 	let registeredFacts;
+ 	const ensureRegistrationFacts = () => {
+@@ -1849,6 +1951,9 @@ function apply(ctx, config) {
+ 			current = source;
+ 		},
+ 		onChange: () => {
++			const nextValidationProfiles = structuredClone(current().providers ?? {});
++			for (const [provider, models] of validationProfileChanges(validationProfiles, nextValidationProfiles)) ctx.llm.clearValidation(provider, models);
++			validationProfiles = nextValidationProfiles;
+ 			try {
+ 				ensureRegistrationFacts();
+ 			} catch (error) {

@@ -50,6 +50,8 @@ await execFileAsync(process.execPath, [
   join(projectRoot, "scripts", "build-macos-icon.js"),
 ]);
 
+await execFileAsync(process.execPath, [join(projectRoot, "scripts", "build-companion.js")], { maxBuffer: 8 * 1024 * 1024 });
+
 const launcher = `#!/bin/zsh
 set -u
 

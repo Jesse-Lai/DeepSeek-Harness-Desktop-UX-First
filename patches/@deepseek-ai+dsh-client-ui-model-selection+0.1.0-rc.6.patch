@@ -1,0 +1,240 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-model-selection/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-model-selection/lib/client.js
+index 1f29484..bf1cdb8 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-model-selection/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-model-selection/lib/client.js
+@@ -157,11 +157,15 @@ window.__ModuleLoader__.load({
+ 			static inject = [
+ 				"connection",
+ 				"sessions",
+-				"remote"
++				"remote",
++				"conversation",
++				"settingsNavigation",
++				"modelsSettings"
+ 			];
+ 			live = { directories: /* @__PURE__ */ new Map() };
+ 			/** Localized composer-block copy; this plugin owns the string it raises. */
+ 			blockReason;
++			openModels;
+ 			/**
+ 			* @param ctx - owning root context (the service registers itself as `models`).
+ 			* @param config - the bound translator for this plugin's own dictionary.
+@@ -169,6 +173,26 @@ window.__ModuleLoader__.load({
+ 			constructor(ctx, config) {
+ 				super(ctx, "modelDirectories");
+ 				this.blockReason = config.blockReason;
++				this.openModels = config.openModels;
++				const conversation = ctx.get("conversation");
++				const modelsSettings = ctx.get("modelsSettings");
++				const publishRootBlock = () => {
++					const settings = modelsSettings.store.getSnapshot();
++					const needsConfiguration = settings.status === "ready" && !settings.rows.some(providerUsable);
++					conversation.blocks.set(void 0, needsConfiguration ? {
++						reason: this.blockReason(),
++						onRequest: this.openModels
++					} : void 0);
++				};
++				publishRootBlock();
++				ctx.effect(() => {
++					const stop = modelsSettings.store.subscribe(publishRootBlock);
++					if (modelsSettings.store.getSnapshot().status === "idle") modelsSettings.load();
++					return () => {
++						stop();
++						conversation.blocks.set(void 0, void 0);
++					};
++				}, "ui-model-selection: root composer block");
+ 				ctx.on("connection/reset", () => {
+ 					for (const directory of this.live.directories.values()) directory.resetConnected();
+ 				});
+@@ -195,14 +219,24 @@ window.__ModuleLoader__.load({
+ 				live.directories.set(sessionId, directory);
+ 				const conversation = this.ctx.get("conversation");
+ 				if (conversation !== void 0) {
++					const modelsSettings = this.ctx.get("modelsSettings");
+ 					const publish = () => {
+-						conversation.blocks.set(sessionId, directory.store.getSnapshot().routable === false ? { reason: this.blockReason() } : void 0);
++						const state = directory.store.getSnapshot();
++						const settings = modelsSettings.store.getSnapshot();
++						const usable = selectedProviderUsable(state, settings);
++						conversation.blocks.set(sessionId, state.routable === false || !usable ? {
++							reason: this.blockReason(),
++							...needsModelConfiguration(state, settings) ? { onRequest: this.openModels } : {}
++						} : void 0);
+ 					};
+ 					publish();
+ 					actx.effect(() => {
+-						const stop = directory.store.subscribe(publish);
++						const stopDirectory = directory.store.subscribe(publish);
++						const stopSettings = modelsSettings.store.subscribe(publish);
++						if (modelsSettings.store.getSnapshot().status === "idle") modelsSettings.load();
+ 						return () => {
+-							stop();
++							stopDirectory();
++							stopSettings();
+ 							conversation.blocks.set(sessionId, void 0);
+ 						};
+ 					}, "ui-model-selection: composer block");
+@@ -269,6 +303,17 @@ window.__ModuleLoader__.load({
+ 		};
+ 		//#endregion
+ 		//#region lib/types/client/ModelSelect.js
++		function providerUsable(row) {
++			return row.entry.active && (row.apiKeyEnv === void 0 || row.credential?.configured === true);
++		}
++		function selectedProviderUsable(state, settings) {
++			if (state.status !== "ready" || settings.status !== "ready" || state.current === null) return false;
++			const row = settings.rows.find((candidate) => candidate.entry.provider === state.current.provider);
++			return row !== void 0 && providerUsable(row);
++		}
++		function needsModelConfiguration(state, settings) {
++			return state.status === "ready" && settings.status === "ready" && !settings.rows.some(providerUsable);
++		}
+ 		/**
+ 		* ModelSelect: the composer's named model seat (`conversation.input.model`).
+ 		* Two-level selection per figma 496:26454's MenuDropdown: the root menu is
+@@ -288,8 +333,9 @@ window.__ModuleLoader__.load({
+ 		* store/verbs) + the standard locale seat.
+ 		* @returns the trigger and, while open, the two-level menu.
+ 		*/
+-		function ModelSelect({ locked, available, directory, load, select, t }) {
++		function ModelSelect({ locked, available, directory, load, select, configuration, loadConfiguration, openModels, t }) {
+ 			const state = (0, react.useSyncExternalStore)((fn) => directory.subscribe(fn), () => directory.getSnapshot());
++			const settings = (0, react.useSyncExternalStore)((fn) => configuration.subscribe(fn), () => configuration.getSnapshot());
+ 			const [open, setOpen] = (0, react.useState)(false);
+ 			const [pane, setPane] = (0, react.useState)("root");
+ 			const lastActionRef = (0, react.useRef)("load");
+@@ -323,6 +369,8 @@ window.__ModuleLoader__.load({
+ 				...effort.description === void 0 ? {} : { description: effort.description }
+ 			}))], [reasoning, t]);
+ 			const busy = state.status === "selecting";
++			const needsConfiguration = needsModelConfiguration(state, settings);
++			const currentUsable = selectedProviderUsable(state, settings);
+ 			const reload = () => {
+ 				lastActionRef.current = "load";
+ 				load();
+@@ -331,8 +379,9 @@ window.__ModuleLoader__.load({
+ 				if (available) {
+ 					lastActionRef.current = "load";
+ 					load();
++					loadConfiguration();
+ 				}
+-			}, [available, load]);
++			}, [available, load, loadConfiguration]);
+ 			(0, react.useEffect)(() => {
+ 				if (!open) return;
+ 				const closeOutside = (event) => {
+@@ -345,7 +394,10 @@ window.__ModuleLoader__.load({
+ 			}, [open]);
+ 			if (!available) return null;
+ 			const show = () => {
++				if (needsConfiguration) {
++					openModels();
++					return;
++				}
+ 				setPane("root");
+ 				setOpen(true);
+-				reload();
+ 			};
+@@ -415,11 +467,12 @@ window.__ModuleLoader__.load({
+ 				lastActionRef.current = "select";
+ 				select(selection).then(settleSelection);
+ 			};
+-			const modelLabel = currentChoice?.model.name ?? t("trigger.fallback");
+-			const triggerLabel = effortLabel === void 0 ? modelLabel : `${modelLabel} · ${effortLabel}`;
+-			const triggerAria = currentChoice === void 0 ? t("trigger.selectAria") : effortLabel === void 0 ? t("trigger.aria", { model: modelLabel }) : t("trigger.ariaEffort", {
++			const modelLabel = needsConfiguration ? t("trigger.add") : !currentUsable ? t("trigger.fallback") : currentChoice?.model.name ?? state.current?.model ?? t("trigger.fallback");
++			const shownEffortLabel = currentUsable ? effortLabel : void 0;
++			const triggerLabel = shownEffortLabel === void 0 ? modelLabel : `${modelLabel} · ${shownEffortLabel}`;
++			const triggerAria = needsConfiguration ? t("trigger.add") : currentChoice === void 0 ? t("trigger.selectAria") : shownEffortLabel === void 0 ? t("trigger.aria", { model: modelLabel }) : t("trigger.ariaEffort", {
+ 				model: modelLabel,
+-				effort: effortLabel
++				effort: shownEffortLabel
+ 			});
+ 			itemRefs.current = [];
+ 			let itemIndex = 0;
+@@ -440,12 +493,13 @@ window.__ModuleLoader__.load({
+ 						type: "button",
+ 						className: ModelSelect_module_css_default.trigger,
+ 						"aria-label": triggerAria,
+-						"aria-haspopup": "menu",
++						"aria-haspopup": needsConfiguration ? "dialog" : "menu",
+ 						"aria-expanded": open,
+ 						"aria-controls": open ? `${id}-menu` : void 0,
+ 						title: triggerLabel,
+ 						disabled: locked,
+-						onClick: () => {
++						onClick: (event) => {
++							event.stopPropagation();
+ 							if (open) close();
+ 							else show();
+ 						},
+@@ -454,9 +508,9 @@ window.__ModuleLoader__.load({
+ 								className: ModelSelect_module_css_default.triggerLabel,
+ 								children: modelLabel
+ 							}),
+-							effortLabel !== void 0 && (0, react_jsx_runtime.jsx)("span", {
++							shownEffortLabel !== void 0 && (0, react_jsx_runtime.jsx)("span", {
+ 								className: ModelSelect_module_css_default.triggerEffort,
+-								children: effortLabel
++								children: shownEffortLabel
+ 							}),
+ 							(0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.IconChevronDownOutline14, { className: clsx(ModelSelect_module_css_default.chevron, open && ModelSelect_module_css_default.chevronOpen) })
+ 						]
+@@ -648,6 +702,7 @@ window.__ModuleLoader__.load({
+ 			"command.description": "选择本会话使用的模型",
+ 			"option.loadError": "目录加载失败：{message}",
+ 			"trigger.fallback": "选择模型",
++			"trigger.add": "添加模型",
+ 			"trigger.selectAria": "选择模型",
+ 			"trigger.aria": "选择模型，当前 {model}",
+ 			"trigger.ariaEffort": "选择模型，当前 {model}，推理等级 {effort}",
+@@ -668,6 +723,7 @@ window.__ModuleLoader__.load({
+ 			"command.description": "Select the model for this conversation",
+ 			"option.loadError": "Catalog failed to load: {message}",
+ 			"trigger.fallback": "Select model",
++			"trigger.add": "Add a model",
+ 			"trigger.selectAria": "Select model",
+ 			"trigger.aria": "Select model, current {model}",
+ 			"trigger.ariaEffort": "Select model, current {model}, reasoning effort {effort}",
+@@ -732,7 +788,9 @@ window.__ModuleLoader__.load({
+ 			"locale",
+ 			"sessions",
+ 			"slots",
+-			"remote"
++			"remote",
++			"settingsNavigation",
++			"modelsSettings"
+ 		];
+ 		/**
+ 		* Client plugin body: mount ModelDirectoryResolver, register the `model` dictionaries,
+@@ -746,7 +804,11 @@ window.__ModuleLoader__.load({
+ 				en
+ 			}), "ui-model-selection: dictionaries");
+ 			const t = ctx.locale.bind(NS);
+-			ctx.plugin(ModelDirectoryResolver, { blockReason: () => t("blocked.composer") });
++			const openModels = () => ctx.settingsNavigation.openSection("models");
++			ctx.plugin(ModelDirectoryResolver, {
++				blockReason: () => t("blocked.composer"),
++				openModels
++			});
+ 			ctx.inject(["commandUi", "modelDirectories"], (scope) => {
+ 				const command = scope.get("commandUi");
+ 				const models = scope.modelDirectories;
+@@ -774,6 +836,7 @@ window.__ModuleLoader__.load({
+ 			ctx.inject(["slots", "modelDirectories"], (scope) => {
+ 				const models = scope.modelDirectories;
+ 				const sessions = scope.sessions;
++				const modelsSettings = scope.modelsSettings;
+ 				scope.slots.inject("conversation.input.model", () => scope.slots.register({
+ 					name: "conversation.input.model",
+ 					locale: NS,
+@@ -782,6 +845,9 @@ window.__ModuleLoader__.load({
+ 						const available = sessions.subagentAddress(sessionId) === void 0;
+ 						return {
+ 							available,
++							openModels,
++							configuration: modelsSettings.store,
++							loadConfiguration: () => modelsSettings.load(),
+ 							directory: directory.store,
+ 							load: () => {
+ 								if (available) directory.load().catch(() => {});

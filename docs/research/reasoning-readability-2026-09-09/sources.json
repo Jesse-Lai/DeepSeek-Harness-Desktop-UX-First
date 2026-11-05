@@ -1,0 +1,141 @@
+{
+  "recordedAt": "2026-09-09T07:01:26.197889+00:00",
+  "projectHead": "89eac48e6addc334266c718f69d5315f047e839b",
+  "projectWorkingTreeHasPreExistingChanges": true,
+  "credentialsRead": false,
+  "liveModelCalls": 0,
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "snapshot_path": "/private/tmp/codex-summary-reasoning-followup.md",
+      "sha256": "24fea701de256cde7aa544bd0aac5b387bae06d6f8e68b5b6ed168a01a6d49bd",
+      "bytes": 70155,
+      "status": "read"
+    },
+    {
+      "id": "S1-api",
+      "url": "https://developers.openai.com/api/reference/resources/responses/methods/create",
+      "snapshot_path": "/private/tmp/codex-summary-api-followup.md",
+      "sha256": "50c1e61a9ca368d893060f29c7dad1452d89db466414fbf30bfd591239a9bfde",
+      "bytes": 496223,
+      "status": "read"
+    },
+    {
+      "id": "S2",
+      "url": "https://github.com/openai/codex/blob/38cbebaf3fe3e81a94bf462079e7cf9659fc9e50/codex-rs/core/src/client.rs",
+      "snapshot_path": "/private/tmp/codex-reasoning-source-20260909/codex-rs/core/src/client.rs",
+      "sha256": "6979098f4ad7b5ec16f19ca90d5c927d3b1e33d0f6d926c70388d0237c52af35",
+      "bytes": 108731,
+      "status": "read"
+    },
+    {
+      "id": "S3",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/thinking",
+      "snapshot_path": "/private/tmp/claude-thinking-overview-research.md",
+      "sha256": "9baa0fba3a60b873c42b66b2ab09b9b42ec60b2d7d45aa79f9500646e562eadd",
+      "bytes": 71829,
+      "status": "read"
+    },
+    {
+      "id": "S4",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/thinking-steering-and-cost",
+      "snapshot_path": "/private/tmp/claude-thinking-cost-research.md",
+      "sha256": "4c9186b0826656ab962c5b36753dbffe2033c50e369ce0c53218131356c76ba1",
+      "bytes": 41336,
+      "status": "read"
+    },
+    {
+      "id": "S5",
+      "url": "https://ai.google.dev/gemini-api/docs/thinking",
+      "snapshot_path": "/private/tmp/gemini-thinking-research.html",
+      "sha256": "6904b48c1f5024c2bcdb3bac165e414f7066815f3039de4eb0efbe10ca96deb1",
+      "bytes": 202204,
+      "status": "read"
+    },
+    {
+      "id": "S6",
+      "url": "https://github.com/google-gemini/gemini-cli/blob/ed2ac40df67a319bf348bd7e3d10494696b31b38/packages/core/src/utils/thoughtUtils.ts",
+      "snapshot_path": "/private/tmp/gemini-thought-utils.ts",
+      "sha256": "2d35679cf73ff5aaf388271e50387b5d854a006b492e50af470ea2eef925a756",
+      "bytes": 1655,
+      "status": "read"
+    },
+    {
+      "id": "S6-ui",
+      "url": "https://github.com/google-gemini/gemini-cli/blob/ed2ac40df67a319bf348bd7e3d10494696b31b38/packages/cli/src/ui/components/messages/ThinkingMessage.tsx",
+      "snapshot_path": "/private/tmp/gemini-thinking-message.tsx",
+      "sha256": "f3f6097350966ae50d56b3ebf081e5cc01e93fec9bb7543a67b2e81e01e0d800",
+      "bytes": 2428,
+      "status": "read"
+    },
+    {
+      "id": "S7",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@deepseek-ai/dsh-llm-deepseek/lib/index.js",
+      "sha256": "111dea66082ef2cd9d9817aaca22f5fbf8e06044895555d249123d4913a8b255",
+      "bytes": 34542,
+      "status": "read"
+    },
+    {
+      "id": "S8-harness",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@deepseek-ai/dsh-llm-pi-ai/lib/index.js",
+      "sha256": "2c9fc146c08795ce0484e8361feb84d0f13de007f53604e7b4d48598e7dfe23b",
+      "bytes": 84672,
+      "status": "read"
+    },
+    {
+      "id": "S8-openai",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@earendil-works/pi-ai/dist/api/openai-responses.js",
+      "sha256": "aea2ca1ed6ff5cd12b774a4ab70793b5086dce772078e303b2badacc2d13e439",
+      "bytes": 11969,
+      "status": "read"
+    },
+    {
+      "id": "S8-simple",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@earendil-works/pi-ai/dist/api/simple-options.js",
+      "sha256": "74dfde37adbd00a6af1fd707c1c5c876577793b078da9fbbd6d40bb75bfb4749",
+      "bytes": 2214,
+      "status": "read"
+    },
+    {
+      "id": "S8-claude",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@earendil-works/pi-ai/dist/api/anthropic-messages.js",
+      "sha256": "72749db7f9e56f3206a002033a692bfc73de73b8ba3735632260f46ff48e555d",
+      "bytes": 44983,
+      "status": "read"
+    },
+    {
+      "id": "S9",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js",
+      "sha256": "9612ad0e65ea2b13d1a57ce08a0af75b9d08a38c302a4cc3c352efd93a55baa7",
+      "bytes": 430470,
+      "status": "read"
+    },
+    {
+      "id": "S10",
+      "url": null,
+      "snapshot_path": "/Users/jesselai/Desktop/DSH-Desktop/plugins/@jesse-lai/dsh-desktop-ui/lib/client.js",
+      "sha256": "a844e85281dd12efff57e70c68677d1aec3ab599cab7328921a1bba11233bdcc",
+      "bytes": 314494,
+      "status": "read"
+    },
+    {
+      "id": "deepseek-docs",
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode",
+      "status": "connection_failed_after_network_retry",
+      "used_as_evidence": false
+    },
+    {
+      "id": "deepseek-pricing",
+      "url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "status": "connection_failed_after_network_retry",
+      "used_as_evidence": false
+    }
+  ]
+}

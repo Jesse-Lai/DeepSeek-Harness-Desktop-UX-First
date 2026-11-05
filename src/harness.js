@@ -88,6 +88,7 @@ export async function startHarness({
   signal,
   onOutput,
   onUnexpectedExit,
+  companion,
 }) {
   if (!executablePath || !cliPath || !userDataPath) {
     throw new TypeError("executablePath, cliPath and userDataPath are required");
@@ -127,6 +128,7 @@ export async function startHarness({
           ...process.env,
           DSH_HOME: harnessHome,
           ELECTRON_RUN_AS_NODE: "1",
+          ...(companion ? { DSH_COMPANION_TOKEN: companion.token, DSH_COMPANION_DATA: companion.dataRoot } : {}),
         },
         stdio: ["ignore", "pipe", "pipe"],
         windowsHide: true,
@@ -136,6 +138,7 @@ export async function startHarness({
     throw new HarnessStartError(`无法启动 Harness：${cause.message}`, { cause });
   }
 
+  let companionUrl;
   let diagnostic = "";
   let stdout = "";
   let ready = false;
@@ -206,6 +209,8 @@ export async function startHarness({
       if (stream === "stdout") stdout = appendDiagnostic(stdout, text);
       onOutput?.({ stream, text });
 
+      const companionMatch = /dsh companion:\s+(http:\/\/127\.0\.0\.1:\d+)(?=\s|$)/.exec(stdout);
+      if (companionMatch) companionUrl = companionMatch[1];
       const parsedUrl = parseHarnessUrl(stdout);
       if (settled || stopping || parsedUrl === undefined || candidateUrl !== undefined) return;
       candidateUrl = parsedUrl;
@@ -262,5 +267,5 @@ export async function startHarness({
     if (signal?.aborted) abortStartup();
   });
 
-  return { child, harnessHome, stop, url, workspacePath };
+  return { child, harnessHome, stop, url, workspacePath, get companionUrl() { return companionUrl; } };
 }

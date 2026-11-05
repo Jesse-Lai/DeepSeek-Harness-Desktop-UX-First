@@ -26,6 +26,7 @@
     "package:mac:arm64": "node scripts/package-macos-arm64.js",
     "package:mac:x64": "node scripts/package-macos-arm64.js x64",
     "package:win:x64": "node scripts/package-windows-x64.js",
+    "postinstall": "patch-package",
     "release:verify-tag": "node scripts/verify-release-tag.js",
     "smoke:packaged:mac:arm64": "node scripts/run-packaged-smoke.js \"dist/DeepSeek Harness UX First-darwin-arm64/DeepSeek Harness UX First.app/Contents/MacOS/DeepSeek Harness UX First\"",
     "smoke:packaged:mac:x64": "node scripts/run-packaged-smoke.js \"dist/DeepSeek Harness UX First-darwin-x64/DeepSeek Harness UX First.app/Contents/MacOS/DeepSeek Harness UX First\"",
@@ -35,7 +36,11 @@
     "smoke": "electron . --smoke-test",
     "verify:mac:arm64": "node scripts/verify-macos-app.js arm64",
     "verify:mac:x64": "node scripts/verify-macos-app.js x64",
-    "verify:win:x64": "node scripts/verify-windows-app.js"
+    "verify:win:x64": "node scripts/verify-windows-app.js",
+    "companion:build": "node scripts/build-companion.js",
+    "companion:test": "swift test --package-path native/DSHCompanion --scratch-path dist/companion-tests",
+    "prestart": "node scripts/ensure-companion.js",
+    "companion:integration": "node scripts/verify-companion-integration.js"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.1.0-rc.6"
@@ -44,6 +49,7 @@
     "@electron/packager": "20.3.0",
     "electron": "43.4.0",
     "graceful-fs": "4.2.11",
+    "patch-package": "8.0.1",
     "sharp": "0.35.3"
   }
 }

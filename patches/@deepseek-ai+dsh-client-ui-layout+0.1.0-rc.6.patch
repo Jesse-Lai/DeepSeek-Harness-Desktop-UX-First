@@ -1,0 +1,277 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/client.js
+index a85b668..8d7ec1c 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/client.js
+@@ -11,6 +11,11 @@ window.__ModuleLoader__.load({
+ 		* LG breakpoint); a manual toggle below it re-expands over the squeezed center
+ 		* (stores.ts narrowExpanded). */
+ 		const SIDEBAR_AUTO_COLLAPSE = 1024;
++		const SIDEBAR_TOP_HEIGHT = 52;
++		const sidebarPlacements = ["left", "right", "top"];
++		function isSidebarPlacement(value) {
++			return sidebarPlacements.includes(value);
++		}
+ 		/**
+ 		* Clamp a panel width into its contract range.
+ 		* @param px - requested width.
+@@ -51,9 +56,20 @@ window.__ModuleLoader__.load({
+ 				details: 0
+ 			};
+ 		}
++		function computeTopColumns(viewport, details) {
++			const d0 = details === 0 ? 0 : clampWidth(details, 300, 520);
++			if (d0 + 640 <= viewport) return {
++				center: viewport - d0,
++				details: d0
++			};
++			return {
++				center: viewport,
++				details: 0
++			};
++		}
+ 		//#endregion
+ 		//#region \0dsh-css:/home/runner/work/deepseek-harness/deepseek-harness/packages/client/ui-layout/src/client/AppFrame.module.css.mjs
+-		const css = ".pI_x6G_frame{background:var(--dsw-alias-bg-base);height:100%;transition:grid-template-columns var(--ds-transition-duration-slow) var(--ds-ease-in-out);grid-template-rows:100%;display:grid;position:relative;overflow:hidden}.pI_x6G_frame[data-dragging]{transition:none}@media (prefers-reduced-motion:reduce){.pI_x6G_frame{transition:none}}.pI_x6G_sidebarCol{background:var(--dsw-specific-sidebar-fill);border-right:1px solid var(--dsw-alias-border-l1);min-width:0;overflow:hidden}.pI_x6G_centerCol{flex-direction:column;min-width:0;display:flex;overflow:hidden}.pI_x6G_detailsCol{border-left:1px solid var(--dsw-alias-border-l2);min-width:0;overflow:hidden}.pI_x6G_frame[data-details-collapsed] .pI_x6G_detailsCol{border-left:none}.pI_x6G_handle{cursor:col-resize;z-index:2;touch-action:none;width:8px;transition:left var(--ds-transition-duration-slow) var(--ds-ease-in-out);margin-left:-4px;position:absolute;top:0;bottom:0}.pI_x6G_frame[data-dragging] .pI_x6G_handle{transition:none}@media (prefers-reduced-motion:reduce){.pI_x6G_handle{transition:none}}.pI_x6G_handle[data-side=details]:after{content:\"\";box-sizing:border-box;background:var(--dsw-alias-button-floating-fill);border:1px solid var(--dsw-alias-border-l2-darkmode-thin);opacity:0;width:12px;height:32px;transition:opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out), background var(--ds-transition-duration-slow) var(--ds-ease-in-out);border-radius:10px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.pI_x6G_detailsCol:hover~.pI_x6G_handle[data-side=details]:after,.pI_x6G_handle[data-side=details]:hover:after,.pI_x6G_handle[data-side=details][data-dragging=true]:after{opacity:1}.pI_x6G_handle[data-side=details]:hover:after,.pI_x6G_handle[data-side=details][data-dragging=true]:after{background:var(--dsw-alias-button-floating-hover);border-color:var(--dsw-alias-border-l3)}.pI_x6G_overlayLayer{z-index:20;pointer-events:none;position:absolute;inset:0}.pI_x6G_overlayLayer>*{pointer-events:auto}";
++		const css = ".pI_x6G_frame{background:var(--dsw-alias-bg-base);height:100%;transition:grid-template-columns var(--ds-transition-duration-slow) var(--ds-ease-in-out),grid-template-rows var(--ds-transition-duration-slow) var(--ds-ease-in-out);display:grid;position:relative;overflow:hidden}.pI_x6G_frame[data-dragging]{transition:none}@media (prefers-reduced-motion:reduce){.pI_x6G_frame{transition:none}}.pI_x6G_sidebarCol{background:var(--dsw-specific-sidebar-fill);border-right:1px solid var(--dsw-alias-border-l1);min-width:0;overflow:hidden}.pI_x6G_frame[data-sidebar-placement=right] .pI_x6G_sidebarCol{border-right:0;border-left:1px solid var(--dsw-alias-border-l1)}.pI_x6G_frame[data-sidebar-placement=top] .pI_x6G_sidebarCol{border-right:0;border-bottom:1px solid var(--dsw-alias-border-l1)}.pI_x6G_centerCol{flex-direction:column;min-width:0;display:flex;overflow:hidden}.pI_x6G_detailsCol{border-left:1px solid var(--dsw-alias-border-l2);min-width:0;overflow:hidden}.pI_x6G_frame[data-details-collapsed] .pI_x6G_detailsCol{border-left:none}.pI_x6G_handle{cursor:col-resize;z-index:2;touch-action:none;width:8px;transition:left var(--ds-transition-duration-slow) var(--ds-ease-in-out);margin-left:-4px;position:absolute;top:0;bottom:0}.pI_x6G_frame[data-dragging] .pI_x6G_handle{transition:none}@media (prefers-reduced-motion:reduce){.pI_x6G_handle{transition:none}}.pI_x6G_handle[data-side=details]:after{content:\"\";box-sizing:border-box;background:var(--dsw-alias-button-floating-fill);border:1px solid var(--dsw-alias-border-l2-darkmode-thin);opacity:0;width:12px;height:32px;transition:opacity var(--ds-transition-duration-slow) var(--ds-ease-in-out), background var(--ds-transition-duration-slow) var(--ds-ease-in-out);border-radius:10px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.pI_x6G_detailsCol:hover~.pI_x6G_handle[data-side=details]:after,.pI_x6G_handle[data-side=details]:hover:after,.pI_x6G_handle[data-side=details][data-dragging=true]:after{opacity:1}.pI_x6G_handle[data-side=details]:hover:after,.pI_x6G_handle[data-side=details][data-dragging=true]:after{background:var(--dsw-alias-button-floating-hover);border-color:var(--dsw-alias-border-l3)}.pI_x6G_overlayLayer{z-index:20;pointer-events:none;position:absolute;inset:0}.pI_x6G_overlayLayer>*{pointer-events:auto}";
+ 		const tagId = "@deepseek-ai/dsh-client-ui-layout/AppFrame.module.css";
+ 		if (typeof document !== "undefined" && document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId) + "]") === null) {
+ 			const tag = document.createElement("style");
+@@ -88,6 +104,7 @@ window.__ModuleLoader__.load({
+ 		function CenterColumn(props) {
+ 			return (0, react_jsx_runtime.jsx)("div", {
+ 				className: AppFrame_module_css_default.centerCol,
++				style: props.style,
+ 				children: props.children
+ 			});
+ 		}
+@@ -95,6 +112,7 @@ window.__ModuleLoader__.load({
+ 		function DetailsColumn(props) {
+ 			return (0, react_jsx_runtime.jsx)("div", {
+ 				className: AppFrame_module_css_default.detailsCol,
++				style: props.style,
+ 				children: props.children
+ 			});
+ 		}
+@@ -191,8 +209,15 @@ window.__ModuleLoader__.load({
+ 			(0, react.useEffect)(() => {
+ 				actions.setNarrow(narrow);
+ 			}, [actions, narrow]);
+-			const sidebarCollapsed = narrow ? !panels.narrowExpanded : panels.sidebar === 0;
+-			const cols = computeColumns(viewport, sidebarCollapsed ? 0 : panels.sidebar === 0 ? 280 : panels.sidebar, detailsSession === void 0 ? 0 : panels.details);
++			const placement = isSidebarPlacement(panels.sidebarPlacement) ? panels.sidebarPlacement : "left";
++			const sidebarCollapsed = placement === "top" ? false : narrow ? !panels.narrowExpanded : panels.sidebar === 0;
++			const verticalCols = computeColumns(viewport, sidebarCollapsed ? 0 : panels.sidebar === 0 ? 280 : panels.sidebar, detailsSession === void 0 ? 0 : panels.details);
++			const topCols = computeTopColumns(viewport, detailsSession === void 0 ? 0 : panels.details);
++			const cols = placement === "top" ? {
++				sidebar: viewport,
++				center: topCols.center,
++				details: topCols.details
++			} : verticalCols;
+ 			const colsRef = (0, react.useRef)(cols);
+ 			colsRef.current = cols;
+ 			const sidebarBase = (0, react.useRef)(0);
+@@ -210,42 +235,65 @@ window.__ModuleLoader__.load({
+ 				setDragging(true);
+ 			}, []);
+ 			const onSidebarDrag = (0, react.useCallback)((dx) => {
+-				actions.setSidebar(sidebarBase.current + dx);
+-			}, [actions]);
++				actions.setSidebar(sidebarBase.current + (placement === "right" ? -dx : dx));
++			}, [actions, placement]);
+ 			const onDetailsDrag = (0, react.useCallback)((dx) => {
+ 				actions.setDetails(detailsBase.current - dx);
+ 			}, [actions]);
++			const frameStyle = placement === "top" ? {
++				gridTemplateAreas: '"sidebar sidebar" "center details"',
++				gridTemplateColumns: `minmax(0, 1fr) ${cols.details}px`,
++				gridTemplateRows: `${SIDEBAR_TOP_HEIGHT}px minmax(0, 1fr)`
++			} : placement === "right" ? {
++				gridTemplateAreas: '"center details sidebar"',
++				gridTemplateColumns: `minmax(0, 1fr) ${cols.details}px ${cols.sidebar}px`,
++				gridTemplateRows: "100%"
++			} : {
++				gridTemplateAreas: '"sidebar center details"',
++				gridTemplateColumns: `${cols.sidebar}px minmax(0, 1fr) ${cols.details}px`,
++				gridTemplateRows: "100%"
++			};
++			const detailsHandleLeft = placement === "right" ? viewport - cols.sidebar - cols.details : viewport - cols.details;
+ 			return (0, react_jsx_runtime.jsxs)("div", {
+ 				ref: frameRef,
+ 				className: AppFrame_module_css_default.frame,
+-				style: { gridTemplateColumns: `${cols.sidebar}px minmax(0, 1fr) ${cols.details}px` },
++				style: frameStyle,
++				"data-sidebar-placement": placement,
+ 				"data-sidebar-collapsed": sidebarCollapsed || void 0,
+ 				"data-details-collapsed": cols.details === 0 || void 0,
+ 				"data-dragging": dragging || void 0,
+ 				children: [
+ 					(0, react_jsx_runtime.jsx)("div", {
+ 						className: AppFrame_module_css_default.sidebarCol,
++						style: { gridArea: "sidebar" },
+ 						children: renderSlot("sidebar", {
+ 							collapsed: sidebarCollapsed,
+-							width: cols.sidebar
++							width: cols.sidebar,
++							placement
+ 						})
+ 					}),
+-					(0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [(0, react_jsx_runtime.jsx)(CenterColumn, { children: renderSlot("conversation", {}) }), (0, react_jsx_runtime.jsx)(DetailsColumn, { children: renderSlot("details", {}) })] }),
++					(0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [(0, react_jsx_runtime.jsx)(CenterColumn, {
++						style: { gridArea: "center" },
++						children: renderSlot("conversation", {})
++					}), (0, react_jsx_runtime.jsx)(DetailsColumn, {
++						style: { gridArea: "details" },
++						children: renderSlot("details", {})
++					})] }),
+ 					(0, react_jsx_runtime.jsx)("div", {
+ 						className: AppFrame_module_css_default.overlayLayer,
+ 						"data-shell-overlay": true,
+ 						children: renderSlot("shell.overlay", {})
+ 					}),
+-					!sidebarCollapsed && (0, react_jsx_runtime.jsx)(DragHandle, {
++					placement !== "top" && !sidebarCollapsed && (0, react_jsx_runtime.jsx)(DragHandle, {
+ 						side: "sidebar",
+-						left: cols.sidebar,
++						left: placement === "right" ? viewport - cols.sidebar : cols.sidebar,
+ 						onStart: onSidebarStart,
+ 						onDrag: onSidebarDrag,
+ 						onEnd: onDragEnd
+ 					}),
+ 					cols.details > 0 && (0, react_jsx_runtime.jsx)(DragHandle, {
+ 						side: "details",
+-						left: viewport - cols.details,
++						left: detailsHandleLeft,
+ 						onStart: onDetailsStart,
+ 						onDrag: onDetailsDrag,
+ 						onEnd: onDragEnd
+@@ -278,11 +326,15 @@ window.__ModuleLoader__.load({
+ 			return (0, _deepseek_ai_dsh_client_runtime_client.defineStore)({
+ 				init: () => ({
+ 					sidebar: 280,
++					sidebarPlacement: "left",
+ 					details: 0,
+ 					narrow: false,
+ 					narrowExpanded: false
+ 				}),
+ 				actions: {
++					setSidebarPlacement: (d, placement) => {
++						if (isSidebarPlacement(placement)) d.sidebarPlacement = placement;
++					},
+ 					setSidebar: (d, px) => {
+ 						d.sidebar = clampWidth(px, 264, 420);
+ 					},
+@@ -326,6 +378,9 @@ window.__ModuleLoader__.load({
+ 			toggleSidebar() {
+ 				this.#require().toggleSidebar();
+ 			}
++			setSidebarPlacement(placement) {
++				this.#require().setSidebarPlacement(placement);
++			}
+ 			/** Open the details panel (no-op when already open). */
+ 			openDetails() {
+ 				this.#require().openDetails();
+@@ -453,4 +508,4 @@ window.__ModuleLoader__.load({
+ 	}
+ });
+ 
+-//# sourceMappingURL=client.js.map
+\ No newline at end of file
++//# sourceMappingURL=client.js.map
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/index.d.ts b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/index.d.ts
+index aa8301d..0b4d102 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/index.d.ts
++++ b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/index.d.ts
+@@ -10,6 +10,7 @@
+ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client';
+ export { LayoutController } from './service.ts';
+ export type { ILayout } from './service.ts';
++export type { SidebarPlacement } from './stores.ts';
+ declare module '@deepseek-ai/cordis' {
+     interface Context {
+         /** The outward face only; the concrete service stays inside this plugin. */
+@@ -86,6 +87,8 @@ export interface SidebarOwnerProps {
+     collapsed: boolean;
+     /** Rendered column width in px (SIDEBAR_COLLAPSED when collapsed). */
+     width: number;
++    /** Navigation placement selected for this native window. */
++    placement: import('./stores.ts').SidebarPlacement;
+ }
+ /** Conversation owner share: business state and actions belong to the registrant. */
+ export interface ConvOwnerProps {
+@@ -102,4 +105,4 @@ export declare const inject: string[];
+  * @param ctx - client root context.
+  */
+ export declare function apply(ctx: ClientContext): void;
+-//# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=index.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/service.d.ts b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/service.d.ts
+index e2a1a0c..29359e0 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/service.d.ts
++++ b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/service.d.ts
+@@ -10,6 +10,7 @@
+  */
+ import type { BoundActions } from '@deepseek-ai/dsh-client-ui-slots';
+ import type { createLayoutStore } from './stores.ts';
++import type { SidebarPlacement } from './stores.ts';
+ /** The layout store's bound action set (framework-baked, draft params peeled). */
+ export type PanelActions = BoundActions<ReturnType<typeof createLayoutStore>>;
+ /**
+@@ -19,6 +20,8 @@ export type PanelActions = BoundActions<ReturnType<typeof createLayoutStore>>;
+  * only).
+  */
+ export interface ILayout {
++    /** Move the navigation surface without remounting its contents. */
++    setSidebarPlacement(placement: SidebarPlacement): void;
+     /** Toggle the sidebar panel (closed ⟷ contract default width). */
+     toggleSidebar(): void;
+     /** Open the details panel (no-op when already open). */
+@@ -39,9 +42,11 @@ export declare class LayoutController implements ILayout {
+     attachPanels(actions: PanelActions): void;
+     /** Toggle the sidebar panel (closed ⟷ contract default width). */
+     toggleSidebar(): void;
++    /** Move the navigation surface without remounting its contents. */
++    setSidebarPlacement(placement: SidebarPlacement): void;
+     /** Open the details panel (no-op when already open). */
+     openDetails(): void;
+     /** Close the details panel. */
+     closeDetails(): void;
+ }
+-//# sourceMappingURL=service.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=service.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/stores.d.ts b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/stores.d.ts
+index a79da9e..4c98d37 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/stores.d.ts
++++ b/node_modules/@deepseek-ai/dsh-client-ui-layout/lib/types/client/stores.d.ts
+@@ -8,6 +8,7 @@
+  * receives the bound actions through the registration's inject hook.
+  */
+ import { type EngineStoreHandle } from '@deepseek-ai/dsh-client-runtime/client';
++export type SidebarPlacement = 'left' | 'right' | 'top';
+ /**
+  * Layout store state: panel width preferences in px (0 = closed), plus the
+  * narrow-viewport pair — `narrow` mirrors AppFrame's breakpoint reading
+@@ -17,6 +18,7 @@ import { type EngineStoreHandle } from '@deepseek-ai/dsh-client-runtime/client';
+  */
+ type LayoutState = {
+     sidebar: number;
++    sidebarPlacement: SidebarPlacement;
+     details: number;
+     narrow: boolean;
+     narrowExpanded: boolean;
+@@ -26,6 +28,7 @@ type LayoutState = {
+  * return type); drift fails assignability at the defineStore call.
+  */
+ type LayoutActions = {
++    setSidebarPlacement: (draft: LayoutState, placement: SidebarPlacement) => void;
+     setSidebar: (draft: LayoutState, px: number) => void;
+     setDetails: (draft: LayoutState, px: number) => void;
+     toggleSidebar: (draft: LayoutState) => void;
+@@ -45,4 +48,4 @@ type LayoutActions = {
+  */
+ export declare function createLayoutStore(): EngineStoreHandle<LayoutState, LayoutActions>;
+ export {};
+-//# sourceMappingURL=stores.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=stores.d.ts.map

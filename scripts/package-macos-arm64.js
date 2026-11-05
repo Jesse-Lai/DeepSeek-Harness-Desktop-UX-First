@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { access } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import {
@@ -17,6 +18,31 @@ const defaultBuildVersion = applicationVersion.match(/\d+/g)?.slice(0, 4).join("
 if (!new Set(["arm64", "x64"]).has(targetArch)) {
   throw new Error(`Unsupported macOS architecture: ${targetArch}`);
 }
+
+const targetNativePackages = [
+  `@koromix/koffi-darwin-${targetArch}`,
+  `node-addon-require-builtin-darwin-${targetArch}`,
+];
+const missingTargetNativePackages = [];
+for (const packageName of targetNativePackages) {
+  try {
+    await access(
+      join(projectRoot, "node_modules", ...packageName.split("/"), "package.json"),
+    );
+  } catch {
+    missingTargetNativePackages.push(packageName);
+  }
+}
+if (missingTargetNativePackages.length > 0) {
+  throw new Error(
+    [
+      `Cannot package macOS ${targetArch}: target-native dependencies are missing.`,
+      `Missing: ${missingTargetNativePackages.join(", ")}.`,
+      `The installed dependency tree is for ${process.platform}/${process.arch}; run npm ci with a ${targetArch} Node.js runtime before packaging this target.`,
+    ].join(" "),
+  );
+}
+await execFileAsync(process.execPath, [join(projectRoot, "scripts", "build-companion.js"), targetArch], { maxBuffer: 8 * 1024 * 1024 });
 await execFileAsync(process.execPath, [
   join(projectRoot, "scripts", "build-macos-icon.js"),
 ]);
@@ -79,6 +105,7 @@ try {
     },
     icon: join(projectRoot, "dist", "icon", "app-icon.icns"),
     ignore: ignoreFromApplication,
+    extraResource: [join(projectRoot, "dist", "native", "DSH Companion.app")],
     ...releaseSigningOptions(),
   });
 } finally {

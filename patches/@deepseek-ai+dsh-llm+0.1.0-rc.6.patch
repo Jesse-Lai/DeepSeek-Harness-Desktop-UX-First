@@ -1,0 +1,205 @@
+diff --git a/node_modules/@deepseek-ai/dsh-llm/lib/index.js b/node_modules/@deepseek-ai/dsh-llm/lib/index.js
+index 3cb45fd..7f08b3c 100644
+--- a/node_modules/@deepseek-ai/dsh-llm/lib/index.js
++++ b/node_modules/@deepseek-ai/dsh-llm/lib/index.js
+@@ -1,3 +1,4 @@
++import { createHash } from "node:crypto";
+ import { createRequire } from "node:module";
+ import { Service } from "@deepseek-ai/cordis";
+ import z from "@deepseek-ai/schemastery";
+@@ -920,6 +921,9 @@ var LlmRuntime = class extends Service {
+ 	adapters = /* @__PURE__ */ new Map();
+ 	directory = /* @__PURE__ */ new Map();
+ 	discoveries = /* @__PURE__ */ new Map();
++	draftValidators = /* @__PURE__ */ new Map();
++	validationStatuses = /* @__PURE__ */ new Map();
++	pendingValidations = /* @__PURE__ */ new Map();
+ 	constructor(ctx) {
+ 		super(ctx, "llm");
+ 	}
+@@ -1133,6 +1137,85 @@ var LlmRuntime = class extends Service {
+ 		}
+ 		return models;
+ 	}
++	/** Register provider-specific validation for an unsaved settings draft. */
++	registerDraftValidator(settingsNs, validate) {
++		const dispose = this.ctx.effect(function* () {
++			if (settingsNs.length === 0) throw new LlmError("model draft validation needs a non-empty settings namespace", "INVALID_DRAFT_VALIDATOR");
++			if (this.draftValidators.has(settingsNs)) throw new LlmError(`model draft validation for "${settingsNs}" is already registered`, "DUPLICATE_DRAFT_VALIDATOR");
++			this.draftValidators.set(settingsNs, validate);
++			yield () => {
++				this.draftValidators.delete(settingsNs);
++			};
++		}.bind(this), "llm.registerDraftValidator()");
++		return () => void dispose();
++	}
++	/** Validate a draft without activating or storing it. */
++	async validateModelDraft(settingsNs, request) {
++		const validate = this.draftValidators.get(settingsNs);
++		if (validate === void 0) throw new LlmError(`no model draft validation is registered for "${settingsNs}"`, "NO_DRAFT_VALIDATOR");
++		const results = await validate(request);
++		const byModel = new Map(request.models.map((model) => [model.id, model]));
++		for (const result of results) {
++			const key = `${request.provider}\0${result.model}`;
++			if (!result.ok) {
++				this.pendingValidations.delete(key);
++				continue;
++			}
++			const model = byModel.get(result.model);
++			this.pendingValidations.set(key, {
++				reasoningEffort: model?.reasoningEffort,
++				fingerprint: this.draftFingerprint(request, model)
++			});
++		}
++		return results.map((result) => ({ ...result }));
++	}
++	confirmModelValidation(provider, models) {
++		for (const model of models) {
++			const key = `${provider}\0${model}`;
++			const pending = this.pendingValidations.get(key);
++			this.pendingValidations.delete(key);
++			this.recordValidation(provider, model, true, void 0, pending?.reasoningEffort, pending?.fingerprint);
++		}
++	}
++	draftFingerprint(request, model) {
++		const keyDigest = request.apiKey === void 0 ? "stored" : createHash("sha256").update(request.apiKey).digest("hex");
++		return createHash("sha256").update(JSON.stringify({
++			provider: request.provider,
++			profile: request.profile,
++			model: model?.id,
++			reasoningEffort: model?.reasoningEffort,
++			keyDigest
++		})).digest("hex");
++	}
++	/** Latest in-process result for one provider; never persisted across restart. */
++	providerValidationStatus(provider) {
++		const values = [...this.validationStatuses.entries()].filter(([key]) => key.startsWith(`${provider}\0`)).map(([, value]) => value);
++		if (values.length === 0) return "unknown";
++		return values.every((value) => value.ok) ? "valid" : "invalid";
++	}
++	/** Clear results whose exact configuration is about to change. */
++	clearValidation(provider, models) {
++		const selected = models === void 0 ? void 0 : new Set(models);
++		let changed = false;
++		for (const key of this.validationStatuses.keys()) if (key.startsWith(`${provider}\0`) && (selected === void 0 || selected.has(key.slice(provider.length + 1)))) {
++			this.validationStatuses.delete(key);
++			changed = true;
++		}
++		for (const key of this.pendingValidations.keys()) if (key.startsWith(`${provider}\0`) && (selected === void 0 || selected.has(key.slice(provider.length + 1)))) this.pendingValidations.delete(key);
++		if (changed) this.emitAdaptersUpdated();
++	}
++	recordValidation(provider, model, ok, message, reasoningEffort, fingerprint) {
++		const key = `${provider}\0${model}`;
++		const previous = this.validationStatuses.get(key);
++		if (previous?.ok === ok && previous?.message === message && previous?.reasoningEffort === reasoningEffort && previous?.fingerprint === fingerprint) return;
++		this.validationStatuses.set(key, {
++			ok,
++			...message === void 0 ? {} : { message },
++			...reasoningEffort === void 0 ? {} : { reasoningEffort },
++			...fingerprint === void 0 ? {} : { fingerprint }
++		});
++		this.emitAdaptersUpdated();
++	}
+ 	/**
+ 	* Resolve the retry policy captured when one provider route was registered.
+ 	* @param provider - registered provider route to inspect.
+@@ -1326,6 +1409,7 @@ var LlmRuntime = class extends Service {
+ 	*/
+ 	async *adapterStream(options, prepared) {
+ 		let iterator;
++		let replied = false;
+ 		try {
+ 			const registration = prepared?.registration ?? this.registration(options.provider);
+ 			const resolvedConfig = prepared === void 0 ? (await this.resolveCallFor(registration, options, options.signal)).config : prepared.config;
+@@ -1340,7 +1424,9 @@ var LlmRuntime = class extends Service {
+ 			const adapter = registration.adapter;
+ 			iterator = adapter.stream(this.forAdapter(resolvedOptions, adapter))[Symbol.asyncIterator]();
+ 		} catch (error) {
+-			yield adapterFailureChunk(error, options.signal);
++			const failure = adapterFailureChunk(error, options.signal);
++			this.recordValidation(options.provider, options.model, false, failure.reason.failure?.message, options.reasoningEffort, "live");
++			yield failure;
+ 			return;
+ 		}
+ 		let completed = false;
+@@ -1355,13 +1441,21 @@ var LlmRuntime = class extends Service {
+ 					};
+ 				} catch (error) {
+ 					completed = true;
+-					yield adapterFailureChunk(error, options.signal);
++					const failure = adapterFailureChunk(error, options.signal);
++					this.recordValidation(options.provider, options.model, false, failure.reason.failure?.message, options.reasoningEffort, "live");
++					yield failure;
+ 					return;
+ 				}
+ 				if (item.done) {
+ 					completed = true;
+ 					return;
+ 				}
++				if (item.value.type === "text-delta" && item.value.text.length > 0 || item.value.type === "block-end" && item.value.block.type === "text" && item.value.block.text.length > 0) replied = true;
++				if (item.value.type === "finish") {
++					const reason = item.value.reason;
++					const ok = replied && reason.kind !== "error" && reason.kind !== "aborted";
++					this.recordValidation(options.provider, options.model, ok, ok ? void 0 : reason.failure?.message ?? "The model returned no text response", options.reasoningEffort, "live");
++				}
+ 				yield item.value;
+ 			}
+ 		} finally {
+diff --git a/node_modules/@deepseek-ai/dsh-llm/lib/types/index.d.ts b/node_modules/@deepseek-ai/dsh-llm/lib/types/index.d.ts
+index 9692be1..9591cfd 100644
+--- a/node_modules/@deepseek-ai/dsh-llm/lib/types/index.d.ts
++++ b/node_modules/@deepseek-ai/dsh-llm/lib/types/index.d.ts
+@@ -191,6 +191,24 @@ export interface DirectoryRegistrationHandle {
+      */
+     replace(entries: readonly LlmConfigurableProvider[]): void;
+ }
++export type LlmDraftValidationField = 'apiKey' | 'baseURL' | 'api' | 'model' | 'reasoning' | 'provider';
++export interface LlmDraftModelValidationResult {
++    model: string;
++    ok: boolean;
++    field?: LlmDraftValidationField;
++    code?: string;
++    message?: string;
++}
++export interface LlmModelDraftValidationRequest {
++    provider: string;
++    profile: Record<string, unknown>;
++    apiKey?: string;
++    models: readonly {
++        id: string;
++        reasoningEffort?: string;
++    }[];
++    signal?: AbortSignal;
++}
+ /**
+  * The abstract `llm` service: an adapter registry plus a streaming model-call
+  * API, interceptable via the `llm/stream` waterfall.
+@@ -199,6 +217,8 @@ export declare class LlmRuntime extends Service {
+     private adapters;
+     private directory;
+     private discoveries;
++    private draftValidators;
++    private validationStatuses;
+     constructor(ctx: Context);
+     /** Notify topology observers without letting one broken listener veto the commit. */
+     private emitAdaptersUpdated;
+@@ -267,6 +287,12 @@ export declare class LlmRuntime extends Service {
+      * @returns the advertised models, deduplicated in endpoint order.
+      */
+     discoverModels(settingsNs: string, request: LlmModelDiscoveryRequest): Promise<LlmDiscoveredModel[]>;
++    registerDraftValidator(settingsNs: string, validate: (request: LlmModelDraftValidationRequest) => Promise<readonly LlmDraftModelValidationResult[]>): () => void;
++    validateModelDraft(settingsNs: string, request: LlmModelDraftValidationRequest): Promise<LlmDraftModelValidationResult[]>;
++    confirmModelValidation(provider: string, models: readonly string[]): void;
++    providerValidationStatus(provider: string): 'unknown' | 'valid' | 'invalid';
++    clearValidation(provider: string, models?: readonly string[]): void;
++    private recordValidation;
+     /**
+      * Resolve the retry policy captured when one provider route was registered.
+      * @param provider - registered provider route to inspect.
+@@ -338,4 +364,4 @@ export declare class LlmRuntime extends Service {
+     private streamWithRegistration;
+ }
+ export default LlmRuntime;
+-//# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=index.d.ts.map
