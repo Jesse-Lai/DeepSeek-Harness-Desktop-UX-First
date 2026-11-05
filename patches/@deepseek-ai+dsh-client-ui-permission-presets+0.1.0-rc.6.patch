@@ -3,7 +3,7 @@ index c523a61..58885d2 100644
 --- a/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js
 +++ b/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js
 @@ -373,29 +373,8 @@ window.__ModuleLoader__.load({
-		/**
+ 		/**
 -		* Client plugin body: register the /permission popup picker over the
 -		* permissions projection.
 +		* Client plugin body: expose the default permission preset in General
@@ -11,7 +11,7 @@ index c523a61..58885d2 100644
 +		* host command, but are intentionally not promoted in the Composer.
  		* @param ctx - client root context.
  		*/
-		function apply(ctx) {
+ 		function apply(ctx) {
 -			const command = ctx.get("commandUi");
 -			const sessions = ctx.sessions;
 -			ctx.effect(() => {
@@ -34,7 +34,7 @@ index c523a61..58885d2 100644
 -			}, "ui-permission: Full access confirmation dictionaries");
 -			const t = ctx.locale.bind(ACCESS_NS);
 -			const sessionFor = (session) => sessions.binding(session.sessionId)?.session;
-			ctx.effect(() => ctx.locale.register("settings.permission", {
+ 			ctx.effect(() => ctx.locale.register("settings.permission", {
 @@ -432,23 +411,4 @@ window.__ModuleLoader__.load({
  				inject: injected
  			}, PermissionRow));
