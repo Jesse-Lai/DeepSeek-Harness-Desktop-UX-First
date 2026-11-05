@@ -1,0 +1,61 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js
+index c523a61..58885d2 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-permission-presets/lib/client.js
+@@ -373,29 +373,8 @@ window.__ModuleLoader__.load({
+ 		/**
+-		* Client plugin body: register the /permission popup picker over the
+-		* permissions projection.
++		* Client plugin body: expose the default permission preset in General
++		* Settings. Per-session permission changes remain available through the
++		* host command, but are intentionally not promoted in the Composer.
+ 		* @param ctx - client root context.
+ 		*/
+ 		function apply(ctx) {
+-			const command = ctx.get("commandUi");
+-			const sessions = ctx.sessions;
+-			ctx.effect(() => {
+-				const disposers = [ctx.locale.register(ACCESS_NS, "zh", {
+-					"confirm.title": accessZh["confirm.title"],
+-					"confirm.description": accessZh["confirm.description"],
+-					"confirm.acknowledge": accessZh["confirm.acknowledge"],
+-					"confirm.cancel": accessZh["confirm.cancel"],
+-					"confirm.enable": accessZh["confirm.enable"]
+-				}), ctx.locale.register(ACCESS_NS, "en", {
+-					"confirm.title": accessEn["confirm.title"],
+-					"confirm.description": accessEn["confirm.description"],
+-					"confirm.acknowledge": accessEn["confirm.acknowledge"],
+-					"confirm.cancel": accessEn["confirm.cancel"],
+-					"confirm.enable": accessEn["confirm.enable"]
+-				})];
+-				return () => {
+-					for (const dispose of disposers) dispose();
+-				};
+-			}, "ui-permission: Full access confirmation dictionaries");
+-			const t = ctx.locale.bind(ACCESS_NS);
+-			const sessionFor = (session) => sessions.binding(session.sessionId)?.session;
+ 			ctx.effect(() => ctx.locale.register("settings.permission", {
+@@ -432,23 +411,4 @@ window.__ModuleLoader__.load({
+ 				inject: injected
+ 			}, PermissionRow));
+-			ctx.effect(() => command.decorate({
+-				name: "permission",
+-				available: (session) => selectOf(sessionFor(session)) !== void 0,
+-				ui: {
+-					kind: "popupSelect",
+-					options: (session) => {
+-						const value = selectOf(sessionFor(session));
+-						if (value === void 0) throw new Error("permission presets are not available on this host");
+-						return Promise.resolve(optionsOf(value, t));
+-					},
+-					onSelect: async (option, session) => {
+-						const live = sessionFor(session);
+-						if (live === void 0) throw new Error("this session is not materialized yet");
+-						const result = await live.command(`/permission ${option.id}`);
+-						if (!result.ok) throw new Error(`permission switch failed: ${result.error.code}: ${result.error.message}`);
+-						if (!result.value.matched) throw new Error("the host offers no /permission command");
+-					}
+-				}
+-			}), "ui-permission: /permission decoration");
+ 		}
+ 		//#endregion

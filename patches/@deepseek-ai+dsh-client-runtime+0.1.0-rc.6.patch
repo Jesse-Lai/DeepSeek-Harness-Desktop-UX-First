@@ -1,0 +1,136 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-runtime/lib/client.js b/node_modules/@deepseek-ai/dsh-client-runtime/lib/client.js
+index 32d17c8..928516d 100644
+--- a/node_modules/@deepseek-ai/dsh-client-runtime/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-runtime/lib/client.js
+@@ -8899,9 +8899,18 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 			* @param remote - generated Remote namespaces shared with every Session.
+ 			* @param conversationRuntime - same-pass registry instances, when runtime apply owns them.
+ 			*/
+ 			constructor(rootCtx, api, remote, conversationRuntime) {
+ 				this.rootCtx = rootCtx;
+-				this.selection = createSnapshotStore({}, { persist: { name: "dsh.sessions.current" } });
++				const atomPaneSession = (() => {
++					try {
++						return new URLSearchParams(globalThis.location?.search ?? "").get("dshAtomSession") ?? void 0;
++					} catch {
++						return void 0;
++					}
++				})();
++				const selectionName = atomPaneSession === void 0 ? "dsh.sessions.current" : `dsh.sessions.current:${atomPaneSession}`;
++				this.selection = createSnapshotStore({}, { persist: { name: selectionName } });
++				if (atomPaneSession !== void 0) this.selection.set({ sessionId: atomPaneSession });
+ 				const restored = this.selection.getSnapshot();
+ 				const conversationEvents = rootCtx.get("conversationEvents");
+ 				const conversationViews = rootCtx.get("conversationViews");
+@@ -9809,6 +9818,17 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 				this.name = "DirectoryBrowseError";
+ 			}
+ 		};
++		/** Root navigation channel for opening a concrete Settings section. */
++		var SettingsNavigation = class {
++			store = createSnapshotStore({ sequence: 0, sectionId: void 0 });
++			constructor(ctx) {
++				ctx.reflect.provide("settingsNavigation", this, void 0);
++			}
++			openSection(sectionId) {
++				const sequence = this.store.getSnapshot().sequence + 1;
++				this.store.set({ sequence, sectionId });
++			}
++		};
+ 		/** Real Workspace object layer and Host actions. */
+ 		var WorkspaceRuntime = class {
+ 			api;
+@@ -9819,6 +9839,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 			manager;
+ 			/** In-flight blank-session creates keyed by workspace (connectWorkspace coalescing). */
+ 			connecting = /* @__PURE__ */ new Map();
++			/** Coalesces concurrent global New Session requests into one Task birth. */
++			connectingTask;
+ 			/** Guards the runtime-owned one-shot initial-selection subscription. */
+ 			initialSelectionStarted = false;
+ 			/**
+@@ -9876,6 +9898,26 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 				this.connecting.set(workspaceId, attempt);
+ 				return attempt;
+ 			}
++			/** Resolve or create a blank session outside every registered Workspace. */
++			async connectTask() {
++				if (this.connectingTask !== void 0) return this.connectingTask;
++				const workspace = this.list.getSnapshot();
++				const sessions = this.sessions.list.getSnapshot();
++				const current = sessions.current;
++				const currentSummary = current === void 0 ? void 0 : sessions.byId[current];
++				const belongsToWorkspace = current === void 0 ? false : workspace.items.some((item) => item.sessionIds.includes(current));
++				if (currentSummary?.blank === true && !belongsToWorkspace && !workspace.archivedSessionIds.includes(current)) return current;
++				const attempt = (async () => {
++					const createScope = globalThis.desktop?.createTaskScope;
++					if (typeof createScope !== "function") return this.sessions.create({});
++					const scope = await createScope();
++					return this.sessions.create({ sessionId: scope.sessionId, cwd: scope.cwd });
++				})().finally(() => {
++					this.connectingTask = void 0;
++				});
++				this.connectingTask = attempt;
++				return attempt;
++			}
+ 			/**
+ 			* Follow the first complete Workspace/Session baseline and select a default
+ 			* session exactly once. A restored current session wins; otherwise the most
+@@ -9894,20 +9936,19 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 					const workspace = this.list.getSnapshot();
+ 					if (!workspace.baselinesReady) return;
+ 					const current = this.sessions.list.getSnapshot().current;
+-					const target = workspace.recentWorkspaceId;
+-					if (current !== void 0 || target === void 0) {
++					if (current !== void 0) {
+ 						state = "done";
+ 						return;
+ 					}
+ 					state = "connecting";
+-					this.connectWorkspace(target).then((sessionId) => {
++					this.connectTask().then((sessionId) => {
+ 						if (disposed) return;
+ 						if (this.sessions.list.getSnapshot().current === void 0) this.sessions.open(sessionId);
+ 						state = "done";
+ 					}, (reason) => {
+ 						if (disposed) return;
+ 						state = "waiting";
+-						console.warn("initial workspace selection failed:", reason);
++						console.warn("initial Task selection failed:", reason);
+ 					});
+ 				};
+ 				const unsubscribe = this.list.subscribe(reconcile);
+@@ -9928,15 +9969,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 			* @param workspaceId - explicit target Workspace for scoped actions.
+ 			*/
+ 			startSession(workspaceId) {
+-				const workspace = this.list.getSnapshot();
+-				const current = this.sessions.list.getSnapshot().current;
+-				const currentWorkspaceId = current === void 0 ? void 0 : workspace.items.find((item) => item.sessionIds.includes(current))?.workspaceId;
+-				const target = workspaceId ?? currentWorkspaceId ?? workspace.recentWorkspaceId;
+-				if (target === void 0) {
+-					this.sessions.clear();
+-					return;
+-				}
+-				this.connectWorkspace(target).then((sessionId) => {
++				const connect = workspaceId === void 0 ? this.connectTask() : this.connectWorkspace(workspaceId);
++				connect.then((sessionId) => {
+ 					this.sessions.open(sessionId);
+ 				}, (reason) => {
+ 					console.warn("new session failed:", reason);
+@@ -10470,6 +10504,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 		*/
+ 		function apply(ctx) {
+ 			ctx.plugin(SlotRegistry);
++			new SettingsNavigation(ctx);
+ 			const conversation = {
+ 				events: new ConversationEventRegistry(ctx),
+ 				views: new ConversationViewRegistry(ctx)
+@@ -10514,6 +10549,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
+ 		exports.SessionCreateError = SessionCreateError;
+ 		exports.SessionProvideChannel = SessionProvideChannel;
+ 		exports.SessionRuntime = SessionRuntime;
++		exports.SettingsNavigation = SettingsNavigation;
+ 		exports.SlotRegistry = SlotRegistry;
+ 		exports.WorkspaceCreateError = WorkspaceCreateError;
+ 		exports.WorkspaceRuntime = WorkspaceRuntime;

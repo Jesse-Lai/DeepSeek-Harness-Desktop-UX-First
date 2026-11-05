@@ -1,0 +1,286 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js
+index 86e7906..be02c47 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js
+@@ -316,7 +316,7 @@ window.__ModuleLoader__.load({
+ 			/** @inheritdoc */
+ 			set(sessionId, block) {
+ 				const store = this.storeFor(sessionId);
+-				if (store.getSnapshot()?.reason === block?.reason) return;
++				if (store.getSnapshot()?.reason === block?.reason && store.getSnapshot()?.onRequest === block?.onRequest) return;
+ 				store.set(block);
+ 			}
+ 			/** @inheritdoc */
+@@ -3378,7 +3378,6 @@ window.__ModuleLoader__.load({
+ 					composingRef.current = false;
+ 				}, 10);
+ 			};
+-			const permissions = useProjection("permissions");
+ 			const continuable = subagent?.address.mode === "continuable";
+ 			const parentOffline = continuable && !subagent.parentAvailable;
+ 			const disabled = removed || inert || !live || blocked !== void 0 || parentOffline;
+@@ -3386,7 +3385,10 @@ window.__ModuleLoader__.load({
+ 			const modelSeatLocked = removed || inert || !live;
+ 			const machineBusy = input?.phase === "adjudicating" || input?.phase === "submitting";
+ 			const workspaceTrigger = inert && !removed && onRequestWorkspace !== void 0;
+-			const textareaDisabled = removed || locked && !workspaceTrigger;
++			const blockedTrigger = blocked?.onRequest !== void 0 && !removed;
++			const requestTrigger = workspaceTrigger || blockedTrigger;
++			const requestAction = workspaceTrigger ? onRequestWorkspace : blocked?.onRequest;
++			const textareaDisabled = removed || locked && !requestTrigger;
+ 			const canSteerQueue = !locked && !machineBusy && !commandMenuOpen && empty && running && subagent === null && input.queue.some((row) => row.placement === "queued");
+ 			(0, react.useEffect)(() => {
+ 				if (input === void 0 || inputActions === void 0) return;
+@@ -3642,7 +3644,7 @@ window.__ModuleLoader__.load({
+ 				const el = inputRef.current;
+ 				if (el !== null) toggleCommandMenu?.(selectionOf(el));
+ 			};
+-			const primaryStops = running && subagent === null;
++			const primaryStops = running && empty && subagent === null;
+ 			const interruptible = running && continuable;
+ 			const primaryLabel = primaryStops ? t("input.stop") : t("input.send");
+ 			const onPrimary = () => {
+@@ -3654,12 +3656,7 @@ window.__ModuleLoader__.load({
+ 				/* v8 ignore next -- defensive: the primary button is disabled while empty||disabled, so a click cannot reach the false arm. */
+ 				if (!empty && !disabled && !machineBusy) inputActions.submit();
+ 			};
+-			const accessSelect = command === void 0 ? null : (0, react_jsx_runtime.jsx)(PermissionSelect, {
+-				value: permissions,
+-				locked,
+-				command,
+-				t
+-			}, sessionId);
++			const accessSelect = null;
+ 			const deco = input === void 0 ? INERT_DECORATIONS : deriveDecorations(input, lexicon);
+ 			const backdrop = [];
+ 			{
+@@ -3747,10 +3744,10 @@ window.__ModuleLoader__.load({
+ 					}),
+ 					(0, react_jsx_runtime.jsxs)("div", {
+ 						ref: cardRef,
+-						className: clsx(InputBar_module_css_default.card, workspaceTrigger && InputBar_module_css_default.cardWorkspaceTrigger),
++						className: clsx(InputBar_module_css_default.card, requestTrigger && InputBar_module_css_default.cardWorkspaceTrigger),
+ 						"data-composer-card": true,
+-						onClick: workspaceTrigger ? onRequestWorkspace : void 0,
+-						onPointerDown: workspaceTrigger ? (e) => {
++						onClick: requestTrigger ? requestAction : void 0,
++						onPointerDown: requestTrigger ? (e) => {
+ 							e.stopPropagation();
+ 						} : void 0,
+ 						children: [
+@@ -3793,9 +3790,9 @@ window.__ModuleLoader__.load({
+ 											className: InputBar_module_css_default.input,
+ 											value: draft,
+ 											disabled: textareaDisabled,
+-											readOnly: machineBusy || workspaceTrigger,
+-											"aria-label": workspaceTrigger ? t("hero.chooseWorkspace") : void 0,
+-											"aria-haspopup": workspaceTrigger ? "menu" : void 0,
++											readOnly: machineBusy || requestTrigger,
++											"aria-label": workspaceTrigger ? t("hero.chooseWorkspace") : blockedTrigger ? blocked.reason : void 0,
++											"aria-haspopup": workspaceTrigger ? "menu" : blockedTrigger ? "dialog" : void 0,
+ 											"aria-expanded": workspaceTrigger ? workspacePickerOpen : void 0,
+ 											"data-phase": input?.phase ?? "inert",
+ 											placeholder: placeholder ?? (parentOffline ? t("placeholder.parentOffline") : disabled ? t("placeholder.unavailable") : canSteerQueue ? t("placeholder.steerQueue") : planActive ? t("placeholder.plan") : t("placeholder.default")),
+@@ -5838,8 +5835,9 @@ window.__ModuleLoader__.load({
+ 			"access.confirm.enable": "启用 Full access",
+ 			"hero.headline": "探索未至之境",
+ 			"hero.preview": "预览版",
+-			"hero.chooseWorkspace": "选择工作区",
++			"hero.chooseWorkspace": "工作区",
+ 			"session.hierarchy": "会话层级",
++			"session.moreActions": "更多操作",
+ 			"details.title": "详情",
+ 			"details.close": "关闭详情",
+ 			"details.empty": "点击消息流中的工具行查看详情",
+@@ -6005,6 +6003,7 @@ window.__ModuleLoader__.load({
+ 			"hero.preview": "Preview",
+ 			"hero.chooseWorkspace": "Choose workspace",
+ 			"session.hierarchy": "Session hierarchy",
++			"session.moreActions": "More actions",
+ 			"details.title": "Details",
+ 			"details.close": "Close details",
+ 			"details.empty": "Click a tool row in the message flow to view its details",
+@@ -6757,6 +6756,14 @@ window.__ModuleLoader__.load({
+ 			tag.textContent = css$6;
+ 			document.head.appendChild(tag);
+ 		}
++		const headerMenuCss = ".dsh-session-header-menu{z-index:2;flex:none;position:relative}.dsh-session-header-menu-trigger{width:32px;height:32px;color:var(--dsw-alias-label-secondary);cursor:pointer;background:0 0;border:0;border-radius:8px;place-items:center;padding:0;display:grid}.dsh-session-header-menu-trigger:hover,.dsh-session-header-menu-trigger[aria-expanded=true]{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}.dsh-session-header-menu-trigger:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:1px}.dsh-session-header-menu-popover{z-index:30;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);box-shadow:var(--dsw-shadow-lv2);box-sizing:border-box;border-radius:10px;flex-direction:column;width:184px;padding:4px;display:flex;position:absolute;top:calc(100% + 4px);right:0}.dsh-session-header-menu-item,.dsh-session-header-menu-utility button{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:36px!important;color:var(--dsw-alias-label-primary)!important;font-family:var(--dsw-font-family)!important;text-align:left!important;cursor:pointer!important;background:0 0!important;border:0!important;border-radius:6px!important;justify-content:flex-start!important;align-items:center!important;gap:8px!important;padding:0 10px!important;font-size:13px!important;font-weight:400!important;line-height:20px!important;display:flex!important}.dsh-session-header-menu-item:hover,.dsh-session-header-menu-utility button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover)!important}.dsh-session-header-menu-item:focus-visible,.dsh-session-header-menu-utility button:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:-2px}.dsh-session-header-menu-utility,.dsh-session-header-menu-utility>[data-slot]{display:contents}.dsh-session-header-menu-utility button:disabled{color:var(--dsw-alias-label-dimmed)!important;cursor:wait!important}.dsh-session-header-menu-utility button span{order:1}.dsh-session-header-menu-utility button svg{order:2;margin-left:auto}";
++		const headerMenuLayerCss = "[data-phase=active]>[data-dsh-session-header]{z-index:40;background:var(--dsw-alias-bg-base)}";
++		if (typeof document !== "undefined" && document.querySelector("style[data-dsh-session-header-menu]") === null) {
++			const tag = document.createElement("style");
++			tag.dataset.dshSessionHeaderMenu = "";
++			tag.textContent = headerMenuCss + headerMenuLayerCss;
++			document.head.appendChild(tag);
++		}
+ 		var ConversationRoot_module_css_default = {
+ 			"headerActions": "wSkVaW_headerActions",
+ 			"crumb": "wSkVaW_crumb",
+@@ -6790,7 +6797,6 @@ window.__ModuleLoader__.load({
+ 			const session = useSession((s) => s);
+ 			const inputState = useInput((s) => s);
+ 			const cwd = useSessions((s) => sessionId === void 0 ? void 0 : s.byId[sessionId]?.cwd);
+-			const summaryBlank = useSessions((s) => sessionId === void 0 ? void 0 : s.byId[sessionId]?.blank);
+ 			const workspaces = useWorkspaces((s) => s);
+ 			const composerBlock = useComposerBlock((block) => block);
+ 			const [pickerOpen, setPickerOpen] = (0, react.useState)(false);
+@@ -6818,8 +6824,8 @@ window.__ModuleLoader__.load({
+ 				workspaces.phase,
+ 				pendingWorkspace
+ 			]);
+-			const settling = sessionId !== void 0 && composerPhase === "blank" && openState === "loading" && summaryBlank !== true;
+-			const hero = sessionId === void 0 || composerPhase === "blank" && (openState === "open" || summaryBlank === true);
++			const settling = sessionId !== void 0 && composerPhase === "blank" && openState === "loading";
++			const hero = sessionId === void 0 || composerPhase === "blank" && openState === "open";
+ 			const zone = session === void 0 || inputState === void 0 ? void 0 : {
+ 				session,
+ 				input: inputState
+@@ -6855,17 +6861,21 @@ window.__ModuleLoader__.load({
+ 					renderSlot("conversation.hero.agentPreset", {})
+ 				]
+ 			});
+-			const inert = sessionId === void 0 || hero && chipTitle === void 0;
++			const inert = sessionId === void 0;
+ 			const inputBar = renderSlot("conversation.composer.bar", {
+ 				variant: hero ? "hero" : "composer",
+-				...inert ? {
++				...composerBlock?.onRequest !== void 0 ? {
++					disabled: true,
++					blocked: composerBlock,
++					placeholder: composerBlock.reason
++				} : inert ? {
+ 					disabled: true,
+ 					placeholder: t("placeholder.workspace"),
+ 					workspacePickerOpen: pickerOpen,
+ 					onRequestWorkspace: () => {
+ 						setPickerOpen(true);
+ 					}
+-				} : !inert && composerBlock !== void 0 ? {
++				} : composerBlock !== void 0 ? {
+ 					blocked: composerBlock,
+ 					placeholder: composerBlock.reason
+ 				} : hero ? { placeholder: t("placeholder.hero") } : {},
+@@ -6950,13 +6960,36 @@ window.__ModuleLoader__.load({
+ 			(0, react.useSyncExternalStore)(views.subscribe, views.version);
+ 			const tabs = views.list();
+ 			const active = resolveActiveView(tabs, useStore((s) => s.view));
++			const alternate = active?.id === "trajectory" ? {
++				id: "chat",
++				label: t("view.chat")
++			} : tabs.find((view) => view.id === "trajectory");
+ 			const ancestry = useSessions((s) => deriveAncestry(s, sessionId), equalBreadcrumbs);
+ 			const composerPhase = useSession((s) => s.composerPhase);
+ 			const hideChrome = useSession((s) => s.blank) && composerPhase === "blank";
++			const [menuOpen, setMenuOpen] = (0, react.useState)(false);
++			const menuRef = (0, react.useRef)(null);
++			(0, react.useEffect)(() => {
++				if (!menuOpen) return;
++				const onPointerDown = (event) => {
++					if (event.target instanceof Node && menuRef.current?.contains(event.target) !== true) setMenuOpen(false);
++				};
++				const onKeyDown = (event) => {
++					if (event.key === "Escape") setMenuOpen(false);
++				};
++				document.addEventListener("pointerdown", onPointerDown);
++				document.addEventListener("keydown", onKeyDown);
++				return () => {
++					document.removeEventListener("pointerdown", onPointerDown);
++					document.removeEventListener("keydown", onKeyDown);
++				};
++			}, [menuOpen]);
++			const utilities = renderSlot("conversation.session.header.utilities", {});
+ 			return (0, react_jsx_runtime.jsx)("header", {
+ 				className: clsx(ConversationRoot_module_css_default.header, hideChrome && ConversationRoot_module_css_default.headerHidden),
++				"data-dsh-session-header": "",
+ 				"aria-hidden": hideChrome || void 0,
+-				children: !hideChrome && (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [(0, react_jsx_runtime.jsxs)("div", {
++				children: !hideChrome && (0, react_jsx_runtime.jsxs)("div", {
+ 					className: ConversationRoot_module_css_default.titleRow,
+ 					children: [(0, react_jsx_runtime.jsxs)("div", {
+ 						className: ConversationRoot_module_css_default.titleCluster,
+@@ -6988,24 +7021,41 @@ window.__ModuleLoader__.load({
+ 							className: ConversationRoot_module_css_default.headerActions,
+ 							children: renderSlot("conversation.session.header.actions", {})
+ 						})]
+-					}), (0, react_jsx_runtime.jsx)("div", {
+-						className: ConversationRoot_module_css_default.headerUtilities,
+-						children: renderSlot("conversation.session.header.utilities", {})
++					}), (0, react_jsx_runtime.jsxs)("div", {
++						className: "dsh-session-header-menu",
++						ref: menuRef,
++						children: [(0, react_jsx_runtime.jsx)("button", {
++							type: "button",
++							className: "dsh-session-header-menu-trigger",
++							"aria-label": t("session.moreActions"),
++							"aria-haspopup": "menu",
++							"aria-expanded": menuOpen,
++							onClick: () => {
++								setMenuOpen((value) => !value);
++							},
++							children: (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.IconEllipsisOutline16, { size: 20 })
++						}), menuOpen && (0, react_jsx_runtime.jsxs)("div", {
++							className: "dsh-session-header-menu-popover",
++							role: "menu",
++							children: [alternate !== void 0 && (0, react_jsx_runtime.jsx)("button", {
++								type: "button",
++								role: "menuitem",
++								className: "dsh-session-header-menu-item",
++								onClick: () => {
++									actions.setView(alternate.id);
++									setMenuOpen(false);
++								},
++								children: alternate.label
++							}), (0, react_jsx_runtime.jsx)("div", {
++								className: "dsh-session-header-menu-utility",
++								onClick: (event) => {
++									if (event.target instanceof Element && event.target.closest("button") !== null) setMenuOpen(false);
++								},
++								children: utilities
++							})]
++						})]
+ 					})]
+-				}), tabs.length > 1 && (0, react_jsx_runtime.jsx)("div", {
+-					className: ConversationRoot_module_css_default.tabs,
+-					role: "tablist",
+-					children: tabs.map((viewTab) => (0, react_jsx_runtime.jsx)("button", {
+-						type: "button",
+-						role: "tab",
+-						"aria-selected": viewTab.id === active?.id,
+-						className: clsx(ConversationRoot_module_css_default.tab, viewTab.id === active?.id && ConversationRoot_module_css_default.tabActive),
+-						onClick: () => {
+-							actions.setView(viewTab.id);
+-						},
+-						children: viewTab.label
+-					}, viewTab.id))
+-				})] })
++				})
+ 			});
+ 		}
+ 		/**
+@@ -9414,11 +9464,6 @@ window.__ModuleLoader__.load({
+ 			getSnapshot: () => null,
+ 			subscribe: () => () => {}
+ 		};
+-		/** No session, therefore nothing to block; same one-identity rule as above. */
+-		const ABSENT_BLOCK = {
+-			getSnapshot: () => void 0,
+-			subscribe: () => () => {}
+-		};
+ 		const EMPTY_LEXICON = /* @__PURE__ */ new Map();
+ 		const ABSENT_LEXICON = {
+ 			getSnapshot: () => EMPTY_LEXICON,
+@@ -9562,7 +9607,7 @@ window.__ModuleLoader__.load({
+ 					}
+ 				},
+ 				inject: (sessionId) => ({
+-					hooks: { composerBlock: sessionId === void 0 ? ABSENT_BLOCK : composerBlocks.storeFor(sessionId) },
++					hooks: { composerBlock: composerBlocks.storeFor(sessionId) },
+ 					selectWorkspace: async (workspaceId) => {
+ 						const nextId = await workspaces.connectWorkspace(workspaceId);
+ 						if (sessionId !== void 0 && nextId !== sessionId) {
+@@ -9792,4 +9837,4 @@ window.__ModuleLoader__.load({
+ 	}
+ });
+ 
+-//# sourceMappingURL=client.js.map
+\ No newline at end of file
++//# sourceMappingURL=client.js.map

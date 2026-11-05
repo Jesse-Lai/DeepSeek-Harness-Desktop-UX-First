@@ -1,0 +1,398 @@
+{
+  "recorded_at": "2026-09-09T07:26:18.359936+00:00",
+  "audit_type": "static source and provider documentation review",
+  "live_model_calls": 0,
+  "production_files_changed": false,
+  "revisions": {
+    "opencode": "830d5eb5354874105cc31599635a80c1662609e8",
+    "roo": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+    "cline": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+    "webui": "0a7c15832fb30b1903753e83f81dc7d27e5b0944",
+    "codex": "38cbebaf3fe3e81a94bf462079e7cf9659fc9e50"
+  },
+  "sources": [
+    {
+      "id": "O1",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/tui/src/context/thinking.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/tui/src/context/thinking.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/tui/src/context/thinking.ts",
+      "sha256": "bda03e663544a8a4346f84e02559e8b723d75291d9a001f6ecfb6c952aac914d",
+      "line_ranges": [
+        [
+          5,
+          17
+        ],
+        [
+          28,
+          62
+        ]
+      ]
+    },
+    {
+      "id": "O2",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/tui/src/routes/session/index.tsx",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/tui/src/routes/session/index.tsx",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/tui/src/routes/session/index.tsx",
+      "sha256": "bf7706ae0c8f1841cadf70aab74bd102ceae7d1597ba6f839f35cd073fbc17eb",
+      "line_ranges": [
+        [
+          1585,
+          1651
+        ]
+      ]
+    },
+    {
+      "id": "O3",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/llm/src/protocols/openai-responses.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/llm/src/protocols/openai-responses.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/llm/src/protocols/openai-responses.ts",
+      "sha256": "616b4fb54fe5645586b92b584b5d41c6f92f815335205d3efd0fa2f438c64b59",
+      "line_ranges": [
+        [
+          456,
+          477
+        ],
+        [
+          923,
+          940
+        ]
+      ]
+    },
+    {
+      "id": "O4",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/llm/src/protocols/openai-chat.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/llm/src/protocols/openai-chat.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/llm/src/protocols/openai-chat.ts",
+      "sha256": "dd086d7ae33596a876256507dede7f5b9705aafb7cd4502155e9209bfdcc9148",
+      "line_ranges": [
+        [
+          408,
+          425
+        ]
+      ]
+    },
+    {
+      "id": "O5",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/opencode/src/session/processor.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/opencode/src/session/processor.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/opencode/src/session/processor.ts",
+      "sha256": "0b31e207beda56bd9a4b9b88c9e42d89a0651dd011773748c8e2938dfc3dcb74",
+      "line_ranges": [
+        [
+          278,
+          314
+        ]
+      ]
+    },
+    {
+      "id": "O6",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/opencode/src/session/compaction.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/opencode/src/session/compaction.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/opencode/src/session/compaction.ts",
+      "sha256": "8d478570a7e4ad32b746030d4f86a1c673949b1e2259bd716b3885d99283289a",
+      "line_ranges": [
+        [
+          358,
+          389
+        ],
+        [
+          420,
+          448
+        ]
+      ]
+    },
+    {
+      "id": "O7",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/opencode/src/cli/cmd/github.handler.ts",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/opencode/src/cli/cmd/github.handler.ts",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/opencode/src/cli/cmd/github.handler.ts",
+      "sha256": "724687d1e7ed0ad0f1c197499192c163fd5fb94a973be488bd0792728533d11b",
+      "line_ranges": [
+        [
+          886,
+          917
+        ],
+        [
+          946,
+          979
+        ]
+      ]
+    },
+    {
+      "id": "O8",
+      "repository": "anomalyco/opencode",
+      "commit": "830d5eb5354874105cc31599635a80c1662609e8",
+      "file": "packages/opencode/src/session/prompt/gpt.txt",
+      "url": "https://github.com/anomalyco/opencode/blob/830d5eb5354874105cc31599635a80c1662609e8/packages/opencode/src/session/prompt/gpt.txt",
+      "local_path": "/private/tmp/oss-reasoning-opencode-20260909/packages/opencode/src/session/prompt/gpt.txt",
+      "sha256": "83a66a46a5febbc21454161d5f053638b22d25d95e09d77b8f6da33debc848ad",
+      "line_ranges": [
+        [
+          81,
+          93
+        ]
+      ]
+    },
+    {
+      "id": "O9",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/shared/api.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/shared/api.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/shared/api.ts",
+      "sha256": "4381791a65a5a43f08e24feb5899d7ce659a627d65151b1a83e5310818e35a8a",
+      "line_ranges": [
+        [
+          12,
+          20
+        ]
+      ]
+    },
+    {
+      "id": "O10",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/api/providers/openai-native.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/api/providers/openai-native.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/api/providers/openai-native.ts",
+      "sha256": "7fa3ea44fbc63183637062eea1fc4ba6b3235d300e803daa0b9c48d62a5303f2",
+      "line_ranges": [
+        [
+          89,
+          94
+        ],
+        [
+          340,
+          361
+        ]
+      ]
+    },
+    {
+      "id": "O11",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/api/providers/deepseek.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/api/providers/deepseek.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/api/providers/deepseek.ts",
+      "sha256": "67273c82bb6aa54b98b9cd143a2729ab26f1e19fd9740263d428d53f5f0f638e",
+      "line_ranges": [
+        [
+          91,
+          121
+        ]
+      ]
+    },
+    {
+      "id": "O12",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/api/providers/anthropic.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/api/providers/anthropic.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/api/providers/anthropic.ts",
+      "sha256": "4c5832cb84ad6aa3d560c743a7959e4255ebaff48d97494a83ab54871fa853b0",
+      "line_ranges": [
+        [
+          257,
+          267
+        ]
+      ]
+    },
+    {
+      "id": "O13",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/api/transform/responses-api-stream.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/api/transform/responses-api-stream.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/api/transform/responses-api-stream.ts",
+      "sha256": "d252870cb3d3f548d61d51bfc8c02526e0c19bdb0af3279a0953f1398afa4bbc",
+      "line_ranges": [
+        [
+          31,
+          45
+        ]
+      ]
+    },
+    {
+      "id": "O14",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "webview-ui/src/components/chat/ReasoningBlock.tsx",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/webview-ui/src/components/chat/ReasoningBlock.tsx",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/webview-ui/src/components/chat/ReasoningBlock.tsx",
+      "sha256": "8ab8104771fc7e6a8318c65c1c2df2edf26cec6f28e4ee4c6c900a9dc7f8249a",
+      "line_ranges": [
+        [
+          18,
+          44
+        ],
+        [
+          70,
+          77
+        ]
+      ]
+    },
+    {
+      "id": "O15",
+      "repository": "RooCodeInc/Roo-Code",
+      "commit": "b867ec9145750d0ae1ff7f02d35406e9bf2a0b16",
+      "file": "src/core/condense/index.ts",
+      "url": "https://github.com/RooCodeInc/Roo-Code/blob/b867ec9145750d0ae1ff7f02d35406e9bf2a0b16/src/core/condense/index.ts",
+      "local_path": "/private/tmp/oss-reasoning-roo-20260909/src/core/condense/index.ts",
+      "sha256": "baafb8a449530f6937ab5b680ad2659a3486f22d3cbc6ca70fa0359de4f8a4de",
+      "line_ranges": [
+        [
+          323,
+          339
+        ],
+        [
+          451,
+          480
+        ]
+      ]
+    },
+    {
+      "id": "O16",
+      "repository": "cline/cline",
+      "commit": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+      "file": "sdk/packages/llms/src/providers/ai-sdk.ts",
+      "url": "https://github.com/cline/cline/blob/40f1d75bd2502f4f872e509496c102ccaa43abf3/sdk/packages/llms/src/providers/ai-sdk.ts",
+      "local_path": "/private/tmp/oss-reasoning-cline-20260909/sdk/packages/llms/src/providers/ai-sdk.ts",
+      "sha256": "3471c1d0a84e7978bde3897fae629d74a8096fc18a5b806be48937eb84bc2eb4",
+      "line_ranges": [
+        [
+          1434,
+          1450
+        ]
+      ]
+    },
+    {
+      "id": "O17",
+      "repository": "cline/cline",
+      "commit": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+      "file": "apps/vscode/src/sdk/message-translator.ts",
+      "url": "https://github.com/cline/cline/blob/40f1d75bd2502f4f872e509496c102ccaa43abf3/apps/vscode/src/sdk/message-translator.ts",
+      "local_path": "/private/tmp/oss-reasoning-cline-20260909/apps/vscode/src/sdk/message-translator.ts",
+      "sha256": "2299e47232ab70dd44a6162d5603865e289b4961e1b33912c3e9d230d089b3e9",
+      "line_ranges": [
+        [
+          1291,
+          1308
+        ]
+      ]
+    },
+    {
+      "id": "O18",
+      "repository": "cline/cline",
+      "commit": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+      "file": "apps/vscode/webview-ui/src/components/chat/ChatRow.tsx",
+      "url": "https://github.com/cline/cline/blob/40f1d75bd2502f4f872e509496c102ccaa43abf3/apps/vscode/webview-ui/src/components/chat/ChatRow.tsx",
+      "local_path": "/private/tmp/oss-reasoning-cline-20260909/apps/vscode/webview-ui/src/components/chat/ChatRow.tsx",
+      "sha256": "fd7891e86a2cdbe81275dcd472c551212428144089e402dbedf739d3873c0177",
+      "line_ranges": [
+        [
+          884,
+          903
+        ]
+      ]
+    },
+    {
+      "id": "O19",
+      "repository": "cline/cline",
+      "commit": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+      "file": "apps/vscode/webview-ui/src/components/chat/ThinkingRow.tsx",
+      "url": "https://github.com/cline/cline/blob/40f1d75bd2502f4f872e509496c102ccaa43abf3/apps/vscode/webview-ui/src/components/chat/ThinkingRow.tsx",
+      "local_path": "/private/tmp/oss-reasoning-cline-20260909/apps/vscode/webview-ui/src/components/chat/ThinkingRow.tsx",
+      "sha256": "ac526c5bf335f9824479743cd47b9d27dc4e23bd5bfddbcd59543687d6bb1244",
+      "line_ranges": [
+        [
+          88,
+          113
+        ]
+      ]
+    },
+    {
+      "id": "O20",
+      "repository": "cline/cline",
+      "commit": "40f1d75bd2502f4f872e509496c102ccaa43abf3",
+      "file": "sdk/packages/core/src/extensions/context/agentic-compaction.ts",
+      "url": "https://github.com/cline/cline/blob/40f1d75bd2502f4f872e509496c102ccaa43abf3/sdk/packages/core/src/extensions/context/agentic-compaction.ts",
+      "local_path": "/private/tmp/oss-reasoning-cline-20260909/sdk/packages/core/src/extensions/context/agentic-compaction.ts",
+      "sha256": "29266e1c515b14b40b1c8688746f26bc8a6ad82fb57b9df8260fc8bdcb73bdd9",
+      "line_ranges": [
+        [
+          70,
+          110
+        ],
+        [
+          253,
+          292
+        ]
+      ]
+    },
+    {
+      "id": "O21",
+      "repository": "open-webui/open-webui",
+      "commit": "0a7c15832fb30b1903753e83f81dc7d27e5b0944",
+      "file": "src/lib/components/chat/Messages/structuredOutput.ts",
+      "url": "https://github.com/open-webui/open-webui/blob/0a7c15832fb30b1903753e83f81dc7d27e5b0944/src/lib/components/chat/Messages/structuredOutput.ts",
+      "local_path": "/private/tmp/oss-reasoning-webui-20260909/src/lib/components/chat/Messages/structuredOutput.ts",
+      "sha256": "3012994212c2da9c7eff4bb12885217599053add4ae989b2cae36ce99fb17640",
+      "line_ranges": [
+        [
+          238,
+          255
+        ],
+        [
+          609,
+          617
+        ]
+      ]
+    },
+    {
+      "id": "O22",
+      "repository": "openai/codex",
+      "commit": "38cbebaf3fe3e81a94bf462079e7cf9659fc9e50",
+      "file": "codex-rs/core/src/client.rs",
+      "url": "https://github.com/openai/codex/blob/38cbebaf3fe3e81a94bf462079e7cf9659fc9e50/codex-rs/core/src/client.rs",
+      "local_path": "/private/tmp/codex-reasoning-source-20260909/codex-rs/core/src/client.rs",
+      "sha256": "6979098f4ad7b5ec16f19ca90d5c927d3b1e33d0f6d926c70388d0237c52af35",
+      "line_ranges": [
+        [
+          870,
+          888
+        ]
+      ]
+    },
+    {
+      "id": "O23",
+      "repository": "openai/codex",
+      "commit": "38cbebaf3fe3e81a94bf462079e7cf9659fc9e50",
+      "file": "codex-rs/codex-api/src/sse/responses.rs",
+      "url": "https://github.com/openai/codex/blob/38cbebaf3fe3e81a94bf462079e7cf9659fc9e50/codex-rs/codex-api/src/sse/responses.rs",
+      "local_path": "/private/tmp/codex-reasoning-source-20260909/codex-rs/codex-api/src/sse/responses.rs",
+      "sha256": "38c1fbcfee732d1b9c3f8990cccf08f2043f4c8526143b939c11e318c57f6f01",
+      "line_ranges": [
+        [
+          381,
+          388
+        ]
+      ]
+    }
+  ],
+  "prior_provider_documentation_manifest": "sources.json",
+  "prior_gemini_cli_commit": "ed2ac40df67a319bf348bd7e3d10494696b31b38"
+}

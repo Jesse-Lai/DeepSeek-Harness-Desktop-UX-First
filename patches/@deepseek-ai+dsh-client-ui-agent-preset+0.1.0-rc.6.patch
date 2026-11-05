@@ -1,0 +1,42 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-ui-agent-preset/lib/client.js b/node_modules/@deepseek-ai/dsh-client-ui-agent-preset/lib/client.js
+index 758c629..fd20378 100644
+--- a/node_modules/@deepseek-ai/dsh-client-ui-agent-preset/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-ui-agent-preset/lib/client.js
+@@ -159,7 +159,7 @@ window.__ModuleLoader__.load({
+ 		}
+ 		//#endregion
+ 		//#region \0dsh-css:/home/runner/work/deepseek-harness/deepseek-harness/packages/client/ui-agent-preset/src/client/AgentPresetLabel.module.css.mjs
+-		const css$3 = ".SVAs4q_label{background:var(--dsw-alias-fill-tsp-secondary);max-width:180px;height:22px;color:var(--dsw-alias-label-secondary);white-space:nowrap;text-overflow:ellipsis;border-radius:6px;align-items:center;gap:4px;padding:0 2px 0 0;font-size:12px;line-height:22px;display:inline-flex;overflow:hidden}.SVAs4q_icon{opacity:.7;flex:none}";
++		const css$3 = ".SVAs4q_label{background:var(--dsw-alias-fill-tsp-secondary);max-width:180px;height:22px;color:var(--dsw-alias-label-secondary);white-space:nowrap;text-overflow:ellipsis;border-radius:6px;align-items:center;padding:0 2px;font-size:12px;line-height:22px;display:inline-flex;overflow:hidden}";
+ 		const tagId$3 = "@deepseek-ai/dsh-client-ui-agent-preset/AgentPresetLabel.module.css";
+ 		if (typeof document !== "undefined" && document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId$3) + "]") === null) {
+ 			const tag = document.createElement("style");
+@@ -168,10 +168,7 @@ window.__ModuleLoader__.load({
+ 			tag.textContent = css$3;
+ 			document.head.appendChild(tag);
+ 		}
+-		var AgentPresetLabel_module_css_default = {
+-			"icon": "SVAs4q_icon",
+-			"label": "SVAs4q_label"
+-		};
++		var AgentPresetLabel_module_css_default = { "label": "SVAs4q_label" };
+ 		//#endregion
+ 		//#region lib/types/client/AgentPresetLabel.js
+ 		/**
+@@ -198,13 +195,12 @@ window.__ModuleLoader__.load({
+ 			if (preset === void 0) return null;
+ 			const option = options.find((entry) => entry.id === preset);
+ 			const text = option === void 0 ? void 0 : presetDisplayText(option, t);
++			const name = text?.name ?? preset;
++			const headerName = BUILT_IN_PRESET_KEYS[preset] === void 0 ? name : name.replace(/\s*(?:模式|mode)$/iu, "");
+ 			return (0, react_jsx_runtime.jsxs)("span", {
+ 				className: AgentPresetLabel_module_css_default.label,
+ 				title: text?.description ?? t("headerHint"),
+-				children: [(0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.IconAgentPresetOutline16, {
+-					size: 14,
+-					className: AgentPresetLabel_module_css_default.icon
+-				}), text?.name ?? preset]
++				children: headerName
+ 			});
+ 		}
+ 		//#endregion

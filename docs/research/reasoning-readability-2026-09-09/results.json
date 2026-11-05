@@ -1,0 +1,1136 @@
+{
+  "generatedAt": "2026-09-09T06:58:30.122Z",
+  "scope": "Synthetic SSE replay through installed DeepSeekAdapter + isolated extraction prototype. Not live model evaluation.",
+  "fixtureCount": 12,
+  "modes": [
+    "hidden",
+    "brief",
+    "expanded",
+    "full"
+  ],
+  "modeReplayMockCalls": 48,
+  "observerContinuationMockCalls": 1,
+  "mockApiCalls": 49,
+  "liveApiCalls": 0,
+  "billableTokensUsed": 0,
+  "assertions": {
+    "identicalOutboundRequestsAcrossModes": true,
+    "identicalProtocolEventsAcrossModes": true,
+    "exactReasoningPassback": true,
+    "immutableInputs": true,
+    "sourceAlignedExcerpts": true
+  },
+  "benchmarks": {
+    "short": {
+      "characters": 2040,
+      "iterations": 100,
+      "p50Ms": 1.8650419999999883,
+      "p95Ms": 2.2326249999999987,
+      "maxMs": 2.5940420000000017
+    },
+    "stress": {
+      "characters": 40838,
+      "iterations": 100,
+      "p50Ms": 2.6174589999999966,
+      "p95Ms": 3.6817499999999654,
+      "maxMs": 4.186499999999967
+    }
+  },
+  "observerResults": {
+    "scope": "Deferred Promise simulation; no model called.",
+    "mainTaskContinuedBeforeObserverResponse": true,
+    "coalescedSnapshots": 10,
+    "simulatedSummaryRequests": 2,
+    "maxInFlight": 1,
+    "cacheHits": 1,
+    "staleResultsSuppressed": true
+  },
+  "rows": [
+    {
+      "id": "duplicate-request",
+      "domain": "coding",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "561960410eda094383922524bbfc9c49bfff5b722bf57aacc9c2ab28af7da67e",
+          "eventsSha256": "f744d8d54a3922c28d0b8ff5592d1cb3bf95cb30014a58acffaacc4d28d40330",
+          "sourceSha256": "8bb6987d0864a0661d067d5eb39f9a56b2e6fc0575f78c9bd8ef1b8ff8898939",
+          "displayCharacters": 0,
+          "sourceCharacters": 125,
+          "projectionMs": 0.007750000000001478,
+          "protocolReplayMs": 11.386167,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "561960410eda094383922524bbfc9c49bfff5b722bf57aacc9c2ab28af7da67e",
+          "eventsSha256": "f744d8d54a3922c28d0b8ff5592d1cb3bf95cb30014a58acffaacc4d28d40330",
+          "sourceSha256": "8bb6987d0864a0661d067d5eb39f9a56b2e6fc0575f78c9bd8ef1b8ff8898939",
+          "displayCharacters": 42,
+          "sourceCharacters": 125,
+          "projectionMs": 0.33525000000000205,
+          "protocolReplayMs": 1.156084,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 40,
+              "end": 57,
+              "text": "组件挂载期间会执行 effect。"
+            },
+            {
+              "start": 100,
+              "end": 125,
+              "text": "先记录两次调用的来源，再决定应该修改哪一个触发点。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "561960410eda094383922524bbfc9c49bfff5b722bf57aacc9c2ab28af7da67e",
+          "eventsSha256": "f744d8d54a3922c28d0b8ff5592d1cb3bf95cb30014a58acffaacc4d28d40330",
+          "sourceSha256": "8bb6987d0864a0661d067d5eb39f9a56b2e6fc0575f78c9bd8ef1b8ff8898939",
+          "displayCharacters": 82,
+          "sourceCharacters": 125,
+          "projectionMs": 0.16041699999999537,
+          "protocolReplayMs": 1.5132909999999953,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 20,
+              "end": 40,
+              "text": "组件挂载和用户点击都可能触发同一个请求。"
+            },
+            {
+              "start": 40,
+              "end": 57,
+              "text": "组件挂载期间会执行 effect。"
+            },
+            {
+              "start": 57,
+              "end": 77,
+              "text": "依赖数组变化也会重新执行 effect。"
+            },
+            {
+              "start": 100,
+              "end": 125,
+              "text": "先记录两次调用的来源，再决定应该修改哪一个触发点。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "561960410eda094383922524bbfc9c49bfff5b722bf57aacc9c2ab28af7da67e",
+          "eventsSha256": "f744d8d54a3922c28d0b8ff5592d1cb3bf95cb30014a58acffaacc4d28d40330",
+          "sourceSha256": "8bb6987d0864a0661d067d5eb39f9a56b2e6fc0575f78c9bd8ef1b8ff8898939",
+          "displayCharacters": 125,
+          "sourceCharacters": 125,
+          "projectionMs": 0.0015830000000036648,
+          "protocolReplayMs": 0.7747910000000005,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 125,
+              "text": "请求出现了两次，需要先检查调用入口。\n\n组件挂载和用户点击都可能触发同一个请求。组件挂载期间会执行 effect。依赖数组变化也会重新执行 effect。\n\n目前没有证据证明服务端重试造成了重复请求。先记录两次调用的来源，再决定应该修改哪一个触发点。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "negation",
+      "domain": "coding",
+      "language": "en",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "23bdc46b2aba6fd6dc573c33713d7aff9b87ec0acf5b5e81c09a2c53553e0b1e",
+          "eventsSha256": "9e9fcd218b6a703e1b0702dd296831697be73e087337739661845d7ba47ced68",
+          "sourceSha256": "a2b08f938c7b31c2a1fc06c388eda47cae2180acb3181f8a8b8b35ce2bd0446c",
+          "displayCharacters": 0,
+          "sourceCharacters": 293,
+          "projectionMs": 0.0003340000000022769,
+          "protocolReplayMs": 1.1893339999999952,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "23bdc46b2aba6fd6dc573c33713d7aff9b87ec0acf5b5e81c09a2c53553e0b1e",
+          "eventsSha256": "9e9fcd218b6a703e1b0702dd296831697be73e087337739661845d7ba47ced68",
+          "sourceSha256": "a2b08f938c7b31c2a1fc06c388eda47cae2180acb3181f8a8b8b35ce2bd0446c",
+          "displayCharacters": 80,
+          "sourceCharacters": 293,
+          "projectionMs": 0.1771670000000043,
+          "protocolReplayMs": 0.9760840000000002,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 43,
+              "end": 73,
+              "text": "The cache stores the response."
+            },
+            {
+              "start": 243,
+              "end": 293,
+              "text": "I will add a test that counts request invocations."
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "23bdc46b2aba6fd6dc573c33713d7aff9b87ec0acf5b5e81c09a2c53553e0b1e",
+          "eventsSha256": "9e9fcd218b6a703e1b0702dd296831697be73e087337739661845d7ba47ced68",
+          "sourceSha256": "a2b08f938c7b31c2a1fc06c388eda47cae2180acb3181f8a8b8b35ce2bd0446c",
+          "displayCharacters": 185,
+          "sourceCharacters": 293,
+          "projectionMs": 0.15874999999999773,
+          "protocolReplayMs": 0.8115829999999988,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 43,
+              "end": 73,
+              "text": "The cache stores the response."
+            },
+            {
+              "start": 74,
+              "end": 105,
+              "text": "A cache key could be incorrect."
+            },
+            {
+              "start": 144,
+              "end": 218,
+              "text": "The new trace rules out the cache; the duplicate comes from two listeners."
+            },
+            {
+              "start": 243,
+              "end": 293,
+              "text": "I will add a test that counts request invocations."
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "23bdc46b2aba6fd6dc573c33713d7aff9b87ec0acf5b5e81c09a2c53553e0b1e",
+          "eventsSha256": "9e9fcd218b6a703e1b0702dd296831697be73e087337739661845d7ba47ced68",
+          "sourceSha256": "a2b08f938c7b31c2a1fc06c388eda47cae2180acb3181f8a8b8b35ce2bd0446c",
+          "displayCharacters": 293,
+          "sourceCharacters": 293,
+          "projectionMs": 0.0013749999999959073,
+          "protocolReplayMs": 0.8812500000000014,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 293,
+              "text": "A cache issue is one possible explanation. The cache stores the response. A cache key could be incorrect. Cache keys are shared by both paths.\n\nThe new trace rules out the cache; the duplicate comes from two listeners. Do not remove caching.\n\nI will add a test that counts request invocations."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "domain": "math",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "0caeaba3e9ce7f0b82fdc0d34ff31e64ec26bb4882a6b5f278a17e683ac410a0",
+          "eventsSha256": "5953dc946c41d67cd101232d3e41e36470877e65248de3102b1b89ece760719b",
+          "sourceSha256": "0df39a28e2fd7cca00dadcce1fdf1285621d4352e04a400050aaa01d8e5988cc",
+          "displayCharacters": 0,
+          "sourceCharacters": 88,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.4669590000000028,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "0caeaba3e9ce7f0b82fdc0d34ff31e64ec26bb4882a6b5f278a17e683ac410a0",
+          "eventsSha256": "5953dc946c41d67cd101232d3e41e36470877e65248de3102b1b89ece760719b",
+          "sourceSha256": "0df39a28e2fd7cca00dadcce1fdf1285621d4352e04a400050aaa01d8e5988cc",
+          "displayCharacters": 43,
+          "sourceCharacters": 88,
+          "projectionMs": 0.057749999999998636,
+          "protocolReplayMs": 0.47025000000000006,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 24,
+              "text": "需要求解整数约束，而不是对小数结果直接四舍五入。"
+            },
+            {
+              "start": 69,
+              "end": 88,
+              "text": "代回两个原方程后，才能确认这个解有效。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "0caeaba3e9ce7f0b82fdc0d34ff31e64ec26bb4882a6b5f278a17e683ac410a0",
+          "eventsSha256": "5953dc946c41d67cd101232d3e41e36470877e65248de3102b1b89ece760719b",
+          "sourceSha256": "0df39a28e2fd7cca00dadcce1fdf1285621d4352e04a400050aaa01d8e5988cc",
+          "displayCharacters": 69,
+          "sourceCharacters": 88,
+          "projectionMs": 0.05658300000000338,
+          "protocolReplayMs": 0.3104580000000041,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 24,
+              "text": "需要求解整数约束，而不是对小数结果直接四舍五入。"
+            },
+            {
+              "start": 26,
+              "end": 39,
+              "text": "先把总数量代入第二个方程。"
+            },
+            {
+              "start": 39,
+              "end": 52,
+              "text": "消元后得到一个候选整数解。"
+            },
+            {
+              "start": 69,
+              "end": 88,
+              "text": "代回两个原方程后，才能确认这个解有效。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "0caeaba3e9ce7f0b82fdc0d34ff31e64ec26bb4882a6b5f278a17e683ac410a0",
+          "eventsSha256": "5953dc946c41d67cd101232d3e41e36470877e65248de3102b1b89ece760719b",
+          "sourceSha256": "0df39a28e2fd7cca00dadcce1fdf1285621d4352e04a400050aaa01d8e5988cc",
+          "displayCharacters": 88,
+          "sourceCharacters": 88,
+          "projectionMs": 0.001958999999999378,
+          "protocolReplayMs": 0.3077910000000017,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 88,
+              "text": "需要求解整数约束，而不是对小数结果直接四舍五入。\n\n先把总数量代入第二个方程。消元后得到一个候选整数解。\n\n候选解还要满足各项非负的条件。代回两个原方程后，才能确认这个解有效。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "research",
+      "domain": "research",
+      "language": "en",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "672ba96c5165af27e63b8376e72fbd1111a17c2924c3e1caff4a0dd89e75ee9b",
+          "eventsSha256": "e300267a15de550668310c49ca92a152195e438efeb2e2bb92e5e70cb2471fca",
+          "sourceSha256": "b507e6afd79f9b6e6d3cdecc2fd372f2a2304f716e672708abcc9726c26357bf",
+          "displayCharacters": 0,
+          "sourceCharacters": 296,
+          "projectionMs": 0.00037499999999823785,
+          "protocolReplayMs": 0.8072080000000028,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "672ba96c5165af27e63b8376e72fbd1111a17c2924c3e1caff4a0dd89e75ee9b",
+          "eventsSha256": "e300267a15de550668310c49ca92a152195e438efeb2e2bb92e5e70cb2471fca",
+          "sourceSha256": "b507e6afd79f9b6e6d3cdecc2fd372f2a2304f716e672708abcc9726c26357bf",
+          "displayCharacters": 108,
+          "sourceCharacters": 296,
+          "projectionMs": 0.11579100000000153,
+          "protocolReplayMs": 0.661999999999999,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 56,
+              "end": 118,
+              "text": "I will compare the original reports before calculating growth."
+            },
+            {
+              "start": 250,
+              "end": 296,
+              "text": "A numerical growth claim is not supported yet."
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "672ba96c5165af27e63b8376e72fbd1111a17c2924c3e1caff4a0dd89e75ee9b",
+          "eventsSha256": "e300267a15de550668310c49ca92a152195e438efeb2e2bb92e5e70cb2471fca",
+          "sourceSha256": "b507e6afd79f9b6e6d3cdecc2fd372f2a2304f716e672708abcc9726c26357bf",
+          "displayCharacters": 234,
+          "sourceCharacters": 296,
+          "projectionMs": 0.119958000000004,
+          "protocolReplayMs": 0.8624170000000007,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 54,
+              "text": "The published figures use different reporting periods."
+            },
+            {
+              "start": 56,
+              "end": 118,
+              "text": "I will compare the original reports before calculating growth."
+            },
+            {
+              "start": 119,
+              "end": 191,
+              "text": "The annual figure cannot be directly compared with the quarterly figure."
+            },
+            {
+              "start": 250,
+              "end": 296,
+              "text": "A numerical growth claim is not supported yet."
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "672ba96c5165af27e63b8376e72fbd1111a17c2924c3e1caff4a0dd89e75ee9b",
+          "eventsSha256": "e300267a15de550668310c49ca92a152195e438efeb2e2bb92e5e70cb2471fca",
+          "sourceSha256": "b507e6afd79f9b6e6d3cdecc2fd372f2a2304f716e672708abcc9726c26357bf",
+          "displayCharacters": 296,
+          "sourceCharacters": 296,
+          "projectionMs": 0.0045830000000037785,
+          "protocolReplayMs": 0.6851669999999999,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 296,
+              "text": "The published figures use different reporting periods.\n\nI will compare the original reports before calculating growth. The annual figure cannot be directly compared with the quarterly figure.\n\nThe older report does not disclose the same denominator. A numerical growth claim is not supported yet."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unknown-tool",
+      "domain": "novel tool",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "cfdd611d71834073be7ee8a4780f42bee96631ac296cf9e0868e3346135303c3",
+          "eventsSha256": "bbbe067b929db592220c872aca84adbec6cd6a31dcab211df1d976fc255dcff5",
+          "sourceSha256": "8a992521b2094d6b034b5cdf3880d17fb248ec0fde881aabde843f2109d04734",
+          "displayCharacters": 0,
+          "sourceCharacters": 118,
+          "projectionMs": 0.0002080000000006521,
+          "protocolReplayMs": 0.3889169999999922,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "cfdd611d71834073be7ee8a4780f42bee96631ac296cf9e0868e3346135303c3",
+          "eventsSha256": "bbbe067b929db592220c872aca84adbec6cd6a31dcab211df1d976fc255dcff5",
+          "sourceSha256": "8a992521b2094d6b034b5cdf3880d17fb248ec0fde881aabde843f2109d04734",
+          "displayCharacters": 41,
+          "sourceCharacters": 118,
+          "projectionMs": 0.0534590000000037,
+          "protocolReplayMs": 0.4121669999999966,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 22,
+              "text": "需要检查轨道预测和观测是否使用同一时间基准。"
+            },
+            {
+              "start": 99,
+              "end": 118,
+              "text": "目前只能确认检查顺序，尚不能确认原因。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "cfdd611d71834073be7ee8a4780f42bee96631ac296cf9e0868e3346135303c3",
+          "eventsSha256": "bbbe067b929db592220c872aca84adbec6cd6a31dcab211df1d976fc255dcff5",
+          "sourceSha256": "8a992521b2094d6b034b5cdf3880d17fb248ec0fde881aabde843f2109d04734",
+          "displayCharacters": 78,
+          "sourceCharacters": 118,
+          "projectionMs": 0.043958000000003494,
+          "protocolReplayMs": 0.32133400000000734,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 22,
+              "text": "需要检查轨道预测和观测是否使用同一时间基准。"
+            },
+            {
+              "start": 60,
+              "end": 80,
+              "text": "这个工具名称本身不能说明观测偏差的原因。"
+            },
+            {
+              "start": 82,
+              "end": 99,
+              "text": "如果时间基准一致，再比较残差分布。"
+            },
+            {
+              "start": 99,
+              "end": 118,
+              "text": "目前只能确认检查顺序，尚不能确认原因。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "cfdd611d71834073be7ee8a4780f42bee96631ac296cf9e0868e3346135303c3",
+          "eventsSha256": "bbbe067b929db592220c872aca84adbec6cd6a31dcab211df1d976fc255dcff5",
+          "sourceSha256": "8a992521b2094d6b034b5cdf3880d17fb248ec0fde881aabde843f2109d04734",
+          "displayCharacters": 118,
+          "sourceCharacters": 118,
+          "projectionMs": 0.0021660000000025548,
+          "protocolReplayMs": 0.3278749999999917,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 118,
+              "text": "需要检查轨道预测和观测是否使用同一时间基准。\n\n准备调用 orbit_epoch_reconcile，核对输入中的历元。这个工具名称本身不能说明观测偏差的原因。\n\n如果时间基准一致，再比较残差分布。目前只能确认检查顺序，尚不能确认原因。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract",
+      "domain": "document review",
+      "language": "en",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "ac6d71d3c233f3f26df611604b098a6a1d3978e1bb5dc4d790bfff516aa897e4",
+          "eventsSha256": "dc9b9db00f70ab2c436b0182833d46b2884a5eb8fe7ae6f9e3d9e3f1cda13acb",
+          "sourceSha256": "536cb7aacc94e291865fdfa861a5779f2d961ed0f32dde4d84b840ce270a3ff0",
+          "displayCharacters": 0,
+          "sourceCharacters": 281,
+          "projectionMs": 0.00016600000000721593,
+          "protocolReplayMs": 0.5463330000000042,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "ac6d71d3c233f3f26df611604b098a6a1d3978e1bb5dc4d790bfff516aa897e4",
+          "eventsSha256": "dc9b9db00f70ab2c436b0182833d46b2884a5eb8fe7ae6f9e3d9e3f1cda13acb",
+          "sourceSha256": "536cb7aacc94e291865fdfa861a5779f2d961ed0f32dde4d84b840ce270a3ff0",
+          "displayCharacters": 108,
+          "sourceCharacters": 281,
+          "projectionMs": 0.08758300000000929,
+          "protocolReplayMs": 0.694625000000002,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 172,
+              "end": 242,
+              "text": "I will quote the amendment together with the relevant original clause."
+            },
+            {
+              "start": 243,
+              "end": 281,
+              "text": "The effective date remains unverified."
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "ac6d71d3c233f3f26df611604b098a6a1d3978e1bb5dc4d790bfff516aa897e4",
+          "eventsSha256": "dc9b9db00f70ab2c436b0182833d46b2884a5eb8fe7ae6f9e3d9e3f1cda13acb",
+          "sourceSha256": "536cb7aacc94e291865fdfa861a5779f2d961ed0f32dde4d84b840ce270a3ff0",
+          "displayCharacters": 220,
+          "sourceCharacters": 281,
+          "projectionMs": 0.07891700000000412,
+          "protocolReplayMs": 0.5603340000000117,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 63,
+              "text": "The renewal clause refers to notice before the end of the term."
+            },
+            {
+              "start": 65,
+              "end": 114,
+              "text": "The attached amendment changes the notice period."
+            },
+            {
+              "start": 172,
+              "end": 242,
+              "text": "I will quote the amendment together with the relevant original clause."
+            },
+            {
+              "start": 243,
+              "end": 281,
+              "text": "The effective date remains unverified."
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "ac6d71d3c233f3f26df611604b098a6a1d3978e1bb5dc4d790bfff516aa897e4",
+          "eventsSha256": "dc9b9db00f70ab2c436b0182833d46b2884a5eb8fe7ae6f9e3d9e3f1cda13acb",
+          "sourceSha256": "536cb7aacc94e291865fdfa861a5779f2d961ed0f32dde4d84b840ce270a3ff0",
+          "displayCharacters": 281,
+          "sourceCharacters": 281,
+          "projectionMs": 0.00041699999999877946,
+          "protocolReplayMs": 0.6146250000000038,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 281,
+              "text": "The renewal clause refers to notice before the end of the term.\n\nThe attached amendment changes the notice period. The original agreement alone is therefore insufficient.\n\nI will quote the amendment together with the relevant original clause. The effective date remains unverified."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan",
+      "domain": "planning",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "7d564c17a65fdfdfb342e0ff2fb71ce841194463e4c17057dffc65fbad66dfaa",
+          "eventsSha256": "16e8379356cbeab2f87861aadc3dc66d7676d8b2abc317370da53b6c4e6d302f",
+          "sourceSha256": "7bc3791f5ce26a8b1745f8f9f455e85644b5fa1502cf2c3c8af6dcd5ee94746b",
+          "displayCharacters": 0,
+          "sourceCharacters": 82,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.28325000000000955,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "7d564c17a65fdfdfb342e0ff2fb71ce841194463e4c17057dffc65fbad66dfaa",
+          "eventsSha256": "16e8379356cbeab2f87861aadc3dc66d7676d8b2abc317370da53b6c4e6d302f",
+          "sourceSha256": "7bc3791f5ce26a8b1745f8f9f455e85644b5fa1502cf2c3c8af6dcd5ee94746b",
+          "displayCharacters": 48,
+          "sourceCharacters": 82,
+          "projectionMs": 0.03300000000000125,
+          "protocolReplayMs": 0.2817500000000024,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 22,
+              "text": "发布计划受到审核窗口和人员安排两个条件限制。"
+            },
+            {
+              "start": 56,
+              "end": 82,
+              "text": "可以先准备发布材料，但实际发布时间要等审核窗口确认。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "7d564c17a65fdfdfb342e0ff2fb71ce841194463e4c17057dffc65fbad66dfaa",
+          "eventsSha256": "16e8379356cbeab2f87861aadc3dc66d7676d8b2abc317370da53b6c4e6d302f",
+          "sourceSha256": "7bc3791f5ce26a8b1745f8f9f455e85644b5fa1502cf2c3c8af6dcd5ee94746b",
+          "displayCharacters": 78,
+          "sourceCharacters": 82,
+          "projectionMs": 0.005415999999996757,
+          "protocolReplayMs": 0.25216600000000255,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 22,
+              "text": "发布计划受到审核窗口和人员安排两个条件限制。"
+            },
+            {
+              "start": 24,
+              "end": 40,
+              "text": "先确认审核是否必须在发布前完成。"
+            },
+            {
+              "start": 40,
+              "end": 54,
+              "text": "人员有空并不代表审核已完成。"
+            },
+            {
+              "start": 56,
+              "end": 82,
+              "text": "可以先准备发布材料，但实际发布时间要等审核窗口确认。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "7d564c17a65fdfdfb342e0ff2fb71ce841194463e4c17057dffc65fbad66dfaa",
+          "eventsSha256": "16e8379356cbeab2f87861aadc3dc66d7676d8b2abc317370da53b6c4e6d302f",
+          "sourceSha256": "7bc3791f5ce26a8b1745f8f9f455e85644b5fa1502cf2c3c8af6dcd5ee94746b",
+          "displayCharacters": 82,
+          "sourceCharacters": 82,
+          "projectionMs": 0.0002920000000017353,
+          "protocolReplayMs": 0.2498329999999953,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 82,
+              "text": "发布计划受到审核窗口和人员安排两个条件限制。\n\n先确认审核是否必须在发布前完成。人员有空并不代表审核已完成。\n\n可以先准备发布材料，但实际发布时间要等审核窗口确认。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mixed-code",
+      "domain": "coding",
+      "language": "mixed",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "367e43e84b4db49fd1c9eb538c290a36eb3d549f6ac3823066bc0ce166b15d87",
+          "eventsSha256": "ca56fb3452f59d548d9390e98187696f9a2947aa9b2b197fb2bfc357ed41421e",
+          "sourceSha256": "cdb16ea2c2a68f4ce24439c54bd17006591cc9adeea71957338805eed5d18a00",
+          "displayCharacters": 0,
+          "sourceCharacters": 157,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.44708300000000634,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "367e43e84b4db49fd1c9eb538c290a36eb3d549f6ac3823066bc0ce166b15d87",
+          "eventsSha256": "ca56fb3452f59d548d9390e98187696f9a2947aa9b2b197fb2bfc357ed41421e",
+          "sourceSha256": "cdb16ea2c2a68f4ce24439c54bd17006591cc9adeea71957338805eed5d18a00",
+          "displayCharacters": 69,
+          "sourceCharacters": 157,
+          "projectionMs": 0.08133300000000077,
+          "protocolReplayMs": 0.4660830000000118,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 47,
+              "text": "The failure occurs after reconnect，先检查连接恢复时的订阅。"
+            },
+            {
+              "start": 135,
+              "end": 157,
+              "text": "下一步增加可关联的记录，再验证是否存在泄漏。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "367e43e84b4db49fd1c9eb538c290a36eb3d549f6ac3823066bc0ce166b15d87",
+          "eventsSha256": "ca56fb3452f59d548d9390e98187696f9a2947aa9b2b197fb2bfc357ed41421e",
+          "sourceSha256": "cdb16ea2c2a68f4ce24439c54bd17006591cc9adeea71957338805eed5d18a00",
+          "displayCharacters": 134,
+          "sourceCharacters": 157,
+          "projectionMs": 0.05433399999999722,
+          "protocolReplayMs": 0.4333750000000123,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 47,
+              "text": "The failure occurs after reconnect，先检查连接恢复时的订阅。"
+            },
+            {
+              "start": 49,
+              "end": 95,
+              "text": "`subscribe()` returns an unsubscribe function."
+            },
+            {
+              "start": 96,
+              "end": 115,
+              "text": "需要确认重连前是否调用了这个清理函数。"
+            },
+            {
+              "start": 135,
+              "end": 157,
+              "text": "下一步增加可关联的记录，再验证是否存在泄漏。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "367e43e84b4db49fd1c9eb538c290a36eb3d549f6ac3823066bc0ce166b15d87",
+          "eventsSha256": "ca56fb3452f59d548d9390e98187696f9a2947aa9b2b197fb2bfc357ed41421e",
+          "sourceSha256": "cdb16ea2c2a68f4ce24439c54bd17006591cc9adeea71957338805eed5d18a00",
+          "displayCharacters": 157,
+          "sourceCharacters": 157,
+          "projectionMs": 0.0003750000000053433,
+          "protocolReplayMs": 0.3981670000000008,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 157,
+              "text": "The failure occurs after reconnect，先检查连接恢复时的订阅。\n\n`subscribe()` returns an unsubscribe function. 需要确认重连前是否调用了这个清理函数。\n\n现有日志只有订阅次数，没有清理次数。下一步增加可关联的记录，再验证是否存在泄漏。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "long-sentence",
+      "domain": "unstructured",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "c55b97b307a7e1c8f63b9c62f2495caf4750a464f378325cfa6f42b89c6aa7fc",
+          "eventsSha256": "c74ba95ef9dc7c3b55e664224d724a60c67b461cc0aecc25135465e225a54c37",
+          "sourceSha256": "98a5478c6682bdb498f0927f01f2f366d2793ff1d456a15bf8b0688c80010163",
+          "displayCharacters": 0,
+          "sourceCharacters": 112,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.4213749999999976,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "c55b97b307a7e1c8f63b9c62f2495caf4750a464f378325cfa6f42b89c6aa7fc",
+          "eventsSha256": "c74ba95ef9dc7c3b55e664224d724a60c67b461cc0aecc25135465e225a54c37",
+          "sourceSha256": "98a5478c6682bdb498f0927f01f2f366d2793ff1d456a15bf8b0688c80010163",
+          "displayCharacters": 112,
+          "sourceCharacters": 112,
+          "projectionMs": 0.005791999999999575,
+          "protocolReplayMs": 0.30066700000000424,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 112,
+              "text": "这是一个没有原生标题而且句子很长的推理片段，其中同时包含约束、候选方法和暂时无法确认的事实，仅仅从这个句子中选择几个词不能保证读者理解完整语境，也不能保证把专业术语解释清楚，所以需要保留可回到原文的入口并诚实标记摘录的性质。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "c55b97b307a7e1c8f63b9c62f2495caf4750a464f378325cfa6f42b89c6aa7fc",
+          "eventsSha256": "c74ba95ef9dc7c3b55e664224d724a60c67b461cc0aecc25135465e225a54c37",
+          "sourceSha256": "98a5478c6682bdb498f0927f01f2f366d2793ff1d456a15bf8b0688c80010163",
+          "displayCharacters": 112,
+          "sourceCharacters": 112,
+          "projectionMs": 0.003374999999991246,
+          "protocolReplayMs": 0.2913329999999945,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 112,
+              "text": "这是一个没有原生标题而且句子很长的推理片段，其中同时包含约束、候选方法和暂时无法确认的事实，仅仅从这个句子中选择几个词不能保证读者理解完整语境，也不能保证把专业术语解释清楚，所以需要保留可回到原文的入口并诚实标记摘录的性质。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "c55b97b307a7e1c8f63b9c62f2495caf4750a464f378325cfa6f42b89c6aa7fc",
+          "eventsSha256": "c74ba95ef9dc7c3b55e664224d724a60c67b461cc0aecc25135465e225a54c37",
+          "sourceSha256": "98a5478c6682bdb498f0927f01f2f366d2793ff1d456a15bf8b0688c80010163",
+          "displayCharacters": 112,
+          "sourceCharacters": 112,
+          "projectionMs": 0.0002499999999940883,
+          "protocolReplayMs": 0.3016659999999973,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 112,
+              "text": "这是一个没有原生标题而且句子很长的推理片段，其中同时包含约束、候选方法和暂时无法确认的事实，仅仅从这个句子中选择几个词不能保证读者理解完整语境，也不能保证把专业术语解释清楚，所以需要保留可回到原文的入口并诚实标记摘录的性质。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "already-clear",
+      "domain": "plain language",
+      "language": "zh",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "2362465d2d29b4b7cbbc85efd1fe03186cb789854f8ae6c4d528274306ef6c88",
+          "eventsSha256": "f82c222de101579879520dd332680b07fc074e71c27c1900ec217886ee869a36",
+          "sourceSha256": "d737d8b5c59b06581250cd0d70ef4dd1af2dfb6903a6340a4b51147b07a0c6ee",
+          "displayCharacters": 0,
+          "sourceCharacters": 35,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.15875000000001194,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "2362465d2d29b4b7cbbc85efd1fe03186cb789854f8ae6c4d528274306ef6c88",
+          "eventsSha256": "f82c222de101579879520dd332680b07fc074e71c27c1900ec217886ee869a36",
+          "sourceSha256": "d737d8b5c59b06581250cd0d70ef4dd1af2dfb6903a6340a4b51147b07a0c6ee",
+          "displayCharacters": 33,
+          "sourceCharacters": 35,
+          "projectionMs": 0.004750000000001364,
+          "protocolReplayMs": 0.15662500000000534,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 11,
+              "text": "这个请求被重复执行了。"
+            },
+            {
+              "start": 13,
+              "end": 35,
+              "text": "我会找到重复触发的位置，把它改成只执行一次。"
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "2362465d2d29b4b7cbbc85efd1fe03186cb789854f8ae6c4d528274306ef6c88",
+          "eventsSha256": "f82c222de101579879520dd332680b07fc074e71c27c1900ec217886ee869a36",
+          "sourceSha256": "d737d8b5c59b06581250cd0d70ef4dd1af2dfb6903a6340a4b51147b07a0c6ee",
+          "displayCharacters": 33,
+          "sourceCharacters": 35,
+          "projectionMs": 0.0037080000000031532,
+          "protocolReplayMs": 0.1495830000000069,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 11,
+              "text": "这个请求被重复执行了。"
+            },
+            {
+              "start": 13,
+              "end": 35,
+              "text": "我会找到重复触发的位置，把它改成只执行一次。"
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "2362465d2d29b4b7cbbc85efd1fe03186cb789854f8ae6c4d528274306ef6c88",
+          "eventsSha256": "f82c222de101579879520dd332680b07fc074e71c27c1900ec217886ee869a36",
+          "sourceSha256": "d737d8b5c59b06581250cd0d70ef4dd1af2dfb6903a6340a4b51147b07a0c6ee",
+          "displayCharacters": 35,
+          "sourceCharacters": 35,
+          "projectionMs": 0.0002080000000006521,
+          "protocolReplayMs": 0.15674999999998818,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 35,
+              "text": "这个请求被重复执行了。\n\n我会找到重复触发的位置，把它改成只执行一次。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jargon",
+      "domain": "systems",
+      "language": "en",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "0b684d42ae508223425cae3db8e6e6616df56a50756a2d02385ff3d83faecfbd",
+          "eventsSha256": "ea3224fa7a4b84a47e7d997e4920e504906dab58e9172da6b3f54290ba878427",
+          "sourceSha256": "51465af77bebe9b23b065381888cb07dcd00f5674eb6fe2ec819594419150ebb",
+          "displayCharacters": 0,
+          "sourceCharacters": 293,
+          "projectionMs": 0.00012499999999704414,
+          "protocolReplayMs": 0.5115420000000057,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "0b684d42ae508223425cae3db8e6e6616df56a50756a2d02385ff3d83faecfbd",
+          "eventsSha256": "ea3224fa7a4b84a47e7d997e4920e504906dab58e9172da6b3f54290ba878427",
+          "sourceSha256": "51465af77bebe9b23b065381888cb07dcd00f5674eb6fe2ec819594419150ebb",
+          "displayCharacters": 113,
+          "sourceCharacters": 293,
+          "projectionMs": 0.07295799999999986,
+          "protocolReplayMs": 0.4601249999999908,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 41,
+              "text": "The linearization point is after the CAS."
+            },
+            {
+              "start": 221,
+              "end": 293,
+              "text": "We need a minimal counterexample before selecting an epoch-based scheme."
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "0b684d42ae508223425cae3db8e6e6616df56a50756a2d02385ff3d83faecfbd",
+          "eventsSha256": "ea3224fa7a4b84a47e7d997e4920e504906dab58e9172da6b3f54290ba878427",
+          "sourceSha256": "51465af77bebe9b23b065381888cb07dcd00f5674eb6fe2ec819594419150ebb",
+          "displayCharacters": 288,
+          "sourceCharacters": 293,
+          "projectionMs": 0.00637499999999136,
+          "protocolReplayMs": 0.5970829999999978,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 41,
+              "text": "The linearization point is after the CAS."
+            },
+            {
+              "start": 43,
+              "end": 122,
+              "text": "An ABA transition can invalidate the observed version despite pointer equality."
+            },
+            {
+              "start": 123,
+              "end": 219,
+              "text": "Hazard pointers may protect reclamation, but do not by themselves prove the update linearizable."
+            },
+            {
+              "start": 221,
+              "end": 293,
+              "text": "We need a minimal counterexample before selecting an epoch-based scheme."
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "0b684d42ae508223425cae3db8e6e6616df56a50756a2d02385ff3d83faecfbd",
+          "eventsSha256": "ea3224fa7a4b84a47e7d997e4920e504906dab58e9172da6b3f54290ba878427",
+          "sourceSha256": "51465af77bebe9b23b065381888cb07dcd00f5674eb6fe2ec819594419150ebb",
+          "displayCharacters": 293,
+          "sourceCharacters": 293,
+          "projectionMs": 0.0002499999999940883,
+          "protocolReplayMs": 0.4974579999999946,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 293,
+              "text": "The linearization point is after the CAS.\n\nAn ABA transition can invalidate the observed version despite pointer equality. Hazard pointers may protect reclamation, but do not by themselves prove the update linearizable.\n\nWe need a minimal counterexample before selecting an epoch-based scheme."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unicode",
+      "domain": "unicode",
+      "language": "mixed",
+      "modes": [
+        {
+          "mode": "hidden",
+          "requestSha256": "dd62b7a4433885f882a6cbdb64b918c6f166f02390c6acbf4dc0b50354cc0f13",
+          "eventsSha256": "0066362b048a2329af45d513517eeaa3ce29ca3e0cbdd70b21cb89561863a025",
+          "sourceSha256": "12ee50121a8e3ae8ac4667a1318429c4d7013b84474ced0fc841c045053c67ef",
+          "displayCharacters": 0,
+          "sourceCharacters": 138,
+          "projectionMs": 0.000125000000011255,
+          "protocolReplayMs": 0.31312499999999943,
+          "mockApiCalls": 1,
+          "excerpts": []
+        },
+        {
+          "mode": "brief",
+          "requestSha256": "dd62b7a4433885f882a6cbdb64b918c6f166f02390c6acbf4dc0b50354cc0f13",
+          "eventsSha256": "0066362b048a2329af45d513517eeaa3ce29ca3e0cbdd70b21cb89561863a025",
+          "sourceSha256": "12ee50121a8e3ae8ac4667a1318429c4d7013b84474ced0fc841c045053c67ef",
+          "displayCharacters": 93,
+          "sourceCharacters": 138,
+          "projectionMs": 0.05275000000000318,
+          "protocolReplayMs": 0.4157079999999951,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 21,
+              "end": 82,
+              "text": "The label uses é rather than a single precomposed character."
+            },
+            {
+              "start": 106,
+              "end": 138,
+              "text": "Keep the original byte sequence."
+            }
+          ]
+        },
+        {
+          "mode": "expanded",
+          "requestSha256": "dd62b7a4433885f882a6cbdb64b918c6f166f02390c6acbf4dc0b50354cc0f13",
+          "eventsSha256": "0066362b048a2329af45d513517eeaa3ce29ca3e0cbdd70b21cb89561863a025",
+          "sourceSha256": "12ee50121a8e3ae8ac4667a1318429c4d7013b84474ced0fc841c045053c67ef",
+          "displayCharacters": 134,
+          "sourceCharacters": 138,
+          "projectionMs": 0.005707999999998492,
+          "protocolReplayMs": 0.3516659999999945,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 19,
+              "text": "🧭 首先确认 Café 的数据来源。"
+            },
+            {
+              "start": 21,
+              "end": 82,
+              "text": "The label uses é rather than a single precomposed character."
+            },
+            {
+              "start": 84,
+              "end": 106,
+              "text": "展示层不能改变回传的 Unicode 内容。"
+            },
+            {
+              "start": 106,
+              "end": 138,
+              "text": "Keep the original byte sequence."
+            }
+          ]
+        },
+        {
+          "mode": "full",
+          "requestSha256": "dd62b7a4433885f882a6cbdb64b918c6f166f02390c6acbf4dc0b50354cc0f13",
+          "eventsSha256": "0066362b048a2329af45d513517eeaa3ce29ca3e0cbdd70b21cb89561863a025",
+          "sourceSha256": "12ee50121a8e3ae8ac4667a1318429c4d7013b84474ced0fc841c045053c67ef",
+          "displayCharacters": 138,
+          "sourceCharacters": 138,
+          "projectionMs": 0.0004160000000013042,
+          "protocolReplayMs": 0.3234999999999957,
+          "mockApiCalls": 1,
+          "excerpts": [
+            {
+              "start": 0,
+              "end": 138,
+              "text": "🧭 首先确认 Café 的数据来源。\n\nThe label uses é rather than a single precomposed character.\n\n展示层不能改变回传的 Unicode 内容。Keep the original byte sequence."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

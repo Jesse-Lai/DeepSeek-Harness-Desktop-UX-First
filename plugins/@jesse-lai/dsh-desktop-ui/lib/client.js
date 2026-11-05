@@ -31,6 +31,7 @@ window.__ModuleLoader__.load({
   "copy": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><rect height=\"14\" rx=\"2\" ry=\"2\" width=\"14\" x=\"8\" y=\"8\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/></svg>",
   "corner-down-right": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"m15 10 5 5-5 5\"/><path d=\"M4 4v7a4 4 0 0 0 4 4h12\"/></svg>",
   "database-backup": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\"/><path d=\"M3 12a9 3 0 0 0 5 2.69\"/><path d=\"M21 9.3V5\"/><path d=\"M3 5v14a9 3 0 0 0 6.47 2.88\"/><g><path d=\"M12 12v4h4\"/><path d=\"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16\"/></g></svg>",
+  "delete": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><g><path d=\"M3 6h18\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/></g><path d=\"M19 8v12c0 1-1 2-2 2H7c-1 0-2-1-2-2V8\"/><line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\"/><line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\"/></svg>",
   "download": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><g><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\"/></g></svg>",
   "downvote": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M17 14V2\"/><path d=\"M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z\"/></svg>",
   "earth": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M21.54 15H17a2 2 0 0 0-2 2v4.54\"/><path d=\"M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17\"/><path d=\"M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05\"/><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>",
@@ -45,7 +46,6 @@ window.__ModuleLoader__.load({
   "history": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><g><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/></g><line x1=\"12\" x2=\"12\" y1=\"12\" y2=\"7\"/><line x1=\"12\" x2=\"16\" y1=\"12\" y2=\"14\"/></svg>",
   "link": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/></svg>",
   "loader-circle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"/></svg>",
-  "menu": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><line x1=\"4\" x2=\"20\" y1=\"6\" y2=\"6\"/><line x1=\"4\" x2=\"20\" y1=\"12\" y2=\"12\"/><line x1=\"4\" x2=\"20\" y1=\"18\" y2=\"18\"/></svg>",
   "message-square-plus": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z\"/><path d=\"M12 8v6\"/><path d=\"M9 11h6\"/></svg>",
   "monitor-cog": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M12 17v4\"/><path d=\"M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7\"/><path d=\"M8 21h8\"/><g><path d=\"m14.305 7.53.923-.382\"/><path d=\"m15.228 4.852-.923-.383\"/><path d=\"m16.852 3.228-.383-.924\"/><path d=\"m16.852 8.772-.383.923\"/><path d=\"m19.148 3.228.383-.924\"/><path d=\"m19.53 9.696-.382-.924\"/><path d=\"m20.772 4.852.924-.383\"/><path d=\"m20.772 7.148.924.383\"/><circle cx=\"18\" cy=\"6\" r=\"3\"/></g></svg>",
   "moon": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg>",
@@ -58,7 +58,6 @@ window.__ModuleLoader__.load({
   "search": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg>",
   "settings": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",
   "shield-check": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/></svg>",
-  "shredder": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><g><path d=\"M4 13V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5\"/><path d=\"M14 2v5a1 1 0 0 0 1 1h5\"/></g><path d=\"M10 22v-5\"/><path d=\"M14 19v-2\"/><path d=\"M18 20v-3\"/><path d=\"M2 13h20\"/><path d=\"M6 20v-3\"/></svg>",
   "shrink": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M9 4.2V9m0 0H4.2M9 9 3 3\"/><path d=\"M15 4.2V9m0 0h4.8M15 9l6-6\"/><path d=\"M9 19.8V15m0 0H4.2M9 15l-6 6\"/><path d=\"m15 15 6 6m-6-6v4.8m0-4.8h4.8\"/></svg>",
   "sparkles": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"/><path d=\"M20 3v4\"/><path d=\"M22 5h-4\"/><path d=\"M4 17v2\"/><path d=\"M5 18H3\"/></svg>",
   "square-arrow-up": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><rect height=\"18\" rx=\"2\" width=\"18\" x=\"3\" y=\"3\"/><path d=\"m16 12-4-4-4 4\"/><path d=\"M12 16V8\"/></svg>",
@@ -128,7 +127,7 @@ window.__ModuleLoader__.load({
   ],
   [
     729835205,
-    "shredder"
+    "delete"
   ],
   [
     757408287,
@@ -176,7 +175,7 @@ window.__ModuleLoader__.load({
   ],
   [
     992564687,
-    "shredder"
+    "delete"
   ],
   [
     1047301455,
@@ -343,10 +342,6 @@ window.__ModuleLoader__.load({
     "square-arrow-up"
   ],
   [
-    3537975236,
-    "menu"
-  ],
-  [
     3555044211,
     "earth"
   ],
@@ -448,12 +443,13 @@ window.__ModuleLoader__.load({
         --dsh-desktop-composer-width: 654px;
         --dsh-desktop-card-radius: 28px;
         --dsh-desktop-composer-shadow: rgb(63 156 255 / 30%);
-        --dsh-desktop-composer-active-shadow: rgb(159 159 159 / 30%);
+        --dsh-desktop-composer-active-shadow: rgb(159 159 159 / 20%);
         --dsh-desktop-composer-shadow-blur: 48px;
-        --dsh-desktop-composer-stats-height: 24px;
         --dsh-desktop-composer-extra-clearance: 16px;
         --dsh-desktop-placeholder: var(--dsw-alias-label-caption);
-        --dsh-desktop-send-disabled-bg: var(--dsw-alias-button-primary-dimmed);
+        /* Host themes may remap the shared dimmed-button alias to white. Keep
+           disabled Send distinct from the white Composer surface. */
+        --dsh-desktop-send-disabled-bg: rgb(235 238 242);
         --dsh-desktop-send-disabled-fg: var(--dsw-alias-label-caption);
         --dsh-desktop-shell-gap: 8px;
         --dsh-desktop-panel-radius: 16px;
@@ -465,18 +461,22 @@ window.__ModuleLoader__.load({
          of the operating system's prefers-color-scheme media query. */
       body[data-ds-dark-theme] {
         --dsh-desktop-composer-active-shadow: rgb(0 0 0 / 48%);
-        --dsh-desktop-sidebar-new-rgb: 0 0 0;
-        --dsh-desktop-sidebar-new-alpha: 40%;
-        --dsh-desktop-sidebar-new-hover-alpha: 50%;
+        --dsh-desktop-send-disabled-bg: rgb(67 69 74);
       }
 
-      /* Chromium is the only UI layer. The transparent macOS document lets
-         BrowserWindow's under-window vibrancy show through only where a Web
-         surface below deliberately remains translucent. */
-      html[data-dsh-desktop-platform="macos"],
-      html[data-dsh-desktop-platform="macos"] body,
-      html[data-dsh-desktop-platform="macos"] #root {
+      /* Only the packaged macOS Electron host supplies native vibrancy. Its
+         preload bridge marks this document explicitly; ordinary Harness Web
+         installs stay opaque on every operating system. */
+      html[data-dsh-desktop-host="macos"],
+      html[data-dsh-desktop-host="macos"] body,
+      html[data-dsh-desktop-host="macos"] #root {
         background: transparent !important;
+      }
+
+      html:not([data-dsh-desktop-host="macos"]),
+      html:not([data-dsh-desktop-host="macos"]) body,
+      html:not([data-dsh-desktop-host="macos"]) #root {
+        background: var(--dsw-alias-bg-base) !important;
       }
 
       body {
@@ -484,14 +484,45 @@ window.__ModuleLoader__.load({
         --dsh-desktop-floating-surface: var(--dsw-alias-bg-layer-2);
         --dsh-desktop-floating-surface-shadow:
           0 0 0 1px var(--dsw-alias-border-l2), var(--dsw-shadow-lv3);
-        /* Keep the New Session material achromatic and let its translucency
-           reveal the native sidebar tint. Theme state changes only the pure
-           base color and alpha, never the label or icon opacity. */
-        --dsh-desktop-sidebar-new-rgb: 255 255 255;
-        --dsh-desktop-sidebar-new-alpha: 72%;
-        --dsh-desktop-sidebar-new-hover-alpha: 84%;
         letter-spacing: -0.008em;
         text-rendering: optimizeLegibility;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-description] {
+        display: none !important;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-body] {
+        margin-top: 12px !important;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-editor] {
+        margin-top: 0 !important;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-field-label] {
+        align-items: center;
+        display: inline-flex;
+        gap: 8px;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-api-link] {
+        color: #4d6bfe;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 400;
+        text-decoration: none;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-api-link]:hover {
+        color: #3154ea;
+        text-decoration: underline;
+      }
+
+      [data-dsh-deepseek-onboarding] [data-dsh-onboarding-api-link]:focus-visible {
+        border-radius: 3px;
+        box-shadow: 0 0 0 2px #4d6bfe;
+        outline: none;
       }
 
       /* Keep every scrollport operable without leaving a permanent visual
@@ -993,7 +1024,7 @@ window.__ModuleLoader__.load({
          transcript/Composer stack. Taking it out of flow keeps both the
          fixed-seat reserve and the chat reading position stable when its list
          opens. JavaScript supplies coordinates relative to the fixed seat so
-         it follows the Composer through panel resizes and its entry motion. */
+         it follows the Composer through panel resizes. */
       [data-phase="active"] [data-composer-seat]
         [data-testid="todo-panel"][data-dsh-todo-overlay] {
         position: absolute !important;
@@ -1053,9 +1084,34 @@ window.__ModuleLoader__.load({
       /* hiddenInset removes the native title bar, so Electron needs an
          explicit drag region. This covers only the empty strip above the
          Harness controls and does not steal clicks from the sidebar. */
-      html[data-dsh-desktop-platform="macos"] [data-dsh-desktop-shell]::before {
+      html[data-dsh-desktop-host="macos"] [data-dsh-desktop-shell]::before {
         content: "";
         position: fixed;
+        inset: 0 0 auto;
+        z-index: 2;
+        height: 44px;
+        app-region: drag;
+        -webkit-app-region: drag;
+      }
+
+      html[data-dsh-desktop-host="macos"]
+        [data-dsh-desktop-shell]:has([data-dsh-atom-host])::before {
+        pointer-events: none;
+        app-region: no-drag;
+        -webkit-app-region: no-drag;
+      }
+
+      html[data-dsh-desktop-host="macos"]
+        [data-dsh-desktop-shell]:has([data-dsh-atom-host])
+        > [data-dsh-desktop-sidebar-column] {
+        position: relative;
+      }
+
+      html[data-dsh-desktop-host="macos"]
+        [data-dsh-desktop-shell]:has([data-dsh-atom-host])
+        > [data-dsh-desktop-sidebar-column]::before {
+        content: "";
+        position: absolute;
         inset: 0 0 auto;
         z-index: 2;
         height: 44px;
@@ -1172,21 +1228,26 @@ window.__ModuleLoader__.load({
 
       [data-dsh-desktop-sidebar-new] {
         position: relative;
-        align-self: flex-start !important;
-        width: max(36px, calc(100% - 14px)) !important;
-        height: 36px !important;
-        margin: 0 0 12px !important;
+        box-sizing: border-box;
+        align-self: stretch !important;
+        justify-content: flex-start !important;
+        width: auto !important;
+        height: 34px !important;
+        margin: 0 14px 2px -8px !important;
+        padding: 0 8px 0 0 !important;
+        gap: 6px !important;
         border: 0 !important;
-        border-radius: 12px !important;
-        background: rgb(
-          var(--dsh-desktop-sidebar-new-rgb) /
-          var(--dsh-desktop-sidebar-new-alpha)
-        ) !important;
+        border-left: 8px solid transparent !important;
+        border-radius: 24px !important;
+        background: transparent !important;
         box-shadow: none !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
         transition:
-          transform 120ms var(--dsh-desktop-ease),
           gap 150ms var(--ds-ease-in-out),
           padding 150ms var(--ds-ease-in-out),
+          margin 150ms var(--ds-ease-in-out),
+          border-left-width 150ms var(--ds-ease-in-out),
           border-radius var(--ds-transition-duration-slow) var(--ds-ease-in-out),
           background-color 160ms var(--dsh-desktop-ease);
       }
@@ -1200,32 +1261,33 @@ window.__ModuleLoader__.load({
       }
 
       [data-dsh-desktop-sidebar-new] svg {
-        width: 14px !important;
-        height: 14px !important;
+        width: 16px !important;
+        height: 16px !important;
+        flex: none;
         transition:
           width var(--ds-transition-duration-slow) var(--ds-ease-in-out),
           height var(--ds-transition-duration-slow) var(--ds-ease-in-out);
       }
 
       [data-dsh-desktop-sidebar-new]:hover {
-        background: rgb(
-          var(--dsh-desktop-sidebar-new-rgb) /
-          var(--dsh-desktop-sidebar-new-hover-alpha)
-        ) !important;
+        background: var(--dsw-alias-interactive-bg-hover) !important;
       }
 
       [data-dsh-desktop-sidebar-new]:active {
-        transform: scale(0.985);
+        transform: none;
       }
 
       [data-dsh-desktop-shell][data-sidebar-collapsed]
         [data-dsh-desktop-sidebar-new] {
-        width: max(36px, calc(100% - 14px)) !important;
+        align-self: flex-start !important;
+        justify-content: center !important;
+        width: 36px !important;
         height: 36px !important;
-        margin: 0 0 12px !important;
+        margin: 0 0 2px !important;
         padding: 0 !important;
         gap: 0 !important;
         border: 0 !important;
+        border-left-width: 0 !important;
         border-radius: 50% !important;
         background: transparent !important;
         box-shadow: none !important;
@@ -1267,6 +1329,291 @@ window.__ModuleLoader__.load({
         padding-left: 0 !important;
       }
 
+      /* Promote Search from a trailing Workspace-header icon into the second
+         top-level sidebar action. The React-owned control stays in place so
+         its expansion, focus, query, and result behavior remain unchanged;
+         the header grid only changes its visual order. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: 34px 36px;
+        column-gap: 2px !important;
+        row-gap: 12px !important;
+        height: 82px !important;
+        margin: 0 0 4px !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        transition:
+          grid-template-rows 240ms var(--dsh-desktop-ease),
+          row-gap 240ms var(--dsh-desktop-ease),
+          height 240ms var(--dsh-desktop-ease),
+          margin-bottom 240ms var(--dsh-desktop-ease);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"] {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        align-self: stretch;
+        width: auto !important;
+        max-width: none !important;
+        height: 34px;
+        margin: 0 0 0 -8px !important;
+        padding: 0 !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_sectionLabel"] {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: center;
+        justify-self: start;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_headerActions"] {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: center;
+        justify-self: end;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_search"] {
+        box-sizing: border-box;
+        position: relative;
+        width: 100% !important;
+        height: 34px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-left: 8px solid transparent !important;
+        border-radius: 24px !important;
+        background: transparent !important;
+        box-shadow: inset 0 0 0 0 transparent;
+        overflow: hidden;
+        transition:
+          width 240ms var(--dsh-desktop-ease),
+          margin-left 240ms var(--dsh-desktop-ease),
+          padding-left 240ms var(--dsh-desktop-ease),
+          border-left-width 240ms var(--dsh-desktop-ease),
+          border-radius 240ms var(--dsh-desktop-ease),
+          box-shadow 200ms var(--dsh-desktop-ease),
+          background-color 160ms var(--dsh-desktop-ease);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        [data-dsh-desktop-sidebar-search] {
+        box-sizing: border-box;
+        position: relative;
+        z-index: 1;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        height: 34px !important;
+        padding: 0 !important;
+        gap: 6px !important;
+        color: var(--dsw-alias-label-primary) !important;
+        border-radius: 24px !important;
+        overflow: hidden;
+        transition:
+          padding-right 240ms var(--dsh-desktop-ease),
+          color 160ms var(--dsh-desktop-ease);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [data-dsh-desktop-sidebar-search]::after {
+        content: attr(data-dsh-desktop-sidebar-search-label);
+        flex: none;
+        min-width: 0;
+        max-width: var(--dsh-desktop-sidebar-search-prefix-width, 100%);
+        color: inherit;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        opacity: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        transition:
+          max-width 240ms var(--dsh-desktop-ease),
+          opacity 100ms var(--dsh-desktop-ease);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [data-dsh-desktop-sidebar-search-prefix="搜索"]::after {
+        --dsh-desktop-sidebar-search-prefix-width: 2em;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [data-dsh-desktop-sidebar-search-prefix="Search"]::after {
+        --dsh-desktop-sidebar-search-prefix-width: 5.2ch;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_search"]:not([class*="_searchExpanded"]):hover {
+        background: var(--dsw-alias-interactive-bg-hover) !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        [data-dsh-desktop-sidebar-search]:hover {
+        background: transparent !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [data-dsh-desktop-sidebar-search] svg {
+        width: 16px !important;
+        height: 16px !important;
+        color: inherit !important;
+        flex: none;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        [class*="_searchInput"] {
+        box-sizing: border-box;
+        position: absolute;
+        z-index: 2;
+        inset: 0 32px 0 30px;
+        width: auto !important;
+        height: 34px;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: var(--dsw-alias-label-primary) !important;
+        caret-color: var(--dsw-alias-label-primary);
+        font-size: 14px !important;
+        line-height: 20px !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 100ms var(--dsh-desktop-ease);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_searchInput"]::placeholder {
+        color: transparent !important;
+      }
+
+      /* The same Search icon and prefix travel into the field while the
+         suffix is progressively revealed. No duplicate placeholder replaces
+         them, so opening and closing follow one continuous visual path. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child:has([class*="_searchExpanded"]) {
+        grid-template-rows: 34px 0;
+        row-gap: 0 !important;
+        height: 34px !important;
+        margin-bottom: 12px !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_searchExpanded"] {
+        width: calc(100% - 8px) !important;
+        margin-left: 8px !important;
+        padding-left: 8px !important;
+        border-left-width: 0 !important;
+        border-radius: 24px !important;
+        background: transparent !important;
+        box-shadow: inset 0 0 0 1px var(--dsw-alias-border-l2);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_searchExpanded"]
+        [data-dsh-desktop-sidebar-search] {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        height: 34px !important;
+        padding-right: 32px !important;
+        gap: 6px !important;
+        color: var(--dsw-alias-label-tertiary) !important;
+        border-radius: 24px !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_searchExpanded"]
+        [data-dsh-desktop-sidebar-search]::after {
+        max-width: calc(100% - 54px);
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_root"]:not([class*="_rail"])
+        > [class*="_sectionHeader"]:first-child
+        > [class*="_searchSlot"]
+        > [class*="_searchExpanded"]
+        [class*="_searchInput"] {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_searchExpanded"]:has([class*="_searchInput"]:not(:placeholder-shown))
+        [data-dsh-desktop-sidebar-search]::after {
+        opacity: 0;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_searchExpanded"]
+        [class*="_clearButton"] {
+        position: absolute;
+        z-index: 3;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+      }
+
+      /* The compact header keeps a zero-width picker anchor after its action
+         group. Remove the wide header's gap so that anchor cannot push the
+         Add Workspace button 2px left of the 56px rail's centre line. */
+      [data-dsh-desktop-shell][data-sidebar-collapsed]
+        [data-dsh-desktop-sidebar-region]
+        [class*="_rail"]
+        > [class*="_sectionHeader"] {
+        justify-content: flex-start !important;
+        gap: 0 !important;
+      }
+
+      /* Tasks is a peer section title, not a trailing workspace-header action.
+         Keep its label on the same left edge as the Workspaces label. */
+      [data-dsh-desktop-sidebar-region] [class*="_tasksSectionHeader"] {
+        justify-content: flex-start !important;
+        margin-right: 0 !important;
+      }
+
+      /* The upstream hidden label uses -4px to cancel its native 4px header
+         gap. The desktop header narrows that gap to 2px, so keeping the native
+         compensation pulls the expanded search slot 2px outside the clipped
+         header. Match the compensation to our gap before sizing the field. */
+      [data-dsh-desktop-sidebar-region] [class*="_sectionLabelHidden"] {
+        margin-right: -2px !important;
+      }
+
       /* The desktop surface intentionally has one workspace browsing mode.
          Remove the upstream grouping/sorting trigger from layout and keyboard
          navigation; without its sole trigger, the menu cannot be opened. */
@@ -1277,15 +1624,17 @@ window.__ModuleLoader__.load({
         display: none !important;
       }
 
-      /* The compact search control is the only rail affordance whose upstream
-         component uses a different DOM node. Start that replacement exactly on
-         the wide search's exit path, then finish the remaining left/down motion
-         without changing opacity. */
+      /* The wide tree remains mounted briefly while the rail is taking over.
+         Hide both Search implementations as soon as collapse starts so no
+         full-width or compact Search control leaks into the collapsed state. */
+      [data-dsh-desktop-shell][data-sidebar-collapsed]
+        [data-dsh-desktop-sidebar-region]
+        [class*="_searchSlot"],
       [data-dsh-desktop-shell][data-sidebar-collapsed]
         [data-dsh-desktop-sidebar-region]
         [class*="_rail"]
         > [class*="_search"] {
-        animation: dsh-desktop-sidebar-search-settle 150ms var(--ds-ease-in-out) both !important;
+        display: none !important;
       }
 
       [data-dsh-desktop-sidebar-region] button[class*="_wide"],
@@ -1311,15 +1660,6 @@ window.__ModuleLoader__.load({
         transform: translateX(-100%);
       }
 
-      /* Upstream bleeds the expanded search 2px past its slot on each side.
-         With the desktop header aligned to the New Session button, that bleed
-         is clipped on the left. Keep the field inside the aligned slot so both
-         controls share the same visible left and right edges. */
-      [data-dsh-desktop-sidebar-region] [class*="_searchExpanded"] {
-        width: 100% !important;
-        margin-inline: 0 !important;
-      }
-
       [data-dsh-desktop-sidebar-region]::before,
       [data-dsh-desktop-sidebar-region]::after,
       [data-dsh-desktop-sidebar-region] > *::before,
@@ -1340,6 +1680,18 @@ window.__ModuleLoader__.load({
         [class*="_treeBody"] > [role="tree"] {
         margin-left: -12px !important;
         padding-left: 12px !important;
+      }
+
+      /* Treat the no-sessions message like the first session row: keep it on
+         the Workspace heading's left edge and center it in the same 32px row. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_treeBody"] > [role="tree"] > [class*="_empty"] {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        height: 32px;
+        padding: 0 !important;
+        line-height: 20px;
       }
 
       [data-dsh-desktop-sidebar-region] [role="treeitem"],
@@ -1368,6 +1720,21 @@ window.__ModuleLoader__.load({
         [class*="_groupSection"]
         [role="treeitem"][aria-selected] > [class*="_title"] {
         margin-left: -2px !important;
+      }
+
+      /* Task rows are peers of workspace rows rather than children of one.
+         Remove the session inset so their leading edge matches the workspace
+         folder glyph; a status dot, when present, occupies that same edge. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_groupSection"]:has(> [class*="_tasksSectionHeader"])
+        [class*="_sessionRow"] {
+        padding-left: 0 !important;
+      }
+
+      [data-dsh-desktop-sidebar-region]
+        [class*="_groupSection"]:has(> [class*="_tasksSectionHeader"])
+        [class*="_flatSessionRowWithoutStatus"] > [class*="_title"] {
+        margin-left: 0 !important;
       }
 
       /* A populated session status owns the trailing metadata position instead
@@ -1411,11 +1778,25 @@ window.__ModuleLoader__.load({
         display: none;
       }
 
-      /* The overflow disclosure follows the same title baseline as grouped
-         session rows: 8px row inset + 16px reserved status inset - 2px. */
+      /* Workspace sessions keep the grouped-row status inset. */
       [data-dsh-desktop-sidebar-region]
         [class*="_groupSection"] > [class*="_sessionOverflowButton"] {
         padding-left: 22px !important;
+      }
+
+      /* Task sessions are flat rows, so their overflow disclosure needs no
+         grouped-row status inset. Align its text with the session titles. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_groupSection"]:has(> [class*="_tasksSectionHeader"])
+        > [class*="_sessionOverflowButton"] {
+        padding-left: 0 !important;
+      }
+
+      /* The inactive workspace folder is part of the row label, so it should
+         use the same foreground instead of the tertiary metadata color. */
+      [data-dsh-desktop-sidebar-region]
+        [class*="_projectRow"] > [class*="_folder"]:not([class*="_folderActive"]) {
+        color: inherit;
       }
 
       /* Keep the workspace folder glyph stable on hover. Harness normally
@@ -1438,8 +1819,12 @@ window.__ModuleLoader__.load({
         display: none !important;
       }
 
-      [data-dsh-desktop-sidebar-region] [role="treeitem"]:hover,
-      [data-dsh-desktop-sidebar-region] [role="treeitem"][aria-selected="true"] {
+      [data-dsh-desktop-sidebar-region] [role="treeitem"]:hover {
+        background: color-mix(in srgb, var(--dsw-alias-interactive-bg-hover) 55%, transparent) !important;
+      }
+
+      [data-dsh-desktop-sidebar-region] [role="treeitem"][aria-selected="true"],
+      [data-dsh-desktop-sidebar-region] [class*="_sessionRow"][data-dsh-atom-open] {
         background: var(--dsw-alias-interactive-bg-hover) !important;
       }
 
@@ -1581,6 +1966,19 @@ window.__ModuleLoader__.load({
         margin-left: 0;
       }
 
+      /* Harness reserves 44px for the Session header but places its 32px
+         title row below a one-sided 12px top inset. Split that inset evenly
+         so the title, status/actions, and overflow menu share the header's
+         visual centre without changing its height or divider position. */
+      [data-dsh-session-header] {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+      }
+
+      [data-dsh-session-header]::after {
+        height: 0.5px !important;
+      }
+
       [data-chat-flow] {
         width: min(var(--dsh-desktop-content-width), 100%);
         margin-inline: auto;
@@ -1645,12 +2043,12 @@ window.__ModuleLoader__.load({
       [data-dsh-progress-update][data-dsh-steer-open] {
         background: color-mix(
           in srgb,
-          var(--dsw-alias-interactive-bg-hover) 45%,
+          var(--dsw-alias-interactive-bg-hover) 55%,
           transparent
         );
         box-shadow: 0 0 0 8px color-mix(
           in srgb,
-          var(--dsw-alias-interactive-bg-hover) 45%,
+          var(--dsw-alias-interactive-bg-hover) 55%,
           transparent
         );
       }
@@ -1664,8 +2062,9 @@ window.__ModuleLoader__.load({
         position: absolute;
         z-index: 2147482900;
         top: auto;
-        bottom: calc(100% - 2px);
-        right: 0;
+        bottom: calc(100% + 8px);
+        right: auto;
+        left: 50%;
         box-sizing: border-box;
         display: flex;
         justify-content: flex-end;
@@ -1674,8 +2073,20 @@ window.__ModuleLoader__.load({
         border-radius: 999px;
         opacity: 0;
         pointer-events: none;
-        transform: translateY(2px);
-        transition: opacity 120ms ease, transform 120ms ease;
+        transform: translateX(-50%);
+        transition: background-color 120ms ease, opacity 120ms ease;
+      }
+
+      /* Bridge the visual gap back to the progress row. Without this hit
+         area, the row loses :hover while the pointer crosses the 8px gap and
+         hides the toolbar before its button can be reached. */
+      [data-dsh-steer-action]::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        height: 8px;
       }
 
       [data-dsh-progress-update]:hover [data-dsh-steer-action],
@@ -1684,7 +2095,12 @@ window.__ModuleLoader__.load({
       [data-dsh-steer-action]:focus-within {
         opacity: 1;
         pointer-events: auto;
-        transform: translateY(0);
+        transform: translateX(-50%);
+      }
+
+      [data-dsh-steer-action]:hover,
+      [data-dsh-steer-action]:focus-within {
+        background: var(--dsw-alias-interactive-bg-hover-solid);
       }
 
       [data-dsh-progress-update][data-dsh-steer-open] [data-dsh-steer-action] {
@@ -1714,7 +2130,7 @@ window.__ModuleLoader__.load({
         padding: 6px 12px;
         background: transparent;
         box-shadow: none;
-        color: var(--dsw-alias-label-secondary);
+        color: var(--dsw-alias-label-primary);
         font: inherit;
         font-size: 14px;
         line-height: 20px;
@@ -1722,7 +2138,12 @@ window.__ModuleLoader__.load({
       }
 
       [data-dsh-steer-trigger]:hover,
-      [data-dsh-steer-trigger]:focus-visible,
+      [data-dsh-steer-trigger]:focus-visible {
+        color: var(--dsw-alias-label-primary);
+        background: transparent;
+        outline: none;
+      }
+
       [data-dsh-steer-submit]:hover,
       [data-dsh-steer-submit]:focus-visible {
         color: var(--dsw-alias-label-primary);
@@ -1747,13 +2168,13 @@ window.__ModuleLoader__.load({
         box-sizing: border-box;
         flex: 1 1 auto;
         min-width: 0;
-        min-height: 24px;
+        min-height: 32px;
         max-height: 120px;
         resize: none;
         overflow-y: auto;
         border: 0;
         outline: none;
-        padding: 0;
+        padding: 5px 0;
         background: transparent;
         color: var(--dsw-alias-label-primary);
         font: inherit;
@@ -1974,32 +2395,11 @@ window.__ModuleLoader__.load({
         display: none !important;
       }
 
-      /* The dock SlotOutlet is always present but upstream uses
-         display: contents, so an empty StatsLine contributes no height.
-         Give that stable slot its own 24px row: the stats can populate the
-         existing box later without lifting the Composer. */
+      /* Session performance details remain available in Trajectory. Keep the
+         aggregate StatsLine out of the conversation Composer. */
       [data-phase="active"] [data-composer-seat]
         [data-slot="conversation.composer.dock"] {
-        display: block !important;
-        box-sizing: border-box;
-        flex: none;
-        width: 100%;
-        max-width: var(--dsh-desktop-composer-width);
-        min-width: 0;
-        align-self: center;
-        margin-inline: auto;
-        min-height: var(--dsh-desktop-composer-stats-height);
-      }
-
-      [data-phase="active"] [data-composer-seat]
-        [data-slot="conversation.composer.dock"] > :not([role="tooltip"]) {
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100% !important;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: none !important;
       }
 
       /* QueueDock still sizes itself from the wider upstream chat column.
@@ -2060,27 +2460,8 @@ window.__ModuleLoader__.load({
         margin: 0 !important;
         border-radius: 0 0 0 var(--dsh-desktop-panel-radius);
         overflow-anchor: none;
-        translate:
-          var(--dsh-desktop-composer-enter-x, 0px)
-          var(--dsh-desktop-composer-enter-y, 0px) !important;
+        translate: none !important;
         transform: none !important;
-      }
-
-      /* Preserve the hero card's last painted position for the first active
-         frame, then let the fixed Composer travel naturally to the viewport
-         floor. The transition is armed only after that first frame has been
-         committed, so the card cannot flash at the destination beforehand. */
-      [data-phase="active"] > [data-conversation-scroll]
-        > [data-composer-seat][data-dsh-composer-fixed][data-dsh-composer-entering] {
-        transition: translate 420ms var(--dsh-desktop-ease) !important;
-        will-change: translate;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        [data-phase="active"] > [data-conversation-scroll]
-          > [data-composer-seat][data-dsh-composer-fixed][data-dsh-composer-entering] {
-          transition: none !important;
-        }
       }
 
       /* A fixed-position Composer is no longer clipped by the rounded center
@@ -2134,7 +2515,9 @@ window.__ModuleLoader__.load({
         max-width: var(--dsh-desktop-composer-width) !important;
         min-height: 84px;
         display: grid !important;
-        grid-template-columns: 24px minmax(120px, 1fr) auto auto;
+        grid-template-columns:
+          24px minmax(0, 1fr) minmax(0, max-content)
+          minmax(0, max-content);
         column-gap: 8px !important;
         row-gap: 0 !important;
         align-items: end;
@@ -2156,10 +2539,10 @@ window.__ModuleLoader__.load({
       }
 
       /* Keep the blue 48px hero glow intact. Once a conversation is active,
-         fully desaturate that same color and halve the halo's blur reach. */
+         fully desaturate the halo and tighten its blur reach. */
       [data-phase="active"] [data-composer-card] {
         --dsh-desktop-composer-shadow: var(--dsh-desktop-composer-active-shadow);
-        --dsh-desktop-composer-shadow-blur: 24px;
+        --dsh-desktop-composer-shadow-blur: 16px;
       }
 
       /* Harness adds a separate 22px masked outline in workspace-trigger
@@ -2334,7 +2717,53 @@ window.__ModuleLoader__.load({
 
       [data-dsh-composer-trailing] {
         grid-column: 4;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: flex-end;
+        justify-self: end;
         gap: 8px !important;
+      }
+
+      /* Keep the fixed-size trailing actions on the right edge while letting
+         the model seat surrender width first. Its label already owns the
+         ellipsis behavior; these constraints give that label a real,
+         shrinkable containing block instead of letting it overlap Send. */
+      [data-dsh-composer-trailing]
+        > :has(> button[data-dsh-composer-menu-trigger="model"]) {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 220px;
+      }
+
+      [data-dsh-composer-trailing]
+        button[data-dsh-composer-menu-trigger="model"] {
+        box-sizing: border-box;
+        width: 100% !important;
+        max-width: 220px;
+        /* The meter ring has 7px of inset inside its 28px target. With the
+           trailing row's 8px gap, zero right padding gives both visible
+           intervals beside the ring the same 15px measure. */
+        padding-right: 0 !important;
+        overflow: hidden;
+      }
+
+      /* A new conversation has no context-pressure reading yet, so the meter
+         does not render. Restore the meter target's 7px half-inset in that
+         state: 7px model padding + 8px row gap keeps Model -> Send at the
+         same visible 15px interval as Meter -> Send. */
+      [data-dsh-composer-trailing]:not(:has(
+        button[aria-haspopup="dialog"]:not([data-dsh-composer-menu-trigger="model"])
+      ))
+        button[data-dsh-composer-menu-trigger="model"] {
+        padding-right: 7px !important;
+      }
+
+      [data-dsh-composer-trailing]
+        button[data-dsh-composer-menu-trigger="model"] > span:first-of-type {
+        min-width: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
       }
 
       [data-dsh-composer-primary] {
@@ -2383,19 +2812,18 @@ window.__ModuleLoader__.load({
         transition: opacity 120ms var(--dsh-desktop-ease) !important;
       }
 
-      html[data-dsh-desktop-platform="windows"] [data-composer-card],
-      html[data-dsh-desktop-platform="other"] [data-composer-card] {
+      html:not([data-dsh-desktop-host="macos"]) [data-composer-card] {
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
       }
 
-      html:not([data-dsh-desktop-platform="macos"]) [data-dsh-desktop-shell] {
+      html:not([data-dsh-desktop-host="macos"]) [data-dsh-desktop-shell] {
         background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 82%, var(--dsw-alias-bg-base)) !important;
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
       }
 
-      html:not([data-dsh-desktop-platform="macos"])
+      html:not([data-dsh-desktop-host="macos"])
         [data-dsh-desktop-shell][data-sidebar-collapsed] {
         background: var(--dsw-alias-bg-base) !important;
       }
@@ -2413,6 +2841,34 @@ window.__ModuleLoader__.load({
         [data-dsh-composer-trailing] { grid-column: 4; }
       }
 
+      /* View changes are state changes, not motion scenes. Keep all structural
+         surfaces at their final geometry from the first painted frame while
+         leaving progress/status animations available for real background work. */
+      [data-dsh-desktop-shell],
+      [data-dsh-desktop-sidebar],
+      [data-dsh-desktop-sidebar-logo],
+      [data-dsh-desktop-sidebar-new],
+      [data-dsh-desktop-sidebar-region],
+      [data-dsh-desktop-sidebar-foot],
+      [data-dsh-desktop-center],
+      [data-dsh-desktop-details],
+      [data-phase="hero"] *,
+      [data-phase="active"] > [data-conversation-scroll]
+        > [data-composer-seat] {
+        transition: none !important;
+      }
+
+      [data-dsh-desktop-sidebar] > *,
+      [data-dsh-desktop-sidebar][class*="_wide"],
+      [data-dsh-desktop-sidebar][class*="_railIn"] *,
+      [data-dsh-desktop-sidebar-region] [class*="_sessionRow"],
+      [data-dsh-desktop-sidebar-region] [class*="_wide"],
+      [data-dsh-desktop-sidebar-region] [class*="_railIn"] *,
+      [data-phase="hero"] *,
+      [data-chat-flow-kind] {
+        animation: none !important;
+      }
+
       @keyframes dsh-desktop-message-in {
         from { opacity: 0; transform: translateY(4px); }
         to { opacity: 1; transform: translateY(0); }
@@ -2420,11 +2876,6 @@ window.__ModuleLoader__.load({
 
       @keyframes dsh-desktop-library-spin {
         to { transform: rotate(360deg); }
-      }
-
-      @keyframes dsh-desktop-sidebar-search-settle {
-        from { transform: translate(14px, -42px); }
-        to { transform: translate(0, 0); }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -2443,11 +2894,21 @@ window.__ModuleLoader__.load({
         [data-dsh-desktop-sidebar-region] [class*="_listArea"] > * {
           transition: none;
         }
-        [data-dsh-desktop-shell][data-sidebar-collapsed]
-          [data-dsh-desktop-sidebar-region]
-          [class*="_rail"]
-          > [class*="_search"] {
-          animation: none !important;
+        [data-dsh-desktop-sidebar-region]
+          [class*="_root"]:not([class*="_rail"])
+          > [class*="_sectionHeader"]:first-child,
+        [data-dsh-desktop-sidebar-region]
+          [class*="_root"]:not([class*="_rail"])
+          > [class*="_sectionHeader"]:first-child
+          > [class*="_searchSlot"]
+          > [class*="_search"],
+        [data-dsh-desktop-sidebar-region]
+          [data-dsh-desktop-sidebar-search],
+        [data-dsh-desktop-sidebar-region]
+          [data-dsh-desktop-sidebar-search]::after,
+        [data-dsh-desktop-sidebar-region]
+          [class*="_searchInput"] {
+          transition: none !important;
         }
         [data-chat-flow-kind] { animation: none; }
         svg[data-state="ongoing"][data-lucide-animated-icon="loader-circle"] {
@@ -2480,6 +2941,13 @@ window.__ModuleLoader__.load({
         "circle, ellipse, g, line, path, polygon, polyline, rect",
       );
       for (const element of elements) {
+        /* Decorations are appended inside the React-owned SVG. Exclude that
+           generated subtree so a later React geometry change (for example,
+           Send arrow -> Stop square) can be detected from the source icon. */
+        if (
+          element.dataset?.lucideLibraryPaint !== undefined ||
+          element.closest?.("[data-lucide-library-paint]") !== null
+        ) continue;
         const row = [element.localName];
         for (const attribute of iconGeometryAttributes) {
           if (element.hasAttribute(attribute)) {
@@ -3110,28 +3578,67 @@ window.__ModuleLoader__.load({
       icon.dataset.lucideAnimatedIcon = slug;
     }
 
+    function clearIconDecoration(icon, original) {
+      original.libraryIcon.remove();
+      if (original.animatedIcon === undefined) delete icon.dataset.lucideAnimatedIcon;
+      else icon.dataset.lucideAnimatedIcon = original.animatedIcon;
+    }
+
     function decorateIcons(root, decorations) {
+      const candidates = [];
       for (const icon of decorations.keys()) {
         if (!icon.isConnected) decorations.delete(icon);
+        else candidates.push(icon);
       }
-      const candidates = [];
       if (typeof SVGElement !== "undefined" && root instanceof SVGElement) candidates.push(root);
       if (root === document || root instanceof HTMLElement) {
         candidates.push(...root.querySelectorAll(
           "svg:not([data-lucide-animated-icon]):not([data-lucide-library-paint])",
         ));
       }
-      for (const source of candidates) {
+      for (const source of new Set(candidates)) {
         const slug = dshIconGeometryMap.get(iconGeometryHash(source));
-        if (slug === undefined) continue;
+        let decoration = decorations.get(source);
+        if (
+          decoration !== undefined &&
+          decoration.libraryIcon.parentElement !== source
+        ) {
+          clearIconDecoration(source, decoration);
+          decorations.delete(source);
+          decoration = undefined;
+        }
+
+        /* The Composer's stop state is already the exact filled rounded
+           square used by the product. Keep that native paint instead of
+           translating the same geometry to the generic Ban icon. */
+        const nativeComposerStop =
+          slug === "ban" &&
+          source.parentElement instanceof HTMLElement &&
+          source.parentElement.dataset.dshComposerPrimary !== undefined;
+        if (slug === undefined || nativeComposerStop) {
+          if (decoration !== undefined) {
+            clearIconDecoration(source, decoration);
+            decorations.delete(source);
+          }
+          continue;
+        }
+
+        if (decoration?.slug === slug) continue;
         const libraryIcon = createLibraryIcon(slug);
         if (libraryIcon === null) continue;
-        if (!decorations.has(source)) {
+        if (decoration === undefined) {
           source.append(libraryIcon);
-          decorations.set(source, {
+          decoration = {
             animatedIcon: source.dataset.lucideAnimatedIcon,
             libraryIcon,
-          });
+            slug,
+          };
+          decorations.set(source, decoration);
+        } else {
+          decoration.libraryIcon.remove();
+          source.append(libraryIcon);
+          decoration.libraryIcon = libraryIcon;
+          decoration.slug = slug;
         }
         source.dataset.lucideAnimatedIcon = slug;
       }
@@ -3139,9 +3646,7 @@ window.__ModuleLoader__.load({
 
     function clearIconDecorations(decorations) {
       for (const [icon, original] of decorations) {
-        original.libraryIcon.remove();
-        if (original.animatedIcon === undefined) delete icon.dataset.lucideAnimatedIcon;
-        else icon.dataset.lucideAnimatedIcon = original.animatedIcon;
+        clearIconDecoration(icon, original);
       }
       decorations.clear();
     }
@@ -3152,6 +3657,14 @@ window.__ModuleLoader__.load({
       if (/mac/i.test(platform) || /mac os x/i.test(userAgent)) return "macos";
       if (/win/i.test(platform) || /windows/i.test(userAgent)) return "windows";
       return "other";
+    }
+
+    function isNativeMacOSHost(platform) {
+      return (
+        platform === "macos" &&
+        typeof window.desktop?.restart === "function" &&
+        typeof window.desktop?.setThemeSource === "function"
+      );
     }
 
     const progressEventSchema = Object.freeze({
@@ -3897,17 +4410,20 @@ window.__ModuleLoader__.load({
       const action = row.querySelector("[data-dsh-steer-action]");
       if (!(action instanceof HTMLElement)) return;
 
+      const isChinese = progressLanguage() === "zh";
+      const inputCopy = isChinese ? "请输入调整要求" : "What should change?";
+
       const editor = document.createElement("div");
       editor.dataset.dshSteerEditor = "";
       const input = document.createElement("textarea");
       input.dataset.dshSteerInput = "";
-      input.setAttribute("placeholder", "What should change?");
+      input.setAttribute("placeholder", inputCopy);
       input.setAttribute("rows", "1");
-      input.setAttribute("aria-label", "What should change?");
+      input.setAttribute("aria-label", inputCopy);
       const submit = document.createElement("button");
       submit.type = "button";
       submit.dataset.dshSteerSubmit = "";
-      submit.textContent = "Steer";
+      submit.textContent = isChinese ? "重新思考" : "Steer";
       submit.disabled = true;
       editor.append(input, submit);
       action.append(editor);
@@ -4024,6 +4540,9 @@ window.__ModuleLoader__.load({
 
     function syncSteerActions(ctx, state) {
       applyStoredSteerCuts(ctx, state);
+      const triggerCopy = progressLanguage() === "zh"
+        ? "从此处重新思考"
+        : "Steer from here";
       for (const flow of document.querySelectorAll("[data-chat-flow]")) {
         if (!(flow instanceof HTMLElement)) continue;
         const rows = flowRows(flow);
@@ -4047,13 +4566,17 @@ window.__ModuleLoader__.load({
             existing?.remove();
             continue;
           }
-          if (existing instanceof HTMLElement) continue;
+          if (existing instanceof HTMLElement) {
+            const trigger = existing.querySelector("[data-dsh-steer-trigger]");
+            if (trigger instanceof HTMLElement) trigger.textContent = triggerCopy;
+            continue;
+          }
           const action = document.createElement("div");
           action.dataset.dshSteerAction = "";
           const trigger = document.createElement("button");
           trigger.type = "button";
           trigger.dataset.dshSteerTrigger = "";
-          trigger.textContent = "Steer from here";
+          trigger.textContent = triggerCopy;
           action.append(trigger);
           row.append(action);
         }
@@ -4198,11 +4721,6 @@ window.__ModuleLoader__.load({
     let composerLayoutObservedSeat;
     let composerLayoutObservedScrollport;
     let composerLayoutLastGeometry = "";
-    let composerHeroCardRect;
-    let composerHeroRoot;
-    let composerEntryAnimationFrame;
-    let composerEntryTimeout;
-    let composerEntrySeat;
 
     function clearTodoOverlay(panel) {
       if (!(panel instanceof HTMLElement)) return;
@@ -4245,110 +4763,13 @@ window.__ModuleLoader__.load({
       );
     }
 
-    function captureHeroComposerLayout() {
-      const root = document.querySelector('[data-phase="hero"]');
-      const card = root?.querySelector("[data-composer-card]");
-      if (!(card instanceof HTMLElement)) return;
-      const rect = card.getBoundingClientRect();
-      const geometry = [rect.left, rect.top, rect.width, rect.height];
-      if (!geometry.every(Number.isFinite) || rect.width <= 0 || rect.height <= 0) return;
-      composerHeroCardRect = {
-        left: rect.left,
-        top: rect.top,
-      };
-      composerHeroRoot = root;
-    }
-
-    function resetComposerEntryStyles(seat) {
-      if (!(seat instanceof HTMLElement)) return;
-      seat.style.removeProperty("--dsh-desktop-composer-enter-x");
-      seat.style.removeProperty("--dsh-desktop-composer-enter-y");
-      delete seat.dataset.dshComposerEntering;
-    }
-
-    function clearComposerEntryAnimation() {
-      if (composerEntryAnimationFrame !== undefined) {
-        window.cancelAnimationFrame(composerEntryAnimationFrame);
-        composerEntryAnimationFrame = undefined;
-      }
-      if (composerEntryTimeout !== undefined) {
-        window.clearTimeout?.(composerEntryTimeout);
-        composerEntryTimeout = undefined;
-      }
-      const seat = composerEntrySeat;
-      composerEntrySeat = undefined;
-      if (!(seat instanceof HTMLElement)) return;
-      seat.removeEventListener("transitionend", finishComposerEntryAnimation);
-      seat.removeEventListener("transitioncancel", finishComposerEntryAnimation);
-      resetComposerEntryStyles(seat);
-    }
-
-    function finishComposerEntryAnimation(event) {
-      if (
-        event !== undefined &&
-        (event.target !== composerEntrySeat || event.propertyName !== "translate")
-      ) {
-        return;
-      }
-      const seat = composerEntrySeat;
-      clearComposerEntryAnimation();
-      if (seat?.isConnected) markScrollButton();
-    }
-
-    function animateFixedComposerFromHero(seat) {
-      if (composerHeroCardRect === undefined || composerEntrySeat === seat) return;
-      const heroRect = composerHeroCardRect;
-      const heroRoot = composerHeroRoot;
-      composerHeroCardRect = undefined;
-      composerHeroRoot = undefined;
-      if (seat.closest('[data-phase="active"]') !== heroRoot) return;
-      const card = seat.querySelector("[data-composer-card]");
-      if (!(card instanceof HTMLElement)) return;
-
-      const activeRect = card.getBoundingClientRect();
-      const deltaX = heroRect.left - activeRect.left;
-      const deltaY = heroRect.top - activeRect.top;
-      if (!Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
-      if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) return;
-      if (
-        typeof window.matchMedia === "function" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
-        return;
-      }
-
-      clearComposerEntryAnimation();
-      composerEntrySeat = seat;
-      seat.style.setProperty("--dsh-desktop-composer-enter-x", `${deltaX}px`);
-      seat.style.setProperty("--dsh-desktop-composer-enter-y", `${deltaY}px`);
-      seat.addEventListener("transitionend", finishComposerEntryAnimation);
-      seat.addEventListener("transitioncancel", finishComposerEntryAnimation);
-
-      /* Commit the inverse offset without a transition. The next frame arms
-         the transition and removes that offset, which is the FLIP "play". */
-      seat.getBoundingClientRect();
-      composerEntryAnimationFrame = window.requestAnimationFrame(() => {
-        composerEntryAnimationFrame = undefined;
-        if (composerEntrySeat !== seat || !seat.isConnected) {
-          clearComposerEntryAnimation();
-          return;
-        }
-        seat.dataset.dshComposerEntering = "";
-        seat.style.setProperty("--dsh-desktop-composer-enter-x", "0px");
-        seat.style.setProperty("--dsh-desktop-composer-enter-y", "0px");
-        composerEntryTimeout = window.setTimeout?.(finishComposerEntryAnimation, 500);
-      });
-    }
-
     function clearFixedComposerLayout() {
-      clearComposerEntryAnimation();
       document.querySelectorAll("[data-dsh-todo-overlay]").forEach(clearTodoOverlay);
       document.querySelectorAll("[data-dsh-composer-fixed]").forEach((seat) => {
         if (!(seat instanceof HTMLElement)) return;
         seat.style.removeProperty("--dsh-desktop-composer-bottom");
         seat.style.removeProperty("--dsh-desktop-composer-left");
         seat.style.removeProperty("--dsh-desktop-composer-seat-width");
-        resetComposerEntryStyles(seat);
         delete seat.dataset.dshComposerFixed;
       });
       document.querySelectorAll("[data-dsh-composer-fixed-host]").forEach((scrollport) => {
@@ -4361,7 +4782,6 @@ window.__ModuleLoader__.load({
 
     function syncFixedComposerLayout() {
       composerLayoutAnimationFrame = undefined;
-      captureHeroComposerLayout();
       const seat = document.querySelector(
         '[data-phase="active"] > [data-conversation-scroll] > [data-composer-seat]',
       );
@@ -4384,7 +4804,6 @@ window.__ModuleLoader__.load({
         marked.style.removeProperty("--dsh-desktop-composer-bottom");
         marked.style.removeProperty("--dsh-desktop-composer-left");
         marked.style.removeProperty("--dsh-desktop-composer-seat-width");
-        resetComposerEntryStyles(marked);
         delete marked.dataset.dshComposerFixed;
       });
       document.querySelectorAll("[data-dsh-composer-fixed-host]").forEach((marked) => {
@@ -4396,9 +4815,6 @@ window.__ModuleLoader__.load({
       const layoutTargetChanged =
         composerLayoutObservedSeat !== seat ||
         composerLayoutObservedScrollport !== scrollport;
-      if (layoutTargetChanged && composerEntrySeat !== seat) {
-        clearComposerEntryAnimation();
-      }
       if (layoutTargetChanged) composerLayoutLastGeometry = "";
       if (layoutTargetChanged && typeof ResizeObserver === "function") {
         composerLayoutResizeObserver?.disconnect();
@@ -4437,7 +4853,6 @@ window.__ModuleLoader__.load({
         if (wasAtBottom) scrollport.scrollTop = scrollport.scrollHeight;
       }
       positionTodoOverlay(todoPanel, card, seat);
-      animateFixedComposerFromHero(seat);
       markScrollButton();
     }
 
@@ -4519,8 +4934,6 @@ window.__ModuleLoader__.load({
       composerLayoutResizeObserver = undefined;
       composerLayoutObservedSeat = undefined;
       composerLayoutObservedScrollport = undefined;
-      composerHeroCardRect = undefined;
-      composerHeroRoot = undefined;
       clearFixedComposerLayout();
       document.querySelectorAll("[data-dsh-scroll-button]").forEach((button) => {
         if (!(button instanceof HTMLElement)) return;
@@ -4537,9 +4950,14 @@ window.__ModuleLoader__.load({
 
       input.dataset.dshComposerInput = "";
       const textarea = input.querySelector("textarea");
-      if (textarea instanceof HTMLElement && textarea.dataset.dshComposerOriginalPlaceholder === undefined) {
-        textarea.dataset.dshComposerOriginalPlaceholder = textarea.getAttribute("placeholder") ?? "";
-        textarea.setAttribute("placeholder", "Do anything");
+      if (textarea instanceof HTMLElement) {
+        if (textarea.dataset.dshComposerOriginalPlaceholder === undefined) {
+          textarea.dataset.dshComposerOriginalPlaceholder =
+            textarea.getAttribute("placeholder") ?? "";
+        }
+        if (textarea.getAttribute("placeholder") !== "Do anything") {
+          textarea.setAttribute("placeholder", "Do anything");
+        }
       }
       for (const child of card.children) {
         if (child !== input && child !== input.nextElementSibling && child instanceof HTMLElement) {
@@ -4571,13 +4989,9 @@ window.__ModuleLoader__.load({
           (item) => item.getAttribute("role") !== "tooltip",
         );
         if (toolItems[0]) toolItems[0].dataset.dshComposerCommand = "";
-        if (toolItems[1]) {
-          toolItems[1].dataset.dshComposerModes = "";
-          const permissionTrigger = toolItems[1].querySelector("button");
-          if (permissionTrigger instanceof HTMLElement) {
-            permissionTrigger.dataset.dshComposerMenuTrigger = "permission";
-          }
-        }
+		if (toolItems[1]) {
+			toolItems[1].dataset.dshComposerModes = "";
+		}
         for (const item of toolItems.slice(2)) item.dataset.dshComposerExtra = "";
       }
       if (trailing instanceof HTMLElement) {
@@ -4606,10 +5020,10 @@ window.__ModuleLoader__.load({
     const commandMenuIconSlugs = Object.freeze({
       compact: "shrink",
       export: "download",
-      feedback: "message-square-plus",
-      goal: "circle-gauge",
-      permission: "shield-check",
-      plan: "file-pen-line",
+		feedback: "message-square-plus",
+		goal: "circle-gauge",
+		permission: "shield-check",
+		plan: "file-pen-line",
       model: "brain",
     });
 
@@ -4735,6 +5149,131 @@ window.__ModuleLoader__.load({
       });
     }
 
+    const deepSeekOnboardingCopy = {
+      title: "Add your DeepSeek API key to get started",
+      description: "Configure the official DeepSeek provider to start building.",
+      fieldLabel: "DeepSeek API key",
+      link: "Get API key ↗",
+      linkHref: "https://platform.deepseek.com/api_keys",
+      placeholder: "Enter your DeepSeek API key",
+      later: "Later",
+      save: "Save",
+    };
+
+    function rememberText(element, dataKey) {
+      if (element.dataset[dataKey] === undefined) {
+        element.dataset[dataKey] = element.textContent ?? "";
+      }
+    }
+
+    function syncDeepSeekOnboarding() {
+      document.querySelectorAll('[role="dialog"][aria-modal="true"]').forEach((dialog) => {
+        if (!(dialog instanceof HTMLElement)) return;
+        const title = Array.from(dialog.querySelectorAll("h2")).find((candidate) =>
+          candidate.textContent === "Add an API key to get started" ||
+          candidate.textContent === deepSeekOnboardingCopy.title
+        );
+        if (!(title instanceof HTMLElement)) return;
+
+        dialog.dataset.dshDeepseekOnboarding = "";
+        rememberText(title, "dshOnboardingOriginalTitle");
+        title.textContent = deepSeekOnboardingCopy.title;
+        const body = title.nextElementSibling;
+        if (body instanceof HTMLElement) body.dataset.dshOnboardingBody = "";
+
+        const description = Array.from(dialog.querySelectorAll("p")).find(
+          (candidate) =>
+            candidate.textContent === deepSeekOnboardingCopy.description ||
+            candidate.dataset.dshOnboardingDescription !== undefined,
+        );
+        if (description instanceof HTMLElement) {
+          description.dataset.dshOnboardingDescription = "";
+          const editor = description.nextElementSibling;
+          if (editor instanceof HTMLElement) editor.dataset.dshOnboardingEditor = "";
+        }
+
+        const input = dialog.querySelector('input[type="password"]');
+        if (!(input instanceof HTMLElement)) return;
+        if (input.dataset.dshOnboardingOriginalPlaceholder === undefined) {
+          input.dataset.dshOnboardingOriginalPlaceholder = input.getAttribute("placeholder") ?? "";
+        }
+        if (input.dataset.dshOnboardingOriginalAriaLabel === undefined) {
+          input.dataset.dshOnboardingOriginalAriaLabel = input.getAttribute("aria-label") ?? "";
+        }
+        input.setAttribute("placeholder", deepSeekOnboardingCopy.placeholder);
+        input.setAttribute("aria-label", deepSeekOnboardingCopy.fieldLabel);
+
+        const field = input.parentElement;
+        const fieldLabel = field?.querySelector('[class*="_fieldLabel"]');
+        if (fieldLabel instanceof HTMLElement) {
+          rememberText(fieldLabel, "dshOnboardingOriginalFieldLabel");
+          fieldLabel.dataset.dshOnboardingFieldLabel = "";
+          let link = fieldLabel.querySelector("[data-dsh-onboarding-api-link]");
+          if (!(link instanceof HTMLElement)) {
+            fieldLabel.textContent = deepSeekOnboardingCopy.fieldLabel;
+            link = document.createElement("a");
+            link.dataset.dshOnboardingApiLink = "";
+            fieldLabel.append(link);
+          }
+          link.setAttribute("href", deepSeekOnboardingCopy.linkHref);
+          link.setAttribute("target", "_blank");
+          link.setAttribute("rel", "noreferrer");
+          link.textContent = deepSeekOnboardingCopy.link;
+        }
+
+        dialog.querySelectorAll("button").forEach((button) => {
+          if (!(button instanceof HTMLElement)) return;
+          const text = button.textContent;
+          if (text === "Configure later" || text === deepSeekOnboardingCopy.later) {
+            rememberText(button, "dshOnboardingOriginalButtonText");
+            button.textContent = deepSeekOnboardingCopy.later;
+          } else if (text === "Save and continue" || text === deepSeekOnboardingCopy.save) {
+            rememberText(button, "dshOnboardingOriginalButtonText");
+            button.textContent = deepSeekOnboardingCopy.save;
+          }
+        });
+      });
+    }
+
+    function clearDeepSeekOnboarding() {
+      document.querySelectorAll("[data-dsh-deepseek-onboarding]").forEach((dialog) => {
+        if (!(dialog instanceof HTMLElement)) return;
+        dialog.querySelectorAll("[data-dsh-onboarding-original-title]").forEach((title) => {
+          title.textContent = title.dataset.dshOnboardingOriginalTitle ?? "";
+          delete title.dataset.dshOnboardingOriginalTitle;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-description]").forEach((description) => {
+          delete description.dataset.dshOnboardingDescription;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-body]").forEach((body) => {
+          delete body.dataset.dshOnboardingBody;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-editor]").forEach((editor) => {
+          delete editor.dataset.dshOnboardingEditor;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-original-placeholder]").forEach((input) => {
+          input.setAttribute(
+            "placeholder",
+            input.dataset.dshOnboardingOriginalPlaceholder ?? "",
+          );
+          input.setAttribute("aria-label", input.dataset.dshOnboardingOriginalAriaLabel ?? "");
+          delete input.dataset.dshOnboardingOriginalPlaceholder;
+          delete input.dataset.dshOnboardingOriginalAriaLabel;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-field-label]").forEach((fieldLabel) => {
+          fieldLabel.querySelector("[data-dsh-onboarding-api-link]")?.remove();
+          fieldLabel.textContent = fieldLabel.dataset.dshOnboardingOriginalFieldLabel ?? "";
+          delete fieldLabel.dataset.dshOnboardingOriginalFieldLabel;
+          delete fieldLabel.dataset.dshOnboardingFieldLabel;
+        });
+        dialog.querySelectorAll("[data-dsh-onboarding-original-button-text]").forEach((button) => {
+          button.textContent = button.dataset.dshOnboardingOriginalButtonText ?? "";
+          delete button.dataset.dshOnboardingOriginalButtonText;
+        });
+        delete dialog.dataset.dshDeepseekOnboarding;
+      });
+    }
+
     function findSidebarRoot(sidebarColumn) {
       if (!(sidebarColumn instanceof HTMLElement)) return null;
       const candidates = [sidebarColumn, ...sidebarColumn.querySelectorAll("div")];
@@ -4751,6 +5290,15 @@ window.__ModuleLoader__.load({
         return candidate;
       }
       return null;
+    }
+
+    function sidebarSearchLabel(searchButton) {
+      const ariaLabel = searchButton.getAttribute("aria-label")?.trim() ?? "";
+      if (ariaLabel.startsWith("搜索")) return { label: ariaLabel, prefix: "搜索" };
+      if (ariaLabel.toLocaleLowerCase().startsWith("search")) {
+        return { label: ariaLabel, prefix: "Search" };
+      }
+      return { label: ariaLabel, prefix: ariaLabel };
     }
 
     function markDesktopShell() {
@@ -4782,6 +5330,13 @@ window.__ModuleLoader__.load({
       }
       if (region instanceof HTMLElement) {
         region.dataset.dshDesktopSidebarRegion = "";
+        const searchButton = region.querySelector('button[class*="_searchButton"]');
+        if (searchButton instanceof HTMLElement) {
+          const searchLabel = sidebarSearchLabel(searchButton);
+          searchButton.dataset.dshDesktopSidebarSearch = "";
+          searchButton.dataset.dshDesktopSidebarSearchLabel = searchLabel.label;
+          searchButton.dataset.dshDesktopSidebarSearchPrefix = searchLabel.prefix;
+        }
       }
       if (foot instanceof HTMLElement) foot.dataset.dshDesktopSidebarFoot = "";
       return true;
@@ -4795,16 +5350,21 @@ window.__ModuleLoader__.load({
       ctx,
       steerState,
     ) {
+      /* Composer semantics must be marked before icon decoration so the
+         primary Stop square can retain its native filled geometry. */
+      markComposers();
       decorateIcons(document, decorations);
       syncLibraryAffordances(injectedDecorations);
       syncFeedbackDialogs(feedbackDialogs, pendingFeedbackRequests);
-      markComposers();
       markCommandMenus();
       markGeneratingProgress();
       syncSteerActions(ctx, steerState);
       syncHeroHeadlineCopy();
+      syncDeepSeekOnboarding();
       markHeroWorkspaceRows();
-      if (markDesktopShell()) markPendingSidebarSessions();
+      if (markDesktopShell()) {
+        markPendingSidebarSessions();
+      }
       syncFixedComposerLayout();
       markScrollButton();
     }
@@ -4842,6 +5402,9 @@ window.__ModuleLoader__.load({
         "data-dsh-desktop-sidebar-logo",
         "data-dsh-desktop-sidebar-new",
         "data-dsh-desktop-sidebar-region",
+        "data-dsh-desktop-sidebar-search",
+        "data-dsh-desktop-sidebar-search-label",
+        "data-dsh-desktop-sidebar-search-prefix",
         "data-dsh-pending-session",
         "data-dsh-desktop-sidebar-foot",
         "data-dsh-desktop-center",
@@ -4854,7 +5417,1909 @@ window.__ModuleLoader__.load({
       }
     }
 
-    const inject = ["theme", "sessions"];
+    const ATOM_LAYOUT_VERSION = 2;
+    const ATOM_DRAG_TYPE = "application/x-dsh-session";
+    const ATOM_PANE_MIN_WIDTH = 320;
+    const ATOM_PANE_MIN_HEIGHT = 240;
+    const ATOM_DIVIDER_SIZE = 8;
+    const atomDropDirections = ["top", "right", "bottom", "left"];
+
+    function atomHasSessionDrag(event) {
+      return Array.from(event.dataTransfer?.types ?? []).includes(ATOM_DRAG_TYPE);
+    }
+
+    function atomDropDirectionAt(bounds, point, previousDirection, hysteresisPixels = 8) {
+      const width = Math.max(1, Number(bounds?.width) || 0);
+      const height = Math.max(1, Number(bounds?.height) || 0);
+      const left = Number(bounds?.left) || 0;
+      const top = Number(bounds?.top) || 0;
+      const x = Math.min(1, Math.max(0, ((Number(point?.x) || 0) - left) / width));
+      const y = Math.min(1, Math.max(0, ((Number(point?.y) || 0) - top) / height));
+      const distances = { top: y, right: 1 - x, bottom: 1 - y, left: x };
+      const direction = atomDropDirections.reduce((best, candidate) => (
+        distances[candidate] < distances[best] ? candidate : best
+      ));
+      if (atomDropDirections.includes(previousDirection)) {
+        const hysteresis = Math.max(0, Number(hysteresisPixels) || 0) / Math.min(width, height);
+        if (distances[previousDirection] <= distances[direction] + hysteresis) return previousDirection;
+      }
+      return direction;
+    }
+
+    function atomMinimumSize(node) {
+      if (node.type === "pane") {
+        return { width: ATOM_PANE_MIN_WIDTH, height: ATOM_PANE_MIN_HEIGHT };
+      }
+      const first = atomMinimumSize(node.first);
+      const second = atomMinimumSize(node.second);
+      return node.direction === "horizontal"
+        ? {
+            width: first.width + ATOM_DIVIDER_SIZE + second.width,
+            height: Math.max(first.height, second.height),
+            first,
+            second,
+          }
+        : {
+            width: Math.max(first.width, second.width),
+            height: first.height + ATOM_DIVIDER_SIZE + second.height,
+            first,
+            second,
+          };
+    }
+
+    function atomApplyMinimumSize(element, minimum) {
+      element.style.minWidth = `${minimum.width}px`;
+      element.style.minHeight = `${minimum.height}px`;
+    }
+
+    function atomUuid(prefix) {
+      return `${prefix}:${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`;
+    }
+
+    function atomPane(sessionId, title) {
+      return { type: "pane", id: atomUuid("pane"), sessionId, title: title || sessionId };
+    }
+
+    function atomSessions(root, result = []) {
+      if (!root) return result;
+      if (root.type === "pane") result.push(root.sessionId);
+      else {
+        atomSessions(root.first, result);
+        atomSessions(root.second, result);
+      }
+      return result;
+    }
+
+    function atomDisposePaneRecordsOutside(paneRecords, root) {
+      const retainedPaneIds = new Set();
+      const collect = (node) => {
+        if (!node) return;
+        if (node.type === "pane") retainedPaneIds.add(node.id);
+        else {
+          collect(node.first);
+          collect(node.second);
+        }
+      };
+      collect(root);
+      for (const [paneId, record] of paneRecords) {
+        if (retainedPaneIds.has(paneId)) continue;
+        record.dispose?.();
+        paneRecords.delete(paneId);
+      }
+    }
+
+    function atomFirstPane(root) {
+      if (!root) return null;
+      return root.type === "pane" ? root : atomFirstPane(root.first) ?? atomFirstPane(root.second);
+    }
+
+    function atomRemove(root, paneId) {
+      if (!root) return { root: null };
+      if (root.type === "pane") return root.id === paneId ? { root: null, pane: root } : { root };
+      const first = atomRemove(root.first, paneId);
+      if (first.pane) return { root: first.root ? { ...root, first: first.root } : root.second, pane: first.pane };
+      const second = atomRemove(root.second, paneId);
+      if (second.pane) return { root: second.root ? { ...root, second: second.root } : root.first, pane: second.pane };
+      return { root };
+    }
+
+    function atomPruneSessions(root, validSessionIds) {
+      if (!root) return null;
+      if (root.type === "pane") return validSessionIds.has(root.sessionId) ? root : null;
+      const first = atomPruneSessions(root.first, validSessionIds);
+      const second = atomPruneSessions(root.second, validSessionIds);
+      if (!first) return second;
+      if (!second) return first;
+      return { ...root, first, second };
+    }
+
+    function atomInsert(root, targetId, incoming, zone) {
+      if (!atomDropDirections.includes(zone)) throw new TypeError("invalid drop direction");
+      if (!root) return incoming;
+      if (root.type === "pane") {
+        if (root.id !== targetId) return root;
+        const direction = zone === "left" || zone === "right" ? "horizontal" : "vertical";
+        const before = zone === "left" || zone === "top";
+        return { type: "split", id: atomUuid("split"), direction, ratio: 0.5, first: before ? incoming : root, second: before ? root : incoming };
+      }
+      return { ...root, first: atomInsert(root.first, targetId, incoming, zone), second: atomInsert(root.second, targetId, incoming, zone) };
+    }
+
+    function atomReplace(root, targetId, incoming) {
+      if (!root) return incoming;
+      if (root.type === "pane") return root.id === targetId ? incoming : root;
+      return { ...root, first: atomReplace(root.first, targetId, incoming), second: atomReplace(root.second, targetId, incoming) };
+    }
+
+    function atomStyle(targetDocument = document) {
+      const existing = targetDocument.querySelector("style[data-dsh-atom-style]");
+      if (existing) return existing;
+      const style = targetDocument.createElement("style");
+      style.dataset.dshAtomStyle = "";
+      style.textContent = `
+        html[data-dsh-atom-frame-root] [data-dsh-desktop-sidebar-column],
+        html[data-dsh-atom-frame-root] [data-dsh-desktop-details] { display: none !important; }
+        html[data-dsh-atom-frame-root] [data-dsh-desktop-shell] { grid-template-columns: 0 minmax(0, 1fr) 0 !important; padding: 0 !important; }
+        html[data-dsh-atom-frame-root] [data-dsh-desktop-center] { grid-column: 2 !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; outline: 0 !important; box-shadow: none !important; }
+        html[data-dsh-atom-embedded] [data-dsh-desktop-shell]::before { pointer-events: none !important; app-region: no-drag !important; -webkit-app-region: no-drag !important; }
+        [data-dsh-atom-drag-handle] { cursor: grab; user-select: none; app-region: no-drag; -webkit-app-region: no-drag; }
+        [data-dsh-atom-drag-handle]:active { cursor: grabbing; }
+        [data-dsh-atom-drag-handle] button:disabled { pointer-events: none; }
+        [data-dsh-atom-window-header] { box-sizing: border-box; padding-left: 88px !important; }
+        html[data-dsh-atom-hide-traffic-light-header-context]
+          [data-dsh-session-header] [class*="_titleCluster"] { display: none !important; }
+        html[data-dsh-atom-hide-traffic-light-header-context]
+          [data-dsh-session-header] .dsh-session-header-menu { margin-left: auto; }
+        [data-dsh-desktop-center]:has(> [data-dsh-atom-host]) { position: relative !important; background: transparent !important; }
+        [data-dsh-atom-host] { position: absolute; inset: 0; z-index: 30; display: flex; min-width: ${ATOM_PANE_MIN_WIDTH}px; min-height: ${ATOM_PANE_MIN_HEIGHT}px; overflow: auto; background: transparent; visibility: visible; pointer-events: auto; }
+        [data-dsh-atom-parking] { position: absolute !important; width: 0 !important; height: 0 !important; overflow: hidden !important; visibility: hidden !important; pointer-events: none !important; }
+        [data-dsh-atom-native-hidden] > :not([data-dsh-atom-host]) { visibility: hidden !important; pointer-events: none !important; }
+        [data-dsh-atom-node] { min-width: ${ATOM_PANE_MIN_WIDTH}px; min-height: ${ATOM_PANE_MIN_HEIGHT}px; }
+        [data-dsh-atom-split] { display: flex; flex: 1 0 auto; }
+        [data-dsh-atom-split="vertical"] { flex-direction: column; }
+        [data-dsh-atom-branch] { display: flex; min-width: 0; min-height: 0; overflow: hidden; }
+        [data-dsh-atom-divider] { position: relative; flex: 0 0 ${ATOM_DIVIDER_SIZE}px; z-index: 5; background: transparent; touch-action: none; user-select: none; }
+        [data-dsh-atom-divider]::after { content: ""; position: absolute; }
+        [data-dsh-atom-split="horizontal"] > [data-dsh-atom-divider] { cursor: col-resize; }
+        [data-dsh-atom-split="horizontal"] > [data-dsh-atom-divider]::after { inset: 0 -4px; cursor: col-resize; }
+        [data-dsh-atom-split="vertical"] > [data-dsh-atom-divider] { cursor: row-resize; }
+        [data-dsh-atom-split="vertical"] > [data-dsh-atom-divider]::after { inset: -4px 0; cursor: row-resize; }
+        /* The iframe is promoted to its own compositor layer. overflow:hidden
+           alone can intermittently miss the trailing corners of middle panes,
+           especially when a split resolves to a fractional device pixel. Keep
+           the normal overflow guard, but give Chromium an explicit rounded
+           compositor clip for every pane as well. */
+        [data-dsh-atom-pane] { position: relative; display: grid; grid-template-rows: minmax(0, 1fr); flex: 1; overflow: hidden; border-radius: var(--dsh-desktop-panel-radius); clip-path: inset(0 round var(--dsh-desktop-panel-radius)); isolation: isolate; background: var(--dsw-alias-bg-base); border: 1px solid transparent; outline: 0; box-shadow: none; }
+        [data-dsh-atom-pane]:has(> [data-dsh-atom-frame][data-dsh-atom-frame-state="loading"])::after { content: ""; position: absolute; z-index: 2; top: 50%; left: 50%; width: 18px; height: 18px; margin: -9px; border: 2px solid var(--dsw-alias-border-l2); border-top-color: var(--dsw-alias-label-tertiary); border-radius: 50%; corner-shape: round; animation: dsh-atom-loading-spin .8s linear infinite; pointer-events: none; }
+        @keyframes dsh-atom-loading-spin { to { transform: rotate(360deg); } }
+        [data-dsh-atom-header] { display: none; }
+        [data-dsh-atom-header]:active { cursor: grabbing; }
+        [data-dsh-atom-title] { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; pointer-events: none; }
+        [data-dsh-atom-dismiss] { box-sizing: border-box; z-index: 2; flex: none; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--dsw-alias-label-secondary); cursor: pointer; background: transparent; border: 0; border-radius: 8px; app-region: no-drag; -webkit-app-region: no-drag; }
+        [data-dsh-atom-dismiss]:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
+        [data-dsh-atom-dismiss]:focus-visible { outline: 2px solid var(--dsw-alias-state-business-primary); outline-offset: 1px; }
+        [data-dsh-atom-dismiss] svg { display: block; width: 20px; height: 20px; }
+        [data-dsh-atom-frame] { width: 100%; height: 100%; border: 0; outline: 0; box-shadow: none; background: var(--dsw-alias-bg-base); }
+        [data-dsh-atom-frame][data-dsh-atom-frame-state="loading"] { visibility: hidden; }
+        [data-dsh-atom-native-drag-handle] { position: absolute; z-index: 10; cursor: grab; user-select: none; touch-action: none; background: transparent; app-region: no-drag; -webkit-app-region: no-drag; }
+        [data-dsh-atom-native-drag-handle]:active { cursor: grabbing; }
+        [data-dsh-atom-zones] { position: absolute; inset: 0; z-index: 20; display: none; pointer-events: none; }
+        html[data-dsh-atom-dragging] [data-dsh-atom-zones] { display: block; pointer-events: auto; }
+        html[data-dsh-atom-dragging] [data-dsh-atom-drag-source] > [data-dsh-atom-zones] { top: var(--dsh-atom-drag-source-safe-top, 48px); }
+        [data-dsh-atom-preview] { position: absolute; display: none; margin: 3px; border: 1px solid rgba(56, 150, 255, .72); border-radius: 8px; background: rgba(39, 140, 255, .42); pointer-events: none; }
+        [data-dsh-atom-preview][data-dsh-atom-zone="top"] { display: block; inset: 0 0 50%; }
+        [data-dsh-atom-preview][data-dsh-atom-zone="right"] { display: block; inset: 0 0 0 50%; }
+        [data-dsh-atom-preview][data-dsh-atom-zone="bottom"] { display: block; inset: 50% 0 0; }
+        [data-dsh-atom-preview][data-dsh-atom-zone="left"] { display: block; inset: 0 50% 0 0; }
+        [data-dsh-desktop-sidebar-region] [class*="_sessionRow"] { cursor: grab; }
+      `;
+      targetDocument.head.append(style);
+      return style;
+    }
+
+    function atomSessionEntries(ctx) {
+      const snapshot = ctx.sessions?.list?.getSnapshot?.();
+      const items = Array.isArray(snapshot?.items)
+        ? snapshot.items
+        : Array.isArray(snapshot?.ids)
+          ? snapshot.ids.map((id) => snapshot.byId?.[id]).filter(Boolean)
+          : Object.values(snapshot?.byId ?? {});
+      return items.map((item) => ({
+        id: item.id ?? item.sessionId,
+        title: item.displayTitle ?? item.title ?? item.id ?? item.sessionId,
+        cwd: item.cwd,
+        blank: item.blank === true,
+        durable: item.blank !== true,
+      })).filter((item) => item.id);
+    }
+
+    function atomSessionIsListed(snapshot, sessionId) {
+      if (!snapshot || !sessionId) return false;
+      if (snapshot.byId?.[sessionId]) return true;
+      return snapshot.items?.some((item) => (item.id ?? item.sessionId) === sessionId) === true;
+    }
+
+    function atomOpenPaneSession(ctx, sessionId) {
+      const list = ctx.sessions?.list;
+      if (!list?.getSnapshot || !ctx.sessions?.open) return () => {};
+      let disposed = false;
+      let requested = false;
+      let retryTimer;
+      let unsubscribe;
+      const cleanup = () => {
+        if (disposed) return;
+        disposed = true;
+        if (retryTimer !== undefined) clearTimeout(retryTimer);
+        unsubscribe?.();
+      };
+      const attempt = () => {
+        if (disposed) return;
+        const snapshot = list.getSnapshot();
+        if (!atomSessionIsListed(snapshot, sessionId)) return;
+        if (!requested) {
+          requested = true;
+          ctx.sessions.open(sessionId);
+        }
+        if (list.getSnapshot()?.current === sessionId) {
+          const session = ctx.sessions?.binding?.(sessionId)?.session;
+          if (session?.getSnapshot?.().openState === "open") {
+            document.documentElement.dataset.dshAtomSessionReady = sessionId;
+            cleanup();
+            return;
+          }
+        }
+        if (retryTimer !== undefined) clearTimeout(retryTimer);
+        retryTimer = setTimeout(() => {
+          requested = false;
+          attempt();
+        }, 250);
+      };
+      unsubscribe = list.subscribe?.(attempt);
+      attempt();
+      return cleanup;
+    }
+
+    function atomWorkspaceFor(ctx, sessionId) {
+      const items = ctx.workspaces?.list?.getSnapshot?.()?.items ?? [];
+      return items.find((item) => item.sessionIds?.includes(sessionId));
+    }
+
+    const sidebarPlacements = ["left", "right", "top"];
+
+    function sidebarPlacementAt(clientX, clientY, width, height, previous) {
+      const candidates = [];
+      if (clientX <= width * 0.2) candidates.push(["left", clientX / Math.max(1, width * 0.2)]);
+      if (clientX >= width * 0.8) candidates.push(["right", (width - clientX) / Math.max(1, width * 0.2)]);
+      if (clientY <= height * 0.25) candidates.push(["top", clientY / Math.max(1, height * 0.25)]);
+      if (candidates.length === 0) return undefined;
+      const bestScore = Math.min(...candidates.map(([, score]) => score));
+      const tied = candidates.filter(([, score]) => Math.abs(score - bestScore) < 0.04);
+      if (tied.some(([placement]) => placement === previous)) return previous;
+      return tied[0][0];
+    }
+
+    function installSidebarPlacement(ctx) {
+      if (!globalThis.location?.href) return () => {};
+      const query = new URL(location.href).searchParams;
+      if (query.get("dshAtomPane") === "1") return () => {};
+      const windowId = query.get("dshAtomWindow") ?? "main";
+      const storageKey = `dsh-sidebar-placement:v1:${windowId}`;
+      let placement;
+      try {
+        const stored = localStorage.getItem(storageKey);
+        placement = sidebarPlacements.includes(stored) ? stored : "left";
+      } catch {
+        placement = "left";
+      }
+      let disposed = false;
+      let applyAttempts = 0;
+      const applyPlacement = (next, persist = false) => {
+        if (!sidebarPlacements.includes(next)) return;
+        placement = next;
+        document.documentElement.dataset.dshSidebarPlacement = next;
+        try {
+          ctx.layout?.setSidebarPlacement?.(next);
+          applyAttempts = 0;
+        } catch {
+          if (!disposed && applyAttempts++ < 20) requestAnimationFrame(() => applyPlacement(next, false));
+        }
+        if (persist) {
+          try { localStorage.setItem(storageKey, next); } catch {}
+        }
+      };
+      applyPlacement(placement);
+
+      const style = document.createElement("style");
+      style.dataset.dshSidebarPlacementStyle = "";
+      style.textContent = `
+        [data-dsh-sidebar-placement-preview] {
+          position: fixed; z-index: 2147482500; display: none; pointer-events: none;
+          box-sizing: border-box;
+          margin: 8px; border: 1px solid rgba(56,150,255,.78); border-radius: 12px;
+          background: rgba(39,140,255,.34); box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset;
+        }
+        html[data-dsh-sidebar-placement-dragging] [data-dsh-sidebar-placement-preview][data-active] { display: block; }
+        [data-dsh-sidebar-placement-preview="left"] {
+          inset: 0 auto 0 0; width: var(--dsh-sidebar-placement-preview-width, 280px);
+        }
+        [data-dsh-sidebar-placement-preview="right"] {
+          inset: 0 0 0 auto; width: var(--dsh-sidebar-placement-preview-width, 280px);
+        }
+        [data-dsh-sidebar-placement-preview="top"] { inset: 0 0 auto; height: 52px; }
+        [data-dsh-sidebar-placement-handle], [data-dsh-sidebar-placement-handle] * {
+          -webkit-app-region: no-drag; app-region: no-drag;
+        }
+        [data-sidebar-placement="right"][data-dsh-desktop-shell] { padding: 0 0 0 var(--dsh-desktop-shell-gap); }
+        [data-sidebar-placement="right"][data-sidebar-collapsed][data-dsh-desktop-shell] { padding-left: 0; }
+        [data-sidebar-placement="right"] [data-dsh-desktop-sidebar-column] { border-left: 0 !important; }
+        /* Moving the navigation must not reinterpret its internal spacing.
+           Reuse the exact left-placement insets for the logo, rows and footer;
+           only the workbench column and its outer shell gap move to the right. */
+        [data-sidebar-placement="top"][data-dsh-desktop-shell] {
+          --dsh-top-nav-group-fill: color-mix(
+            in srgb,
+            var(--dsw-alias-interactive-bg-hover) 55%,
+            transparent
+          );
+          padding: 0 8px;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-column] { position: relative; z-index: 3; }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar] {
+          --dsh-sidebar-inline-padding: 0 !important;
+          box-sizing: border-box;
+          display: grid !important;
+          grid-template-columns: 166px auto minmax(0, 1fr) 36px !important;
+          align-items: center !important;
+          gap: 6px !important;
+          width: 100% !important;
+          height: 52px !important;
+          padding: 0 8px !important;
+          overflow: visible !important;
+          -webkit-app-region: drag; app-region: drag;
+        }
+        html[data-dsh-desktop-host="macos"]
+          [data-sidebar-placement="top"] [data-dsh-desktop-sidebar] {
+          padding-left: 80px !important;
+        }
+        /* In side placements this pseudo-element is the empty native-window
+           drag strip. In top placement the sidebar column spans the entire
+           navigation row, so the same overlay would intercept every control. */
+        html[data-dsh-desktop-host="macos"]
+          [data-sidebar-placement="top"][data-dsh-desktop-shell]:has([data-dsh-atom-host])
+          > [data-dsh-desktop-sidebar-column]::before {
+          content: none;
+          pointer-events: none;
+          -webkit-app-region: no-drag;
+          app-region: no-drag;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar] button,
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar] input,
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar] [role="treeitem"] {
+          position: relative; -webkit-app-region: no-drag; app-region: no-drag;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-logo] {
+          box-sizing: border-box;
+          justify-content: flex-start !important;
+          width: 166px !important;
+          height: 44px !important;
+          margin: 0 !important;
+          padding: 0 4px !important;
+          overflow: hidden !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-new] {
+          box-sizing: border-box;
+          align-self: center !important;
+          justify-content: center !important;
+          width: 34px !important;
+          height: 34px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          border: 0 !important;
+          border-radius: 10px !important;
+          gap: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-new] > span {
+          position: absolute !important;
+          width: 1px !important;
+          height: 1px !important;
+          max-width: 1px !important;
+          margin: -1px !important;
+          padding: 0 !important;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+          overflow: hidden;
+          transform: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-new] svg {
+          display: block;
+          width: 20px !important;
+          height: 20px !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region] {
+          position: relative;
+          min-width: 0;
+          width: 100%;
+          height: 52px;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          min-width: 0;
+          width: 100%;
+          height: 52px;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child {
+          box-sizing: border-box;
+          display: flex !important;
+          flex: 0 0 64px;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          gap: 4px !important;
+          width: 64px !important;
+          height: 52px !important;
+          margin: 0 !important;
+          padding: 0 4px !important;
+          overflow: visible !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_sectionLabel"] {
+          display: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_searchSlot"] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex: 0 0 28px;
+          align-self: center !important;
+          align-items: center;
+          justify-content: center;
+          width: 28px !important;
+          max-width: 28px !important;
+          height: 28px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_searchSlot"] > [class*="_search"] {
+          box-sizing: border-box;
+          width: 28px !important;
+          height: 28px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          border: 0 !important;
+          border-radius: 50% !important;
+          box-shadow: none !important;
+          overflow: hidden;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [data-dsh-desktop-sidebar-search] {
+          justify-content: center !important;
+          width: 28px !important;
+          height: 28px !important;
+          padding: 0 !important;
+          gap: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [data-dsh-desktop-sidebar-search]::after {
+          display: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_headerActions"] {
+          display: flex !important;
+          flex: 0 0 28px;
+          align-items: center;
+          justify-content: center;
+          gap: 0 !important;
+          width: 28px;
+          max-width: 28px !important;
+          height: 28px;
+          overflow: visible !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_headerActions"] > button,
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [data-dsh-desktop-sidebar-search] {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          vertical-align: middle;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_headerActions"] svg,
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [data-dsh-desktop-sidebar-search] svg {
+          display: block;
+          width: 20px !important;
+          height: 20px !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_searchSlotExpanded"] {
+          position: absolute;
+          z-index: 80;
+          top: 8px;
+          left: 4px;
+          display: flex !important;
+          width: min(420px, calc(100vw - 32px)) !important;
+          max-width: 420px !important;
+          height: 36px !important;
+          padding: 0 !important;
+          border-radius: 12px;
+          background: var(--dsw-alias-bg-layer-2);
+          box-shadow: var(--dsw-shadow-lv2);
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_sectionHeader"]:first-child
+          > [class*="_searchSlotExpanded"] > [class*="_searchExpanded"] {
+          width: 100% !important;
+          height: 36px !important;
+          margin: 0 !important;
+          padding-left: 4px !important;
+          border: 1px solid var(--dsw-alias-border-l2) !important;
+          border-radius: 12px !important;
+          background: var(--dsw-alias-bg-layer-2) !important;
+          box-shadow: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] > [class*="_listArea"] {
+          box-sizing: border-box;
+          flex: 1 1 auto;
+          min-width: 0;
+          width: auto;
+          height: 52px;
+          margin: 0 0 0 12px !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+          -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 28px,
+            #000 calc(100% - 28px),
+            transparent 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 28px,
+            #000 calc(100% - 28px),
+            transparent 100%
+          );
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_treeBody"] {
+          display: flex !important;
+          flex-direction: row !important;
+          min-width: 0;
+          width: 100%;
+          height: 52px;
+          min-height: 0;
+          overflow: hidden;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_treeBody"] > [role="tree"] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex: 1 1 auto;
+          align-items: center !important;
+          gap: 2px;
+          min-width: 0;
+          width: 100%;
+          height: 52px;
+          margin: 0 !important;
+          padding: 0 4px !important;
+          white-space: nowrap;
+          overflow-x: auto !important;
+          overflow-y: hidden !important;
+          scrollbar-width: none;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_treeBody"] > [role="tree"]::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_groupSection"] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex: 0 0 auto;
+          align-items: center !important;
+          gap: 2px;
+          height: 44px;
+          margin: 0 2px !important;
+          padding: 0 4px;
+          border-radius: 12px;
+          background: var(--dsh-top-nav-group-fill);
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_groupSection"] > * + *,
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_flatList"] > * + * {
+          margin-top: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_projectRow"] {
+          box-sizing: border-box;
+          flex: 0 0 auto;
+          width: auto !important;
+          min-width: 96px;
+          max-width: 180px;
+          height: 34px !important;
+          margin: 0 !important;
+          padding: 0 8px !important;
+          border: 0 !important;
+          border-radius: 10px !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_sessionRow"] {
+          box-sizing: border-box;
+          flex: 0 0 clamp(112px, 14vw, 220px);
+          width: clamp(112px, 14vw, 220px) !important;
+          min-width: 112px;
+          max-width: 220px;
+          height: 34px !important;
+          margin: 0 !important;
+          padding: 0 10px !important;
+          border: 0 !important;
+          border-radius: 10px !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_sessionRow"] > [class*="_title"] {
+          min-width: 0;
+          margin: 0 6px 0 4px !important;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_time"] {
+          display: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_tasksSectionHeader"] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex: 0 0 auto;
+          align-items: center !important;
+          min-width: 72px;
+          height: 34px !important;
+          margin: 0 !important;
+          padding: 0 8px !important;
+          border-radius: 10px;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region]
+          [data-orientation="horizontal"] [class*="_sessionOverflowButton"] {
+          flex: 0 0 auto;
+          width: auto !important;
+          min-width: 112px;
+          height: 34px;
+          margin: 0 !important;
+          padding: 0 10px !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-foot] {
+          box-sizing: border-box;
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          justify-self: end;
+          width: 36px;
+          height: 52px;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-foot] > div:first-child {
+          display: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-foot] > div {
+          display: flex !important;
+          align-items: center;
+          justify-content: center !important;
+          width: auto !important;
+          min-width: 0;
+          height: 100%;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-foot]
+          button[aria-haspopup="dialog"] {
+          box-sizing: border-box;
+          justify-content: center !important;
+          width: 34px !important;
+          height: 34px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          gap: 0 !important;
+          border: 0 !important;
+          border-radius: 10px !important;
+          font-size: 0 !important;
+          line-height: 0 !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-foot]
+          button[aria-haspopup="dialog"] span {
+          position: absolute !important;
+          width: 1px !important;
+          height: 1px !important;
+          max-width: 1px !important;
+          margin: -1px !important;
+          padding: 0 !important;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+          overflow: hidden;
+          transform: none !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region] [class*="_sessionRow"][data-dsh-atom-open] {
+          background: var(--dsw-alias-interactive-bg-hover) !important;
+        }
+        [data-sidebar-placement="top"] [data-dsh-desktop-sidebar-region] [class*="_sessionRow"][data-dsh-atom-focused] {
+          background: var(--dsw-alias-interactive-bg-hover) !important;
+        }
+      `;
+      document.head.append(style);
+      const previews = sidebarPlacements.map((value) => {
+        const preview = document.createElement("div");
+        preview.dataset.dshSidebarPlacementPreview = value;
+        document.body.append(preview);
+        return preview;
+      });
+      const showPreview = (target) => {
+        for (const preview of previews) preview.toggleAttribute("data-active", preview.dataset.dshSidebarPlacementPreview === target);
+      };
+      const clearPreview = () => {
+        document.documentElement.removeAttribute("data-dsh-sidebar-placement-dragging");
+        showPreview(undefined);
+      };
+      let drag;
+      let suppressClick = false;
+      const cancelDrag = () => {
+        if (!drag) return;
+        drag = undefined;
+        clearPreview();
+      };
+      const onPointerDown = (event) => {
+        if (event.button !== 0 || !(event.target instanceof Element)) return;
+        const handle = event.target.closest("[data-dsh-sidebar-placement-handle]");
+        if (!(handle instanceof HTMLElement)) return;
+        const sidebarColumn = document.querySelector("[data-dsh-desktop-sidebar-column]");
+        if (placement !== "top" && sidebarColumn instanceof HTMLElement) {
+          const sidebarWidth = sidebarColumn.getBoundingClientRect().width;
+          if (sidebarWidth > 0) {
+            document.documentElement.style.setProperty("--dsh-sidebar-placement-preview-width", `${sidebarWidth}px`);
+          }
+        }
+        drag = { pointerId: event.pointerId, handle, x: event.clientX, y: event.clientY, active: false, target: undefined };
+        handle.setPointerCapture?.(event.pointerId);
+      };
+      const onPointerMove = (event) => {
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        if (!drag.active && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 6) return;
+        drag.active = true;
+        suppressClick = true;
+        document.documentElement.dataset.dshSidebarPlacementDragging = "";
+        drag.target = sidebarPlacementAt(event.clientX, event.clientY, innerWidth, innerHeight, drag.target);
+        showPreview(drag.target);
+        event.preventDefault();
+      };
+      const onPointerUp = (event) => {
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        const completed = drag.active;
+        const target = drag.target;
+        drag.handle.releasePointerCapture?.(event.pointerId);
+        drag = undefined;
+        clearPreview();
+        if (completed && target) applyPlacement(target, true);
+      };
+      const onPointerCancel = () => cancelDrag();
+      const onKeyDown = (event) => { if (event.key === "Escape") cancelDrag(); };
+      const onClick = (event) => {
+        if (!(event.target instanceof Element) || !event.target.closest("[data-dsh-sidebar-placement-handle]")) return;
+        const isBrand = event.target.closest('button[aria-label="Move navigation"],button[aria-label="拖动导航栏"]');
+        if (suppressClick || isBrand) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        suppressClick = false;
+      };
+      document.addEventListener("pointerdown", onPointerDown, true);
+      document.addEventListener("pointermove", onPointerMove, true);
+      document.addEventListener("pointerup", onPointerUp, true);
+      document.addEventListener("pointercancel", onPointerCancel, true);
+      document.addEventListener("keydown", onKeyDown, true);
+      document.addEventListener("click", onClick, true);
+      window.addEventListener("blur", cancelDrag);
+      return () => {
+        disposed = true;
+        cancelDrag();
+        document.removeEventListener("pointerdown", onPointerDown, true);
+        document.removeEventListener("pointermove", onPointerMove, true);
+        document.removeEventListener("pointerup", onPointerUp, true);
+        document.removeEventListener("pointercancel", onPointerCancel, true);
+        document.removeEventListener("keydown", onKeyDown, true);
+        document.removeEventListener("click", onClick, true);
+        window.removeEventListener("blur", cancelDrag);
+        previews.forEach((preview) => preview.remove());
+        style.remove();
+        document.documentElement.style.removeProperty("--dsh-sidebar-placement-preview-width");
+        delete document.documentElement.dataset.dshSidebarPlacement;
+      };
+    }
+
+    function installAtomWorkbench(ctx) {
+      if (!globalThis.location?.href) return () => {};
+      const query = new URL(location.href).searchParams;
+      const paneSession = query.get("dshAtomSession");
+      const style = atomStyle();
+      if (query.get("dshAtomPane") === "1") {
+        document.documentElement.dataset.dshAtomFrameRoot = "";
+        const needsWindowControlsInset = window.self === window.top;
+        const markWindowHeader = () => {
+          if (!needsWindowControlsInset) return;
+          const scroll = document.querySelector("[data-conversation-scroll]");
+          const header = scroll?.parentElement?.querySelector(":scope > header") ?? document.querySelector("header");
+          if (header instanceof HTMLElement) {
+            header.dataset.dshAtomWindowHeader = "";
+            header.style.setProperty("padding-left", "88px", "important");
+          }
+        };
+        const headerObserver = new MutationObserver(markWindowHeader);
+        headerObserver.observe(document.body ?? document.documentElement, { childList: true, subtree: true });
+        markWindowHeader();
+        const stopOpening = paneSession ? atomOpenPaneSession(ctx, paneSession) : () => {};
+        return () => {
+          headerObserver.disconnect();
+          document.querySelectorAll("[data-dsh-atom-window-header]").forEach((header) => {
+            delete header.dataset.dshAtomWindowHeader;
+            header.style.removeProperty("padding-left");
+          });
+          stopOpening();
+          delete document.documentElement.dataset.dshAtomFrameRoot;
+          delete document.documentElement.dataset.dshAtomSessionReady;
+          style.remove();
+        };
+      }
+      if (!window.desktop?.atomContext) {
+        style.remove();
+        return () => {};
+      }
+      const isAtomWindow = query.has("dshAtomWindow");
+      if (isAtomWindow) document.documentElement.dataset.dshAtomFrameRoot = "";
+
+      let disposed = false;
+      let host;
+      let center;
+      let root;
+      let focusedPaneId;
+      let layoutGroups = [];
+      let activeGroupId;
+      let parking;
+      let renderedStructure;
+      let activeAtomDrag;
+      let mounting;
+      let contextReady = false;
+      let sidebarOpenSequence = 0;
+      const paneRecords = new Map();
+      const splitRecords = new Map();
+      let windowContext = { windowId: query.get("dshAtomWindow") ?? "main", role: query.has("dshAtomWindow") ? "atom" : "main" };
+      let workspaceId = query.get("dshAtomWorkspace") ?? undefined;
+      const storageKey = () => `dsh-atom-layout-groups:v${ATOM_LAYOUT_VERSION}:${windowContext.windowId}`;
+      const legacyStorageKey = () => `dsh-atom-layout:v1:${workspaceId ?? "unscoped"}:${windowContext.windowId}`;
+      const openWindowsKey = "dsh-atom-open-sessions:v1";
+
+      const activeGroup = () => layoutGroups.find((group) => group.id === activeGroupId);
+      const syncActiveGroup = () => {
+        const group = activeGroup();
+        if (!group || !root) return;
+        group.root = root;
+        group.focusedPaneId = focusedPaneId;
+        group.workspaceId = workspaceId;
+      };
+
+      const save = () => {
+        if (!root) return;
+        try {
+          syncActiveGroup();
+          localStorage.setItem(storageKey(), JSON.stringify({ version: ATOM_LAYOUT_VERSION, activeGroupId, groups: layoutGroups }));
+          const registry = JSON.parse(localStorage.getItem(openWindowsKey) ?? "{}");
+          registry[windowContext.windowId] = [...new Set(layoutGroups.flatMap((group) => atomSessions(group.root)))];
+          localStorage.setItem(openWindowsKey, JSON.stringify(registry));
+          if (windowContext.role === "atom") {
+            window.desktop.publishAtomEvent("layout-state", { workspaceId, layout: { root, focusedPaneId } });
+          }
+        } catch {}
+      };
+      const restore = (fallbackSession) => {
+        const snapshot = ctx.sessions?.list?.getSnapshot?.();
+        if (snapshot?.phase !== undefined && snapshot.phase !== "ready") return null;
+        const entries = atomSessionEntries(ctx);
+        const restorableEntries = entries.filter((entry) => entry.durable);
+        const validSessionIds = new Set(restorableEntries.map((entry) => entry.id));
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey()) ?? "null");
+          if (saved?.version === ATOM_LAYOUT_VERSION && Array.isArray(saved.groups)) {
+            layoutGroups = saved.groups.flatMap((group) => {
+              const restored = atomPruneSessions(group.root, validSessionIds);
+              return restored ? [{ ...group, root: restored }] : [];
+            });
+            const requested = layoutGroups.find((group) => atomSessions(group.root).includes(fallbackSession));
+            const selected = requested ?? layoutGroups.find((group) => group.id === saved.activeGroupId) ?? layoutGroups[0];
+            if (selected) {
+              activeGroupId = selected.id;
+              focusedPaneId = findPaneById(selected.root, selected.focusedPaneId)?.id
+                ?? findSessionPane(selected.root, fallbackSession)?.id
+                ?? atomFirstPane(selected.root)?.id;
+              workspaceId = selected.workspaceId ?? atomWorkspaceFor(ctx, atomFirstPane(selected.root)?.sessionId)?.workspaceId;
+              return selected.root;
+            }
+          }
+          const legacy = JSON.parse(localStorage.getItem(legacyStorageKey()) ?? "null");
+          if (legacy?.version === 1 && legacy.root) {
+            const restored = atomPruneSessions(legacy.root, validSessionIds);
+            if (restored) {
+              const group = { id: atomUuid("group"), workspaceId, root: restored, focusedPaneId: legacy.focusedPaneId };
+              layoutGroups = [group];
+              activeGroupId = group.id;
+              focusedPaneId = findPaneById(restored, legacy.focusedPaneId)?.id ?? atomFirstPane(restored)?.id;
+              return restored;
+            }
+          }
+        } catch {}
+        const fallback = validSessionIds.has(fallbackSession) ? fallbackSession : restorableEntries[0]?.id;
+        if (!fallback) return null;
+        const initial = atomPane(fallback, restorableEntries.find((item) => item.id === fallback)?.title);
+        const group = { id: atomUuid("group"), workspaceId, root: initial, focusedPaneId: initial.id };
+        layoutGroups = [group];
+        activeGroupId = group.id;
+        focusedPaneId = initial.id;
+        return initial;
+      };
+      const restoreWindowContext = () => {
+        if (windowContext.role !== "atom" || !windowContext.layout?.root) return null;
+        const snapshot = ctx.sessions?.list?.getSnapshot?.();
+        if (snapshot?.phase !== undefined && snapshot.phase !== "ready") return null;
+        const validSessionIds = new Set(
+          atomSessionEntries(ctx).filter((entry) => entry.durable).map((entry) => entry.id),
+        );
+        const restored = atomPruneSessions(windowContext.layout.root, validSessionIds);
+        if (!restored) return null;
+        const group = {
+          id: atomUuid("group"),
+          workspaceId: windowContext.workspaceId ?? workspaceId,
+          root: restored,
+          focusedPaneId: windowContext.layout.focusedPaneId,
+        };
+        layoutGroups = [group];
+        activeGroupId = group.id;
+        workspaceId = group.workspaceId;
+        focusedPaneId = findPaneById(restored, group.focusedPaneId)?.id
+          ?? atomFirstPane(restored)?.id;
+        return restored;
+      };
+
+      const frameUrl = (sessionId) => {
+        const url = new URL(location.href);
+        url.searchParams.delete("dshAtomWindow");
+        url.searchParams.delete("dshAtomWorkspace");
+        url.searchParams.set("dshAtomPane", "1");
+        url.searchParams.set("dshAtomSession", sessionId);
+        return url.href;
+      };
+
+      const clearAtomDropTargets = () => {
+        document.querySelectorAll("[data-dsh-atom-pane]").forEach((pane) => {
+          if (!(pane instanceof HTMLElement)) return;
+          delete pane.dataset.dragTarget;
+          pane.querySelector("[data-dsh-atom-preview]")?.removeAttribute("data-dsh-atom-zone");
+        });
+      };
+      const setAtomDragCapture = (active, broadcast = false, payload) => {
+        if (active && payload) activeAtomDrag = payload;
+        else if (!active) activeAtomDrag = undefined;
+        document.documentElement.toggleAttribute("data-dsh-atom-dragging", active);
+        document.querySelectorAll("[data-dsh-atom-pane]").forEach((pane) => {
+          if (!(pane instanceof HTMLElement)) return;
+          const isLocalSource = active &&
+            activeAtomDrag?.sourceWindowId === windowContext.windowId &&
+            pane.dataset.dshAtomPane === activeAtomDrag?.paneId;
+          pane.toggleAttribute("data-dsh-atom-drag-source", isLocalSource);
+        });
+        if (!active) clearAtomDropTargets();
+        if (broadcast) window.desktop.publishAtomEvent("drag-state", { active, workspaceId, payload: active ? activeAtomDrag : undefined });
+      };
+
+      const syncFocusedPaneState = () => {
+        document.querySelectorAll("[data-dsh-atom-pane]").forEach((pane) => {
+          if (!(pane instanceof HTMLElement)) return;
+          if (pane.dataset.dshAtomPane === focusedPaneId) pane.dataset.focused = "";
+          else delete pane.dataset.focused;
+        });
+      };
+
+      const syncAtomSidebarOpenState = () => {
+        const openSessionIds = new Set(atomSessions(root));
+		const focusedSessionId = paneRecords.get(focusedPaneId)?.node.sessionId;
+        document.querySelectorAll('[data-dsh-desktop-sidebar-region] [class*="_sessionRow"][data-dsh-session-id]').forEach((row) => {
+          if (!(row instanceof HTMLElement)) return;
+          row.toggleAttribute("data-dsh-atom-open", openSessionIds.has(row.dataset.dshSessionId));
+		  row.toggleAttribute("data-dsh-atom-focused", row.dataset.dshSessionId === focusedSessionId);
+        });
+      };
+
+      const syncAtomTrafficLightHeaderContext = () => {
+        const firstPaneId = atomFirstPane(root)?.id;
+        const leadingPaneId = windowContext.role === "main" &&
+          document.documentElement.dataset.dshSidebarPlacement === "right"
+          ? firstPaneId
+          : undefined;
+        for (const record of paneRecords.values()) {
+          const frameRoot = record.frame.contentDocument?.documentElement;
+          if (!frameRoot) continue;
+          const hidden = record.node.id === leadingPaneId;
+          const windowHeader = windowContext.role === "atom" && record.node.id === firstPaneId;
+          const sessionHeader = record.frame.contentDocument?.querySelector("[data-dsh-session-header]");
+          const changed = frameRoot.hasAttribute("data-dsh-atom-hide-traffic-light-header-context") !== hidden;
+          frameRoot.toggleAttribute("data-dsh-atom-hide-traffic-light-header-context", hidden);
+          sessionHeader?.toggleAttribute("data-dsh-atom-window-header", windowHeader);
+          if (changed) record.bindFrameHeaderDrag?.();
+        }
+      };
+      const sidebarPlacementObserver = new MutationObserver(syncAtomTrafficLightHeaderContext);
+      sidebarPlacementObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-dsh-sidebar-placement"],
+      });
+
+      const layoutStructure = (node) => node.type === "pane"
+        ? `pane:${node.id}`
+        : `split:${node.id}:${node.direction}(${layoutStructure(node.first)},${layoutStructure(node.second)})`;
+
+      const movePreservingState = (parent, child) => {
+        if (parent.isConnected && child.isConnected && typeof parent.moveBefore === "function") {
+          parent.moveBefore(child, null);
+        } else {
+          parent.append(child);
+        }
+      };
+
+      const paneRecordForSession = (sessionId) => {
+        for (const record of paneRecords.values()) {
+          if (record.node.sessionId === sessionId) return record;
+        }
+        return undefined;
+      };
+
+      const pointerDropTargetAt = (clientX, clientY) => {
+        let target;
+        for (const record of paneRecords.values()) {
+          if (!record.element.isConnected) continue;
+          // The pane itself remains measurable while pointer capture carries
+          // the drag beyond this window and into a cross-window handoff.
+          const bounds = record.element.getBoundingClientRect();
+          if (clientX < bounds.left || clientX >= bounds.right || clientY < bounds.top || clientY >= bounds.bottom) continue;
+          target = {
+            paneId: record.node.id,
+            direction: atomDropDirectionAt(
+              bounds,
+              { x: clientX, y: clientY },
+              record.preview.dataset.dshAtomZone,
+            ),
+            record,
+          };
+          break;
+        }
+        clearAtomDropTargets();
+        if (target) {
+          target.record.element.dataset.dragTarget = "";
+          target.record.preview.dataset.dshAtomZone = target.direction;
+        }
+        return target;
+      };
+
+      const bindAtomHeaderDrag = (header, getNode, options = {}) => {
+        const pointForEvent = options.pointForEvent ?? ((event) => ({ x: event.clientX, y: event.clientY }));
+        const onPointerDown = (event) => {
+          if (event.button !== 0) return;
+          if (event.target?.closest?.("button:not(:disabled), a, input, select, textarea, [role=button]")) return;
+          options.onPointerDown?.();
+          const pointerId = event.pointerId;
+          const start = pointForEvent(event);
+          let active = false;
+          let payload;
+          let currentTarget;
+          let tracking = true;
+          const move = (next) => {
+            if (!tracking || next.pointerId !== pointerId) return;
+            const point = pointForEvent(next);
+            if (!active && Math.hypot(point.x - start.x, point.y - start.y) < 6) return;
+            next.preventDefault();
+            if (!active) {
+              active = true;
+              const node = getNode();
+              payload = {
+                sessionId: node.sessionId,
+                title: node.title,
+                paneId: node.id,
+                sourceWindowId: windowContext.windowId,
+                transferId: atomUuid("transfer"),
+                workspaceId,
+              };
+              setAtomDragCapture(true, true, payload);
+            }
+            currentTarget = pointerDropTargetAt(point.x, point.y);
+            window.desktop.publishAtomEvent("drag-pointer", {
+              workspaceId,
+              payload,
+              point: { x: window.screenX + point.x, y: window.screenY + point.y },
+            });
+          };
+          const cleanup = () => {
+            if (!tracking) return;
+            tracking = false;
+            header.removeEventListener("pointermove", move);
+            header.removeEventListener("pointerup", up);
+            header.removeEventListener("pointercancel", cancel);
+            if (header.hasPointerCapture?.(pointerId)) header.releasePointerCapture(pointerId);
+            if (active) setAtomDragCapture(false, true);
+          };
+          const up = (next) => {
+            move(next);
+            const target = currentTarget;
+            const dragged = active;
+            cleanup();
+            if (!dragged || !payload) return;
+            if (target) {
+              acceptDrop(payload, target.paneId, target.direction);
+              return;
+            }
+            void window.desktop.detachAtomSession({
+              sessionId: payload.sessionId,
+              title: payload.title,
+              paneId: payload.paneId,
+              sourceWindowId: payload.sourceWindowId,
+              transferId: payload.transferId,
+              workspaceId,
+              canCreateWindow: windowContext.role === "main" || root.type !== "pane",
+              layout: { root: getNode() },
+            }).then((result) => {
+              if (result?.detached || result?.merged) closePane(payload.paneId);
+            }).catch(() => undefined);
+          };
+          const cancel = () => cleanup();
+          header.addEventListener("pointermove", move);
+          header.addEventListener("pointerup", up);
+          header.addEventListener("pointercancel", cancel);
+          header.setPointerCapture(pointerId);
+        };
+        header.addEventListener("pointerdown", onPointerDown);
+        return () => header.removeEventListener("pointerdown", onPointerDown);
+      };
+
+      const renderPane = (node) => {
+          let record = paneRecords.get(node.id);
+          if (record && record.node.sessionId !== node.sessionId) {
+            record.dispose?.();
+            paneRecords.delete(node.id);
+            record = undefined;
+          }
+          if (record) {
+            record.node = node;
+            record.element.toggleAttribute("data-focused", focusedPaneId === node.id);
+            record.title.textContent = node.title || node.sessionId;
+            record.frame.title = node.title || node.sessionId;
+            return record.element;
+          }
+          const element = document.createElement("section");
+          element.dataset.dshAtomNode = "";
+          element.dataset.dshAtomPane = node.id;
+          if (focusedPaneId === node.id) element.dataset.focused = "";
+          const header = document.createElement("div");
+          header.dataset.dshAtomHeader = "";
+          const title = document.createElement("span");
+          title.dataset.dshAtomTitle = "";
+          title.textContent = node.title || node.sessionId;
+          header.append(title);
+          const frame = document.createElement("iframe");
+          frame.dataset.dshAtomFrame = "";
+          frame.dataset.dshAtomFrameState = "loading";
+          frame.src = frameUrl(node.sessionId);
+          frame.title = node.title || node.sessionId;
+          const dragHandle = document.createElement("div");
+          dragHandle.dataset.dshAtomNativeDragHandle = "";
+          dragHandle.hidden = true;
+          dragHandle.setAttribute("aria-hidden", "true");
+          let resolveReady;
+          const ready = new Promise((resolve) => { resolveReady = resolve; });
+          let readyObserver;
+          let headerObserver;
+          let dragHandleResizeObserver;
+          let draggableTitleRegion;
+          let stopHeaderDrag;
+          let revealPending = false;
+          const syncFrameReady = () => {
+            const frameDocument = frame.contentDocument;
+            if (frameDocument?.documentElement?.dataset.dshAtomSessionReady !== node.sessionId) return;
+            if (revealPending || frame.dataset.dshAtomFrameState === "ready") return;
+            revealPending = true;
+            readyObserver?.disconnect();
+            readyObserver = undefined;
+            frame.dataset.dshAtomFrameState = "ready";
+            resolveReady();
+          };
+          const clearFrameHeaderDrag = () => {
+            headerObserver?.disconnect();
+            headerObserver = undefined;
+            if (draggableTitleRegion) delete draggableTitleRegion.dataset.dshAtomDragHandle;
+            draggableTitleRegion = undefined;
+            dragHandle.hidden = true;
+          };
+          const bindFrameHeaderDrag = () => {
+            const frameDocument = frame.contentDocument;
+            const sessionHeader = frameDocument?.querySelector("[data-dsh-session-header]");
+            const menu = sessionHeader?.querySelector(".dsh-session-header-menu");
+            let dismiss = sessionHeader?.querySelector("[data-dsh-atom-dismiss]");
+            const showDismiss = atomSessions(root).length > 1;
+            if (!showDismiss) {
+              dismiss?.remove();
+              dismiss = undefined;
+            } else if (menu && !dismiss) {
+              dismiss = frameDocument.createElement("button");
+              dismiss.type = "button";
+              dismiss.dataset.dshAtomDismiss = "";
+              const closeLabel = frameDocument.documentElement.lang?.toLowerCase().startsWith("zh")
+                ? "关闭此会话窗口"
+                : "Close session pane";
+              dismiss.setAttribute("aria-label", closeLabel);
+              dismiss.title = closeLabel;
+              dismiss.innerHTML = animatedIconMarkup.x;
+              dismiss.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                closePane(record.node.id);
+              });
+              menu.after(dismiss);
+            }
+            const titleRegion = menu?.parentElement ?? sessionHeader?.firstElementChild ?? sessionHeader;
+            // Elements created by the iframe belong to its Window realm, so
+            // they never satisfy the outer document's HTMLElement instanceof
+            // check even though this is a same-origin frame.
+            if (!titleRegion || typeof titleRegion.getBoundingClientRect !== "function") {
+              dragHandle.hidden = true;
+              return;
+            }
+            if (draggableTitleRegion !== titleRegion) {
+              if (draggableTitleRegion) delete draggableTitleRegion.dataset.dshAtomDragHandle;
+              draggableTitleRegion = titleRegion;
+              titleRegion.dataset.dshAtomDragHandle = "";
+            }
+            const paneBounds = element.getBoundingClientRect();
+            const frameBounds = frame.getBoundingClientRect();
+            const regionBounds = titleRegion.getBoundingClientRect();
+            const menuBounds = menu?.getBoundingClientRect();
+            const width = Math.max(0, Math.min(
+              regionBounds.width,
+              Math.max(0, frameBounds.width - regionBounds.left),
+              menuBounds ? menuBounds.left - regionBounds.left : regionBounds.width,
+            ));
+            const left = frameBounds.left - paneBounds.left + regionBounds.left;
+            const top = frameBounds.top - paneBounds.top + regionBounds.top;
+            dragHandle.style.left = `${left}px`;
+            dragHandle.style.top = `${top}px`;
+            dragHandle.style.width = `${width}px`;
+            dragHandle.style.height = `${regionBounds.height}px`;
+            element.style.setProperty(
+              "--dsh-atom-drag-source-safe-top",
+              `${Math.max(0, top + regionBounds.height)}px`,
+            );
+            dragHandle.hidden = width < 8 || regionBounds.height < 8;
+          };
+          const prepareFrame = () => {
+            const frameDocument = frame.contentDocument;
+            if (!frameDocument?.documentElement || !frameDocument.head) return;
+            clearFrameHeaderDrag();
+            frameDocument.documentElement.dataset.dshAtomFrameRoot = "";
+            frameDocument.documentElement.dataset.dshAtomEmbedded = "";
+            atomStyle(frameDocument);
+            syncAtomTrafficLightHeaderContext();
+            readyObserver?.disconnect();
+            readyObserver = new MutationObserver(syncFrameReady);
+            readyObserver.observe(frameDocument.documentElement, {
+              attributes: true,
+              attributeFilter: ["data-dsh-atom-session-ready"],
+            });
+            headerObserver = new MutationObserver(bindFrameHeaderDrag);
+            headerObserver.observe(frameDocument.body ?? frameDocument.documentElement, {
+              childList: true,
+              subtree: true,
+            });
+            bindFrameHeaderDrag();
+            syncFrameReady();
+          };
+          frame.addEventListener("load", prepareFrame);
+          const zones = document.createElement("div");
+          zones.dataset.dshAtomZones = "";
+          const preview = document.createElement("div");
+          preview.dataset.dshAtomPreview = "";
+          zones.append(preview);
+          const dispose = () => {
+            readyObserver?.disconnect();
+            readyObserver = undefined;
+            clearFrameHeaderDrag();
+            dragHandleResizeObserver?.disconnect();
+            dragHandleResizeObserver = undefined;
+            stopHeaderDrag?.();
+            stopHeaderDrag = undefined;
+            frame.removeEventListener("load", prepareFrame);
+            element.remove();
+          };
+          record = { node, element, title, frame, zones, preview, dragHandle, ready, bindFrameHeaderDrag, isReady: () => frame.dataset.dshAtomFrameState === "ready", dispose };
+          paneRecords.set(node.id, record);
+          stopHeaderDrag = bindAtomHeaderDrag(dragHandle, () => record.node, {
+            onPointerDown() {
+              focusedPaneId = record.node.id;
+              syncFocusedPaneState();
+              syncAtomSidebarOpenState();
+            },
+          });
+          dragHandleResizeObserver = new ResizeObserver(bindFrameHeaderDrag);
+          dragHandleResizeObserver.observe(element);
+          element.addEventListener("pointerdown", () => {
+            focusedPaneId = record.node.id;
+            syncFocusedPaneState();
+            syncAtomSidebarOpenState();
+          });
+          const activateDropTarget = (event) => {
+            if (!atomHasSessionDrag(event) && !activeAtomDrag) return;
+            event.preventDefault();
+            if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+            document.querySelectorAll("[data-dsh-atom-pane][data-drag-target]").forEach((pane) => {
+              if (pane === element) return;
+              delete pane.dataset.dragTarget;
+              pane.querySelector("[data-dsh-atom-preview]")?.removeAttribute("data-dsh-atom-zone");
+            });
+            element.dataset.dragTarget = "";
+            preview.dataset.dshAtomZone = atomDropDirectionAt(
+              zones.getBoundingClientRect(),
+              { x: event.clientX, y: event.clientY },
+              preview.dataset.dshAtomZone,
+            );
+          };
+          const leaveDropTarget = (event) => {
+            if (event.relatedTarget && zones.contains(event.relatedTarget)) return;
+            delete element.dataset.dragTarget;
+            delete preview.dataset.dshAtomZone;
+          };
+          zones.addEventListener("dragenter", activateDropTarget);
+          zones.addEventListener("dragover", activateDropTarget);
+          zones.addEventListener("dragleave", leaveDropTarget);
+          zones.addEventListener("drop", (event) => {
+            if (!atomHasSessionDrag(event) && !activeAtomDrag) return;
+            event.preventDefault();
+            const direction = preview.dataset.dshAtomZone ?? atomDropDirectionAt(
+              zones.getBoundingClientRect(),
+              { x: event.clientX, y: event.clientY },
+            );
+            const data = readAtomDrag(event) ?? activeAtomDrag;
+            setAtomDragCapture(false, true);
+            const accepted = data ? acceptDrop(data, record.node.id, direction) : false;
+            if (accepted && data.sourceWindowId !== windowContext.windowId) {
+              window.desktop.publishAtomEvent("pane-transfer-committed", {
+                transferSourceWindowId: data.sourceWindowId,
+                paneId: data.paneId,
+                transferId: data.transferId,
+              });
+            }
+          });
+          element.append(header, frame, dragHandle, zones);
+          return element;
+      };
+
+      const mountNode = (parent, node, minimum = atomMinimumSize(node)) => {
+        if (node.type === "pane") {
+          const pane = renderPane(node);
+          atomApplyMinimumSize(pane, minimum);
+          movePreservingState(parent, pane);
+          return;
+        }
+        const splitElement = document.createElement("div");
+        splitElement.dataset.dshAtomNode = "";
+        splitElement.dataset.dshAtomSplit = node.direction;
+        atomApplyMinimumSize(splitElement, minimum);
+        const first = document.createElement("div");
+        first.dataset.dshAtomBranch = "";
+        first.style.flex = `${node.ratio} 0 0`;
+        atomApplyMinimumSize(first, minimum.first);
+        const divider = document.createElement("div");
+        divider.dataset.dshAtomDivider = "";
+        const second = document.createElement("div");
+        second.dataset.dshAtomBranch = "";
+        second.style.flex = `${1 - node.ratio} 0 0`;
+        atomApplyMinimumSize(second, minimum.second);
+        const record = { node, element: splitElement, first, second };
+        splitRecords.set(node.id, record);
+        divider.addEventListener("pointerdown", (event) => resizeDivider(event, record.node, splitElement));
+        splitElement.append(first, divider, second);
+        parent.append(splitElement);
+        mountNode(first, node.first, minimum.first);
+        mountNode(second, node.second, minimum.second);
+      };
+
+      const syncRenderedNode = (node, minimum = atomMinimumSize(node)) => {
+        if (node.type === "pane") {
+          atomApplyMinimumSize(renderPane(node), minimum);
+          return;
+        }
+        const record = splitRecords.get(node.id);
+        if (!record) return;
+        record.node = node;
+        record.element.dataset.dshAtomSplit = node.direction;
+        atomApplyMinimumSize(record.element, minimum);
+        record.first.style.flex = `${node.ratio} 0 0`;
+        atomApplyMinimumSize(record.first, minimum.first);
+        record.second.style.flex = `${1 - node.ratio} 0 0`;
+        atomApplyMinimumSize(record.second, minimum.second);
+        syncRenderedNode(node.first, minimum.first);
+        syncRenderedNode(node.second, minimum.second);
+      };
+
+      const render = () => {
+        if (!host || !root) return;
+        const visibleRoot = root;
+        const nextStructure = layoutStructure(visibleRoot);
+        if (nextStructure !== renderedStructure) {
+          if (!parking) {
+            parking = document.createElement("div");
+            parking.dataset.dshAtomParking = "";
+            host.append(parking);
+          }
+          for (const record of paneRecords.values()) {
+            if (record.element.isConnected) movePreservingState(parking, record.element);
+          }
+          for (const child of [...host.children]) {
+            if (child !== parking) child.remove();
+          }
+          splitRecords.clear();
+          mountNode(host, visibleRoot);
+          renderedStructure = nextStructure;
+        } else {
+          syncRenderedNode(visibleRoot);
+        }
+        const validPaneIds = new Set();
+        const collectPaneIds = (node) => {
+          if (node.type === "pane") validPaneIds.add(node.id);
+          else { collectPaneIds(node.first); collectPaneIds(node.second); }
+        };
+        collectPaneIds(root);
+        for (const [paneId, record] of paneRecords) {
+          if (validPaneIds.has(paneId)) continue;
+          movePreservingState(parking, record.element);
+        }
+        syncAtomSidebarOpenState();
+        syncAtomTrafficLightHeaderContext();
+        for (const record of paneRecords.values()) record.bindFrameHeaderDrag?.();
+        save();
+      };
+      const attachHost = () => {
+        if (host?.isConnected) {
+          render();
+          return true;
+        }
+        center = document.querySelector("[data-dsh-desktop-center]");
+        if (!(center instanceof HTMLElement)) {
+          markDesktopShell();
+          center = document.querySelector("[data-dsh-desktop-center]");
+        }
+        if (!(center instanceof HTMLElement) || !root) return false;
+        center.dataset.dshAtomNativeHidden = "";
+        host = document.createElement("main");
+        host.dataset.dshAtomHost = "";
+        center.append(host);
+        render();
+        return true;
+      };
+      const closePane = (paneId) => {
+        const result = atomRemove(root, paneId);
+        root = result.root;
+        if (result.pane) {
+          paneRecords.get(result.pane.id)?.dispose?.();
+          paneRecords.delete(result.pane.id);
+        }
+        if (root && !findPaneById(root, focusedPaneId)) focusedPaneId = atomFirstPane(root)?.id;
+        if (!root) {
+          try {
+            const registry = JSON.parse(localStorage.getItem(openWindowsKey) ?? "{}");
+            delete registry[windowContext.windowId];
+            localStorage.setItem(openWindowsKey, JSON.stringify(registry));
+          } catch {}
+          syncAtomSidebarOpenState();
+          if (windowContext.role === "atom") {
+            window.desktop.closeAtomWindow();
+            return;
+          }
+          layoutGroups = layoutGroups.filter((group) => group.id !== activeGroupId);
+          const fallbackGroup = layoutGroups[0];
+          if (fallbackGroup) {
+            activeGroupId = fallbackGroup.id;
+            workspaceId = fallbackGroup.workspaceId;
+            root = fallbackGroup.root;
+            focusedPaneId = fallbackGroup.focusedPaneId ?? atomFirstPane(root)?.id;
+            render();
+            return;
+          }
+          if (host) host.replaceChildren();
+          renderedStructure = undefined;
+        } else render();
+      };
+      const findSessionPane = (node, sessionId) => node && (node.type === "pane" ? (node.sessionId === sessionId ? node : null) : findSessionPane(node.first, sessionId) || findSessionPane(node.second, sessionId));
+      const findPaneById = (node, paneId) => node && (node.type === "pane" ? (node.id === paneId ? node : null) : findPaneById(node.first, paneId) || findPaneById(node.second, paneId));
+      const groupForSession = (sessionId) => layoutGroups.find((group) => findSessionPane(group.root, sessionId));
+      const focusPaneComposer = (paneId) => {
+        const focus = () => {
+          const textarea = paneRecords.get(paneId)?.frame.contentDocument?.querySelector('[data-composer-card] textarea:not(:disabled), [data-composer-seat] textarea:not(:disabled)');
+          if (textarea instanceof HTMLElement) textarea.focus({ preventScroll: true });
+        };
+        requestAnimationFrame(() => requestAnimationFrame(focus));
+      };
+      const activateLayoutGroup = (group, sessionId, requestSequence = sidebarOpenSequence) => {
+        if (requestSequence !== sidebarOpenSequence) return;
+        syncActiveGroup();
+        atomDisposePaneRecordsOutside(paneRecords, group.root);
+        activeGroupId = group.id;
+        workspaceId = group.workspaceId;
+        root = group.root;
+        focusedPaneId = findSessionPane(root, sessionId)?.id ?? group.focusedPaneId ?? atomFirstPane(root)?.id;
+        render();
+        const focusedRecord = paneRecords.get(focusedPaneId);
+        if (focusedRecord?.isReady()) focusPaneComposer(focusedPaneId);
+        else focusedRecord?.ready.then(() => {
+          if (activeGroupId === group.id && focusedPaneId === focusedRecord.node.id) focusPaneComposer(focusedPaneId);
+        });
+      };
+      const createSoloLayoutGroup = (entry, requestSequence = sidebarOpenSequence) => {
+        syncActiveGroup();
+        const node = atomPane(entry.id, entry.title);
+        const group = {
+          id: atomUuid("group"),
+          workspaceId: atomWorkspaceFor(ctx, entry.id)?.workspaceId,
+          root: node,
+          focusedPaneId: node.id,
+        };
+        layoutGroups.push(group);
+        activateLayoutGroup(group, entry.id, requestSequence);
+      };
+      const warmSessionPane = (sessionId, title) => {
+        const cached = paneRecordForSession(sessionId);
+        if (cached) return cached;
+        const node = atomPane(sessionId, title);
+        const element = renderPane(node);
+        if (!parking) {
+          parking = document.createElement("div");
+          parking.dataset.dshAtomParking = "";
+          host?.append(parking);
+        }
+        if (parking) movePreservingState(parking, element);
+        return paneRecords.get(node.id);
+      };
+      const acceptDrop = (data, targetId, zone) => {
+        if (workspaceId && data.workspaceId && workspaceId !== data.workspaceId) return false;
+        const targetWorkspaceId = atomWorkspaceFor(ctx, data.sessionId)?.workspaceId;
+        if (workspaceId && targetWorkspaceId && workspaceId !== targetWorkspaceId) return false;
+        const existing = findSessionPane(root, data.sessionId);
+        if (existing?.id === targetId) {
+          focusedPaneId = existing.id;
+          render();
+          return true;
+        }
+        const warmed = existing ? paneRecords.get(existing.id) : warmSessionPane(data.sessionId, data.title);
+        if (!warmed) return false;
+        let committed = false;
+        const commit = () => {
+          const previousGroup = groupForSession(data.sessionId);
+          if (previousGroup && previousGroup.id !== activeGroupId) {
+            previousGroup.root = atomRemove(previousGroup.root, findSessionPane(previousGroup.root, data.sessionId)?.id).root;
+            if (!previousGroup.root) layoutGroups = layoutGroups.filter((group) => group.id !== previousGroup.id);
+          }
+          const currentExisting = findSessionPane(root, data.sessionId);
+          if (currentExisting) root = atomRemove(root, currentExisting.id).root;
+          const currentTarget = findPaneById(root, targetId)?.id ?? focusedPaneId ?? atomFirstPane(root)?.id;
+          if (!currentTarget) return;
+          root = atomInsert(root, currentTarget, warmed.node, zone);
+          focusedPaneId = warmed.node.id;
+          try { localStorage.setItem(`dsh-atom-transfer:${data.transferId}`, windowContext.windowId); } catch {}
+          render();
+          committed = true;
+        };
+        commit();
+        return committed;
+      };
+      const writeAtomDrag = (event, data, source = event.currentTarget) => {
+        const payload = { ...data, transferId: atomUuid("transfer"), workspaceId };
+        event.dataTransfer?.setData(ATOM_DRAG_TYPE, JSON.stringify(payload));
+        event.dataTransfer?.setData("text/plain", JSON.stringify(payload));
+        if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+        if (source instanceof HTMLElement) source.dataset.atomTransferId = payload.transferId;
+        warmSessionPane(data.sessionId, data.title);
+        setAtomDragCapture(true, true, payload);
+      };
+      const readAtomDrag = (event) => {
+        for (const type of [ATOM_DRAG_TYPE, "text/plain"]) {
+          try {
+            const value = event.dataTransfer?.getData(type);
+            if (value) return JSON.parse(value);
+          } catch {}
+        }
+        return null;
+      };
+      const resizeDivider = (event, node, element) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const divider = event.currentTarget;
+        const first = element.children[0];
+        const second = element.children[2];
+        if (!(divider instanceof HTMLElement) || !(first instanceof HTMLElement) || !(second instanceof HTMLElement)) return;
+        const bounds = element.getBoundingClientRect();
+        const initialRatio = node.ratio;
+        let nextRatio = initialRatio;
+        let active = true;
+        const move = (next) => {
+          if (!active || next.pointerId !== event.pointerId) return;
+          next.preventDefault();
+          const raw = node.direction === "horizontal" ? (next.clientX - bounds.left) / bounds.width : (next.clientY - bounds.top) / bounds.height;
+          nextRatio = Math.min(0.8, Math.max(0.2, raw));
+          first.style.flex = `${nextRatio} 0 0`;
+          second.style.flex = `${1 - nextRatio} 0 0`;
+        };
+        const cleanup = (commit) => {
+          if (!active) return;
+          active = false;
+          divider.removeEventListener("pointermove", move);
+          divider.removeEventListener("pointerup", up);
+          divider.removeEventListener("pointercancel", cancel);
+          divider.removeEventListener("lostpointercapture", cancel);
+          if (divider.hasPointerCapture?.(event.pointerId)) divider.releasePointerCapture(event.pointerId);
+          if (commit) {
+            node.ratio = nextRatio;
+            save();
+          } else {
+            first.style.flex = `${initialRatio} 0 0`;
+            second.style.flex = `${1 - initialRatio} 0 0`;
+          }
+        };
+        const up = (next) => {
+          move(next);
+          cleanup(true);
+        };
+        const cancel = () => cleanup(false);
+        divider.addEventListener("pointermove", move);
+        divider.addEventListener("pointerup", up);
+        divider.addEventListener("pointercancel", cancel);
+        divider.addEventListener("lostpointercapture", cancel);
+        divider.setPointerCapture(event.pointerId);
+      };
+
+      const openSidebarSession = (sessionId) => {
+        const requestSequence = ++sidebarOpenSequence;
+        const entry = atomSessionEntries(ctx).find((item) => item.id === sessionId);
+        if (!entry) return false;
+        if (!root) {
+          const node = atomPane(entry.id, entry.title);
+          const group = { id: atomUuid("group"), workspaceId: atomWorkspaceFor(ctx, entry.id)?.workspaceId, root: node, focusedPaneId: node.id };
+          layoutGroups.push(group);
+          activeGroupId = group.id;
+          workspaceId = group.workspaceId;
+          root = node;
+          focusedPaneId = node.id;
+          attachHost();
+          return true;
+        }
+        if (entry.blank) {
+          const blankGroup = groupForSession(sessionId);
+          if (blankGroup) activateLayoutGroup(blankGroup, sessionId, requestSequence);
+          else createSoloLayoutGroup(entry, requestSequence);
+          return true;
+        }
+        const registry = (() => { try { return JSON.parse(localStorage.getItem(openWindowsKey) ?? "{}"); } catch { return {}; } })();
+        const owner = Object.entries(registry).find(([, ids]) => Array.isArray(ids) && ids.includes(sessionId));
+        if (owner && owner[0] !== windowContext.windowId) {
+          window.desktop.focusAtomWindow(owner[0]);
+          window.desktop.publishAtomEvent("focus-session", { windowId: owner[0], sessionId });
+          return true;
+        }
+        const owningGroup = groupForSession(sessionId);
+        if (owningGroup && owningGroup.id !== activeGroupId) {
+          activateLayoutGroup(owningGroup, sessionId, requestSequence);
+          return true;
+        }
+        const existing = findSessionPane(root, sessionId);
+        if (!existing && !owningGroup) {
+          createSoloLayoutGroup(entry, requestSequence);
+          return true;
+        }
+        const warmed = existing ? paneRecords.get(existing.id) : warmSessionPane(sessionId, entry.title);
+        if (!warmed) return false;
+        const commit = () => {
+          if (requestSequence !== sidebarOpenSequence) return;
+          const nowExisting = findSessionPane(root, sessionId);
+          if (nowExisting) {
+            focusedPaneId = nowExisting.id;
+            focusPaneComposer(focusedPaneId);
+          }
+          else {
+            const target = focusedPaneId || (root.type === "pane" ? root.id : null);
+            root = target ? atomReplace(root, target, warmed.node) : warmed.node;
+            focusedPaneId = warmed.node.id;
+          }
+          render();
+        };
+        commit();
+        return true;
+      };
+
+      const sidebarSessionRow = (target) => target instanceof Element
+        ? target.closest('[data-dsh-desktop-sidebar-region] [class*="_sessionRow"][role="treeitem"]')
+        : null;
+      const followSidebarClick = (event) => {
+        const row = sidebarSessionRow(event.target);
+        if (!(row instanceof HTMLElement)) return;
+        const clickedSessionId = row.dataset.dshSessionId;
+        queueMicrotask(() => {
+          const sessionId = clickedSessionId ?? ctx.sessions?.list?.getSnapshot?.().current;
+          if (sessionId) openSidebarSession(sessionId);
+        });
+      };
+      const enrichSidebarDrag = (event) => {
+        const row = sidebarSessionRow(event.target);
+        if (!(row instanceof HTMLElement)) return;
+        const sessionId = event.dataTransfer?.getData("text/plain");
+        const entry = atomSessionEntries(ctx).find((item) => item.id === sessionId);
+        if (!entry) return;
+        if (!root) {
+          const current = ctx.sessions?.list?.getSnapshot?.().current;
+          const currentEntry = atomSessionEntries(ctx).find((item) => item.id === current && item.durable);
+          const initial = currentEntry ?? entry;
+          root = atomPane(initial.id, initial.title);
+          focusedPaneId = root.id;
+          attachHost();
+        }
+        writeAtomDrag(event, { sessionId: entry.id, title: entry.title, sourceWindowId: windowContext.windowId }, row);
+      };
+      const finishDocumentDrag = () => setAtomDragCapture(false, true);
+      document.addEventListener("click", followSidebarClick);
+      document.addEventListener("dragstart", enrichSidebarDrag);
+      document.addEventListener("dragend", finishDocumentDrag);
+      const mount = () => {
+        if (disposed || host?.isConnected) return Promise.resolve(host?.isConnected === true);
+        if (mounting) return mounting;
+        mounting = (async () => {
+          document.documentElement.dataset.dshAtomMountState = "waiting";
+          try {
+            if (!contextReady) {
+              windowContext = await window.desktop.atomContext() ?? windowContext;
+              contextReady = true;
+            }
+            if (disposed || host?.isConnected) return host?.isConnected === true;
+            const current = paneSession ?? ctx.sessions?.list?.getSnapshot?.().current;
+            workspaceId = windowContext.workspaceId ?? workspaceId ?? atomWorkspaceFor(ctx, current)?.workspaceId;
+            root = root ?? restoreWindowContext() ?? restore(current);
+            if (!root || !attachHost()) return false;
+            document.documentElement.dataset.dshAtomMountState = "ready";
+            return true;
+          } catch {
+            contextReady = false;
+            document.documentElement.dataset.dshAtomMountState = "retry";
+            return false;
+          } finally {
+            mounting = undefined;
+          }
+        })();
+        return mounting;
+      };
+      let nativeCurrent = ctx.sessions?.list?.getSnapshot?.().current;
+      const stopNativeSelection = ctx.sessions?.list?.subscribe?.(() => {
+        const current = ctx.sessions.list.getSnapshot().current;
+        syncAtomSidebarOpenState();
+        if (!host) void mount();
+        if (!current || current === nativeCurrent) return;
+        if (openSidebarSession(current)) nativeCurrent = current;
+      });
+      let companionSession;
+      const openCompanionSession = () => {
+        if (!companionSession || !contextReady) return;
+        if (openSidebarSession(companionSession)) {
+          window.desktop.companionOpened?.(companionSession);
+          companionSession = undefined;
+        }
+      };
+      const stopCompanionOpen = isAtomWindow ? undefined : window.desktop.onCompanionOpen?.((sessionId) => {
+        companionSession = sessionId;
+        Promise.resolve(ctx.sessions?.refresh?.()).then(openCompanionSession).catch(() => {});
+      });
+      const interval = setInterval(() => {
+        if (!host?.isConnected) void mount();
+        openCompanionSession();
+      }, 500);
+      const stopEvents = window.desktop.onAtomEvent((message) => {
+        if (message?.type === "restore-layout" && message.detail?.layout?.root) {
+          atomDisposePaneRecordsOutside(paneRecords, message.detail.layout.root);
+          root = message.detail.layout.root;
+          focusedPaneId = message.detail.layout.focusedPaneId;
+          render();
+        } else if (message?.type === "window-closed") {
+          try {
+            const registry = JSON.parse(localStorage.getItem(openWindowsKey) ?? "{}");
+            delete registry[message.detail?.windowId];
+            localStorage.setItem(openWindowsKey, JSON.stringify(registry));
+          } catch {}
+        } else if (message?.type === "focus-session" && message.detail?.windowId === windowContext.windowId) {
+          const target = findSessionPane(root, message.detail.sessionId);
+          if (target) { focusedPaneId = target.id; render(); }
+        } else if (
+          message?.type === "pane-transfer-committed" &&
+          message.detail?.transferSourceWindowId === windowContext.windowId
+        ) {
+          closePane(message.detail.paneId);
+        } else if (message?.type === "merge-pane" && message.detail?.targetWindowId === windowContext.windowId) {
+          const target = pointerDropTargetAt(message.detail.point?.x, message.detail.point?.y);
+          const accepted = target
+            ? acceptDrop(message.detail.data, target.paneId, target.direction)
+            : false;
+          window.desktop.publishAtomEvent("merge-result", {
+            requestId: message.detail.requestId,
+            accepted,
+          });
+        } else if (message?.type === "drag-state") {
+          const sameWorkspace = !workspaceId || !message.detail?.workspaceId || workspaceId === message.detail.workspaceId;
+          setAtomDragCapture(message.detail?.active === true && sameWorkspace, false, message.detail?.payload);
+        } else if (message?.type === "drag-pointer") {
+          const sameWorkspace = !workspaceId || !message.detail?.workspaceId || workspaceId === message.detail.workspaceId;
+          if (sameWorkspace && activeAtomDrag && message.detail?.point) {
+            setAtomDragCapture(true, false, message.detail.payload);
+            pointerDropTargetAt(
+              message.detail.point.x - window.screenX,
+              message.detail.point.y - window.screenY,
+            );
+          } else {
+            clearAtomDropTargets();
+          }
+        }
+      });
+      void mount();
+      return () => {
+        disposed = true;
+        sidebarPlacementObserver.disconnect();
+        clearInterval(interval);
+        stopEvents?.();
+        document.removeEventListener("click", followSidebarClick);
+        document.removeEventListener("dragstart", enrichSidebarDrag);
+        document.removeEventListener("dragend", finishDocumentDrag);
+        setAtomDragCapture(false);
+        document.querySelectorAll("[data-dsh-atom-open]").forEach((row) => row.removeAttribute("data-dsh-atom-open"));
+		document.querySelectorAll("[data-dsh-atom-focused]").forEach((row) => row.removeAttribute("data-dsh-atom-focused"));
+        stopNativeSelection?.();
+        stopCompanionOpen?.();
+        save();
+        atomDisposePaneRecordsOutside(paneRecords, null);
+        host?.remove();
+        center?.removeAttribute("data-dsh-atom-native-hidden");
+        if (isAtomWindow) delete document.documentElement.dataset.dshAtomFrameRoot;
+        delete document.documentElement.dataset.dshAtomMountState;
+        style.remove();
+      };
+    }
+
+    const inject = ["theme", "sessions", "workspaces", "layout"];
 
     function syncNativeThemeSource(snapshot) {
       const preference = snapshot?.preference;
@@ -4884,9 +7349,15 @@ window.__ModuleLoader__.load({
         style.textContent = jesseComposerTheme;
         document.head.append(style);
 
+        const platform = desktopPlatform();
         document.documentElement.dataset.dshDesktopUi = "jesse-composer";
-        document.documentElement.dataset.dshDesktopPlatform = desktopPlatform();
-        document.documentElement.dataset.dshWindowRole = "main";
+        document.documentElement.dataset.dshDesktopPlatform = platform;
+        if (isNativeMacOSHost(platform)) {
+          document.documentElement.dataset.dshDesktopHost = "macos";
+        }
+        document.documentElement.dataset.dshWindowRole = new URL(
+          globalThis.location?.href ?? "http://127.0.0.1/",
+        ).searchParams.has("dshAtomWindow") ? "atom" : "main";
         const iconDecorations = new Map();
         const injectedIconDecorations = new Map();
         const feedbackDialogs = new Map();
@@ -4939,7 +7410,8 @@ window.__ModuleLoader__.load({
           ctx,
           steerState,
         );
-
+        const cleanupSidebarPlacement = installSidebarPlacement(ctx);
+        const cleanupAtomWorkbench = installAtomWorkbench(ctx);
         const mutationObserverOptions = {
           childList: true,
           subtree: true,
@@ -4957,6 +7429,7 @@ window.__ModuleLoader__.load({
             "disabled",
             "inert",
             "open",
+            "placeholder",
           ],
         };
         const observer = new MutationObserver(() => {
@@ -5009,9 +7482,13 @@ window.__ModuleLoader__.load({
           clearGeneratingProgress();
           clearSteerUi(steerState);
           clearHeroHeadlineCopy();
+          clearDeepSeekOnboarding();
           clearComposerMarks();
+          cleanupSidebarPlacement();
+          cleanupAtomWorkbench();
           style.remove();
           delete document.documentElement.dataset.dshDesktopUi;
+          delete document.documentElement.dataset.dshDesktopHost;
           delete document.documentElement.dataset.dshDesktopPlatform;
           delete document.documentElement.dataset.dshWindowRole;
         };

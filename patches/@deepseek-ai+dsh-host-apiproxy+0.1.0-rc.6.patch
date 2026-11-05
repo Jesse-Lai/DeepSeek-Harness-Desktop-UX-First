@@ -1,0 +1,387 @@
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/index.js b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/index.js
+index 9e3afa7..f96bc62 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/index.js
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/index.js
+@@ -3570,6 +3570,7 @@ function createApiProxy(ctx, defaults) {
+ 					settingsNs: entry.settingsNs,
+ 					settingsPath: [...entry.settingsPath],
+ 					active: active.has(entry.provider),
++					validation: ctx.llm.providerValidationStatus(entry.provider),
+ 					...entry.declared === void 0 ? {} : { declared: entry.declared }
+ 				}));
+ 				for (const provider of registered) {
+@@ -3579,7 +3580,8 @@ function createApiProxy(ctx, defaults) {
+ 						displayName: provider.name,
+ 						settingsNs: "",
+ 						settingsPath: [],
+-						active: true
++						active: true,
++						validation: ctx.llm.providerValidationStatus(provider.id)
+ 					});
+ 				}
+ 				return Promise.resolve(ok(request, { providers: views }));
+@@ -3607,6 +3609,28 @@ function createApiProxy(ctx, defaults) {
+ 						}
+ 					});
+ 				}
++			},
++			async validateModelDraft(request, signal) {
++				const { settingsNs, provider, profile, apiKey, models } = request.payload;
++				try {
++					return ok(request, { results: await ctx.llm.validateModelDraft(settingsNs, {
++						provider,
++						profile,
++						...apiKey === void 0 ? {} : { apiKey },
++						models,
++						...signal === void 0 ? {} : { signal }
++					}) });
++				} catch (error) {
++					return err(request, {
++						code: "model-validation-failed",
++						message: error instanceof Error ? error.message : String(error),
++						details: { settingsNs, provider }
++					});
++				}
++			},
++			confirmModelValidation(request) {
++				ctx.llm.confirmModelValidation(request.payload.provider, request.payload.models);
++				return Promise.resolve(ok(request, {}));
+ 			}
+ 		},
+ 		events: {
+@@ -4556,6 +4580,7 @@ const configurableProviderViewSchema = z$1.object({
+ 	settingsNs: z$1.string(),
+ 	settingsPath: z$1.array(z$1.string()),
+ 	active: z$1.boolean(),
++	validation: z$1.union([z$1.literal("unknown"), z$1.literal("valid"), z$1.literal("invalid")]),
+ 	declared: z$1.boolean().optional()
+ });
+ /** llm.providers request payload. */
+@@ -4586,6 +4611,38 @@ const llmDiscoverModelsRequestSchema = z$1.object({
+ });
+ /** llm.discoverModels response value. */
+ const llmDiscoverModelsValueSchema = z$1.object({ models: z$1.array(discoveredModelViewSchema) });
++const draftValidationFieldSchema = z$1.union([
++	z$1.literal("apiKey"),
++	z$1.literal("baseURL"),
++	z$1.literal("api"),
++	z$1.literal("model"),
++	z$1.literal("reasoning"),
++	z$1.literal("provider")
++]);
++const draftValidationModelSchema = z$1.object({
++	id: z$1.string().min(1),
++	reasoningEffort: z$1.string().min(1).optional()
++});
++const llmValidateModelDraftRequestSchema = z$1.object({
++	settingsNs: z$1.string().min(1),
++	provider: z$1.string().min(1),
++	profile: z$1.record(z$1.string(), z$1.unknown()),
++	apiKey: z$1.string().min(1).optional(),
++	models: z$1.array(draftValidationModelSchema).min(1)
++});
++const draftValidationResultSchema = z$1.object({
++	model: z$1.string().min(1),
++	ok: z$1.boolean(),
++	field: draftValidationFieldSchema.optional(),
++	code: z$1.string().min(1).optional(),
++	message: z$1.string().min(1).optional()
++});
++const llmValidateModelDraftValueSchema = z$1.object({ results: z$1.array(draftValidationResultSchema) });
++const llmConfirmModelValidationRequestSchema = z$1.object({
++	provider: z$1.string().min(1),
++	models: z$1.array(z$1.string().min(1)).min(1)
++});
++const llmConfirmModelValidationValueSchema = z$1.object({});
+ //#endregion
+ //#region lib/types/api/subagents.schema.js
+ /** Zod schemas for the browser-safe subagent domain. */
+@@ -4874,6 +4931,14 @@ const UNARY_ROUTES = {
+ 	"llm.discoverModels": {
+ 		schema: llmDiscoverModelsRequestSchema,
+ 		invoke: (api, r, signal) => api.llm.discoverModels(r, signal)
++	},
++	"llm.validateModelDraft": {
++		schema: llmValidateModelDraftRequestSchema,
++		invoke: (api, r, signal) => api.llm.validateModelDraft(r, signal)
++	},
++	"llm.confirmModelValidation": {
++		schema: llmConfirmModelValidationRequestSchema,
++		invoke: (api, r) => api.llm.confirmModelValidation(r)
+ 	}
+ };
+ /** Route lookup that narrows an arbitrary path segment to a map key (single cast point for the string→key refinement). */
+@@ -5290,7 +5355,9 @@ const UNARY_VALUE_SCHEMAS = {
+ 	"credentials.unset": credentialsUnsetValueSchema,
+ 	"llm.providers": llmProvidersValueSchema,
+ 	"llm.models": llmModelsValueSchema,
+-	"llm.discoverModels": llmDiscoverModelsValueSchema
++	"llm.discoverModels": llmDiscoverModelsValueSchema,
++	"llm.validateModelDraft": llmValidateModelDraftValueSchema,
++	"llm.confirmModelValidation": llmConfirmModelValidationValueSchema
+ };
+ /** Default timeout for bounded unary calls (rpc-compare 2026-07-19: a hung host must not leave callers pending forever). */
+ const DEFAULT_TIMEOUT_MS = 3e4;
+@@ -5518,7 +5585,9 @@ var AbstractApiClient = class {
+ 	llm = {
+ 		providers: (payload, signal) => this.callUnary("llm.providers", payload, signal),
+ 		models: (payload, signal) => this.callUnary("llm.models", payload, signal),
+-		discoverModels: (payload, signal) => this.callUnary("llm.discoverModels", payload, signal)
++		discoverModels: (payload, signal) => this.callUnary("llm.discoverModels", payload, signal),
++		validateModelDraft: (payload, signal) => this.callUnary("llm.validateModelDraft", payload, signal, "caller-signal-only"),
++		confirmModelValidation: (payload, signal) => this.callUnary("llm.confirmModelValidation", payload, signal)
+ 	};
+ 	events = {
+ 		mux: (payload, signal, onOpen) => this.openMux(payload, signal, onOpen),
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/index.d.ts b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/index.d.ts
+index ebaa5e8..772904b 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/index.d.ts
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/index.d.ts
+@@ -49,7 +49,7 @@ export type { EventsApi, MuxFrame, HostFrame, QueuedInboxItem, ToolCallView, Too
+ export type { GoalsApi, GoalId, GoalRef } from './goals.ts';
+ export type { SettingsApi, SettingsNamespaceView, SettingsPathOpView, SettingsSecretView } from './settings.ts';
+ export type { CredentialsApi, CredentialView } from './credentials.ts';
+-export type { ConfigurableProviderView, DiscoveredModelView, LlmApi } from './llm.ts';
++export type { ConfigurableProviderView, DiscoveredModelView, DraftModelValidationResult, LlmApi } from './llm.ts';
+ export type { DownloadsApi } from './downloads.ts';
+ export type { ApprovalResponsePayload } from './approvals.ts';
+ export type { QuestionResponsePayload } from './questions.ts';
+@@ -60,4 +60,4 @@ export type { RpcError, RpcErrorCode, RpcErrorDetailsMap, RpcResult } from './rp
+ export { clientRequestSchema, serverRequestSchema, serverResponseSchema, } from './rpc.schema.ts';
+ export { SESSION_SEARCH_RESULT_LIMIT, SESSION_SEARCH_SNIPPET_MAX_CODE_POINTS, } from './session-search.ts';
+ export type { RequestPayload, ResponseValue, RpcMethodMap } from './rpc-map.ts';
+-//# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=index.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.d.ts b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.d.ts
+index 6cffa55..75b6245 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.d.ts
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.d.ts
+@@ -21,6 +21,8 @@ export interface ConfigurableProviderView {
+     settingsPath: string[];
+     /** Whether the route is currently registered (its models are requestable). */
+     active: boolean;
++    /** Latest real-response validation in this Host process. */
++    validation: 'unknown' | 'valid' | 'invalid';
+     /**
+      * Whether the owning adapter knows this route only because configuration
+      * declared it. Absent when the adapter draws no such distinction, so a
+@@ -73,6 +75,27 @@ export interface LlmApi {
+     }>, signal?: AbortSignal): Promise<RpcResponse<{
+         models: DiscoveredModelView[];
+     }>>;
++    /** Validate an unsaved provider profile with one real minimal request per model. */
++    validateModelDraft(request: RpcRequest<{
++        settingsNs: string;
++        provider: string;
++        profile: Record<string, unknown>;
++        apiKey?: string;
++        models: Array<{ id: string; reasoningEffort?: string }>;
++    }>, signal?: AbortSignal): Promise<RpcResponse<{
++        results: DraftModelValidationResult[];
++    }>>;
++    confirmModelValidation(request: RpcRequest<{
++        provider: string;
++        models: string[];
++    }>): Promise<RpcResponse<{}>>;
++}
++export interface DraftModelValidationResult {
++    model: string;
++    ok: boolean;
++    field?: 'apiKey' | 'baseURL' | 'api' | 'model' | 'reasoning' | 'provider';
++    code?: string;
++    message?: string;
+ }
+ /** Wire view of one model an interrogated endpoint advertises. */
+ export interface DiscoveredModelView {
+@@ -85,4 +108,4 @@ export interface DiscoveredModelView {
+     /** Maximum output tokens, when disclosed. */
+     maxTokens?: number;
+ }
+-//# sourceMappingURL=llm.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=llm.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.d.ts b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.d.ts
+index 1452ae8..27dc6a2 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.d.ts
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.d.ts
+@@ -10,6 +10,11 @@ export declare const configurableProviderViewSchema: z.ZodObject<{
+     settingsNs: z.ZodString;
+     settingsPath: z.ZodArray<z.ZodString>;
+     active: z.ZodBoolean;
++    validation: z.ZodEnum<{
++        unknown: "unknown";
++        valid: "valid";
++        invalid: "invalid";
++    }>;
+     declared: z.ZodOptional<z.ZodBoolean>;
+ }, z.core.$strip>;
+ /** llm.providers request payload. */
+@@ -22,6 +27,11 @@ export declare const llmProvidersValueSchema: z.ZodObject<{
+         settingsNs: z.ZodString;
+         settingsPath: z.ZodArray<z.ZodString>;
+         active: z.ZodBoolean;
++        validation: z.ZodEnum<{
++            unknown: "unknown";
++            valid: "valid";
++            invalid: "invalid";
++        }>;
+         declared: z.ZodOptional<z.ZodBoolean>;
+     }, z.core.$strip>>;
+ }, z.core.$strip>;
+@@ -76,4 +86,8 @@ export declare const llmDiscoverModelsValueSchema: z.ZodObject<{
+         maxTokens: z.ZodOptional<z.ZodNumber>;
+     }, z.core.$strip>>;
+ }, z.core.$strip>;
+-//# sourceMappingURL=llm.schema.d.ts.map
+\ No newline at end of file
++export declare const llmValidateModelDraftRequestSchema: z.ZodType;
++export declare const llmValidateModelDraftValueSchema: z.ZodType;
++export declare const llmConfirmModelValidationRequestSchema: z.ZodType;
++export declare const llmConfirmModelValidationValueSchema: z.ZodType;
++//# sourceMappingURL=llm.schema.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.js b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.js
+index 68938c1..e511851 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.js
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/llm.schema.js
+@@ -11,6 +11,7 @@ export const configurableProviderViewSchema = z.object({
+     settingsNs: z.string(),
+     settingsPath: z.array(z.string()),
+     active: z.boolean(),
++    validation: z.enum(["unknown", "valid", "invalid"]),
+     declared: z.boolean().optional(),
+ });
+ /** llm.providers request payload. */
+@@ -50,4 +51,25 @@ export const llmDiscoverModelsRequestSchema = z.object({
+ export const llmDiscoverModelsValueSchema = z.object({
+     models: z.array(discoveredModelViewSchema),
+ });
+-//# sourceMappingURL=llm.schema.js.map
+\ No newline at end of file
++export const llmValidateModelDraftRequestSchema = z.object({
++    settingsNs: z.string().min(1),
++    provider: z.string().min(1),
++    profile: z.record(z.string(), z.unknown()),
++    apiKey: z.string().min(1).optional(),
++    models: z.array(z.object({ id: z.string().min(1), reasoningEffort: z.string().min(1).optional() })).min(1),
++});
++export const llmValidateModelDraftValueSchema = z.object({
++    results: z.array(z.object({
++        model: z.string().min(1),
++        ok: z.boolean(),
++        field: z.enum(["apiKey", "baseURL", "api", "model", "reasoning", "provider"]).optional(),
++        code: z.string().min(1).optional(),
++        message: z.string().min(1).optional(),
++    })),
++});
++export const llmConfirmModelValidationRequestSchema = z.object({
++    provider: z.string().min(1),
++    models: z.array(z.string().min(1)).min(1),
++});
++export const llmConfirmModelValidationValueSchema = z.object({});
++//# sourceMappingURL=llm.schema.js.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/rpc-map.d.ts b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/rpc-map.d.ts
+index 351987e..ff0a7b8 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/rpc-map.d.ts
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/api/rpc-map.d.ts
+@@ -72,9 +72,11 @@ export interface RpcMethodMap {
+     'llm.providers': LlmApi['providers'];
+     'llm.models': LlmApi['models'];
+     'llm.discoverModels': LlmApi['discoverModels'];
++    'llm.validateModelDraft': LlmApi['validateModelDraft'];
++    'llm.confirmModelValidation': LlmApi['confirmModelValidation'];
+ }
+ /** Business request payload of method K (reaches through the RpcRequest narrow form to payload). */
+ export type RequestPayload<K extends keyof RpcMethodMap> = Parameters<RpcMethodMap[K]>[0]['payload'];
+ /** Business return value of method K (reaches through the RpcResponse narrow form to infer the ok value of result). */
+ export type ResponseValue<K extends keyof RpcMethodMap> = Awaited<ReturnType<RpcMethodMap[K]>> extends RpcResponse<infer T> ? T : never;
+-//# sourceMappingURL=rpc-map.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=rpc-map.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.d.ts b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.d.ts
+index e3d0480..b7a5301 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.d.ts
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.d.ts
+@@ -101,6 +101,8 @@ export interface IApiClient {
+         providers(payload: RequestPayload<'llm.providers'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.providers'>>>;
+         models(payload: RequestPayload<'llm.models'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.models'>>>;
+         discoverModels(payload: RequestPayload<'llm.discoverModels'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.discoverModels'>>>;
++        validateModelDraft(payload: RequestPayload<'llm.validateModelDraft'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.validateModelDraft'>>>;
++        confirmModelValidation(payload: RequestPayload<'llm.confirmModelValidation'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.confirmModelValidation'>>>;
+     };
+     /** client-response passthrough (rpcId is a backfill of the server-request's id — never minted here). */
+     respond(message: ClientResponse, signal?: AbortSignal): Promise<RpcReceipt>;
+@@ -191,4 +193,4 @@ export declare class InProcessApiClient extends AbstractApiClient {
+     protected doFetch(input: URL, init?: RequestInit): Promise<Response>;
+ }
+ export {};
+-//# sourceMappingURL=client.d.ts.map
+\ No newline at end of file
++//# sourceMappingURL=client.d.ts.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.js b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.js
+index 1b4e874..0a0a82b 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.js
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/client.js
+@@ -15,7 +15,7 @@ import { agentPresetCopyValueSchema, agentPresetListValueSchema, agentPresetOpen
+ import { goalCreateValueSchema, goalEditValueSchema, goalPauseValueSchema, goalResumeValueSchema, goalCompleteValueSchema, goalClearValueSchema, } from "../api/goals.schema.js";
+ import { settingsDescribeValueSchema, settingsMutateValueSchema, settingsOpenDocumentValueSchema, settingsReplaceValueSchema, settingsUpdateValueSchema, } from "../api/settings.schema.js";
+ import { credentialsDescribeValueSchema, credentialsSetValueSchema, credentialsUnsetValueSchema, } from "../api/credentials.schema.js";
+-import { llmDiscoverModelsValueSchema, llmModelsValueSchema, llmProvidersValueSchema } from "../api/llm.schema.js";
++import { llmConfirmModelValidationValueSchema, llmDiscoverModelsValueSchema, llmModelsValueSchema, llmProvidersValueSchema, llmValidateModelDraftValueSchema } from "../api/llm.schema.js";
+ import { subagentHistoryValueSchema, subagentInterruptValueSchema, subagentListValueSchema, subagentPromptValueSchema, } from "../api/subagents.schema.js";
+ /**
+  * S→C second-level parse table: value schema by method (the response-path
+@@ -74,6 +74,8 @@ const UNARY_VALUE_SCHEMAS = {
+     'llm.providers': llmProvidersValueSchema,
+     'llm.models': llmModelsValueSchema,
+     'llm.discoverModels': llmDiscoverModelsValueSchema,
++    'llm.validateModelDraft': llmValidateModelDraftValueSchema,
++    'llm.confirmModelValidation': llmConfirmModelValidationValueSchema,
+ };
+ /** Default timeout for bounded unary calls (rpc-compare 2026-07-19: a hung host must not leave callers pending forever). */
+ const DEFAULT_TIMEOUT_MS = 30_000;
+@@ -317,6 +319,8 @@ export class AbstractApiClient {
+         providers: (payload, signal) => this.callUnary('llm.providers', payload, signal),
+         models: (payload, signal) => this.callUnary('llm.models', payload, signal),
+         discoverModels: (payload, signal) => this.callUnary('llm.discoverModels', payload, signal),
++        validateModelDraft: (payload, signal) => this.callUnary('llm.validateModelDraft', payload, signal, 'caller-signal-only'),
++        confirmModelValidation: (payload, signal) => this.callUnary('llm.confirmModelValidation', payload, signal),
+     };
+     events = {
+         mux: (payload, signal, onOpen) => this.openMux(payload, signal, onOpen),
+@@ -367,4 +371,4 @@ function abortError(signal) {
+         return new Error(reason);
+     return new Error('This operation was aborted');
+ }
+-//# sourceMappingURL=client.js.map
+\ No newline at end of file
++//# sourceMappingURL=client.js.map
+diff --git a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/handler.js b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/handler.js
+index 9d72e02..1542d12 100644
+--- a/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/handler.js
++++ b/node_modules/@deepseek-ai/dsh-host-apiproxy/lib/types/fetch/handler.js
+@@ -17,7 +17,7 @@ import { agentPresetCopyRequestSchema, agentPresetListRequestSchema, agentPreset
+ import { goalCreateRequestSchema, goalEditRequestSchema, goalPauseRequestSchema, goalResumeRequestSchema, goalCompleteRequestSchema, goalClearRequestSchema, } from "../api/goals.schema.js";
+ import { settingsDescribeRequestSchema, settingsMutateRequestSchema, settingsOpenDocumentRequestSchema, settingsReplaceRequestSchema, settingsUpdateRequestSchema, } from "../api/settings.schema.js";
+ import { credentialsDescribeRequestSchema, credentialsSetRequestSchema, credentialsUnsetRequestSchema, } from "../api/credentials.schema.js";
+-import { llmDiscoverModelsRequestSchema, llmModelsRequestSchema, llmProvidersRequestSchema } from "../api/llm.schema.js";
++import { llmConfirmModelValidationRequestSchema, llmDiscoverModelsRequestSchema, llmModelsRequestSchema, llmProvidersRequestSchema, llmValidateModelDraftRequestSchema } from "../api/llm.schema.js";
+ import { subagentHistoryRequestSchema, subagentInterruptRequestSchema, subagentListRequestSchema, subagentPromptRequestSchema, } from "../api/subagents.schema.js";
+ const UNARY_ROUTES = {
+     'session.list': { schema: sessionListRequestSchema, invoke: (api, r) => api.sessions.list(r) },
+@@ -72,6 +72,8 @@ const UNARY_ROUTES = {
+     'llm.providers': { schema: llmProvidersRequestSchema, invoke: (api, r) => api.llm.providers(r) },
+     'llm.models': { schema: llmModelsRequestSchema, invoke: (api, r) => api.llm.models(r) },
+     'llm.discoverModels': { schema: llmDiscoverModelsRequestSchema, invoke: (api, r, signal) => api.llm.discoverModels(r, signal) },
++    'llm.validateModelDraft': { schema: llmValidateModelDraftRequestSchema, invoke: (api, r, signal) => api.llm.validateModelDraft(r, signal) },
++    'llm.confirmModelValidation': { schema: llmConfirmModelValidationRequestSchema, invoke: (api, r) => api.llm.confirmModelValidation(r) },
+ };
+ /** Route lookup that narrows an arbitrary path segment to a map key (single cast point for the string→key refinement). */
+ function methodFor(path) {
+@@ -242,4 +244,4 @@ export function toFetchHandler(api) {
+         },
+     };
+ }
+-//# sourceMappingURL=handler.js.map
+\ No newline at end of file
++//# sourceMappingURL=handler.js.map

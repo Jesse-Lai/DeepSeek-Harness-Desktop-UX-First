@@ -1,0 +1,119 @@
+diff --git a/node_modules/@deepseek-ai/dsh-llm-deepseek/lib/index.js b/node_modules/@deepseek-ai/dsh-llm-deepseek/lib/index.js
+index b9624f2..9721a1f 100644
+--- a/node_modules/@deepseek-ai/dsh-llm-deepseek/lib/index.js
++++ b/node_modules/@deepseek-ai/dsh-llm-deepseek/lib/index.js
+@@ -1,5 +1,5 @@
+ import z from "@deepseek-ai/schemastery";
+-import { CONTEXT_WINDOW_EXCEEDED_CODE, CallId, EMPTY_RESPONSE_CODE, LlmAdapter, LlmError, ProviderRequestId, QUOTA_EXCEEDED_CODE, ReasoningEffortId, RetryPolicySchema, assertUsableApiKey, attributionHeaders, contentHasImage, isContextWindowExceededError, isQuotaExceededError, resolveRetryPolicy } from "@deepseek-ai/dsh-llm";
++import { CONTEXT_WINDOW_EXCEEDED_CODE, CallId, EMPTY_RESPONSE_CODE, LlmAdapter, LlmError, ProviderRequestId, QUOTA_EXCEEDED_CODE, ReasoningEffortId, RetryPolicySchema, assertUsableApiKey, attributionHeaders, contentHasImage, createUserMessage, isContextWindowExceededError, isQuotaExceededError, resolveRetryPolicy } from "@deepseek-ai/dsh-llm";
+ import { credentialRef } from "@deepseek-ai/dsh-credentials";
+ import { launchEnvironmentOf } from "@deepseek-ai/dsh-launch-environment";
+ import { deepEqualJson, installSettingsSection, settingsNamespace } from "@deepseek-ai/dsh-settings";
+@@ -716,8 +716,36 @@ function resolveAdapterOptions(config, environment) {
+ 		retryPolicy: resolveRetryPolicy(config.retryPolicy, "llm-deepseek: retryPolicy")
+ 	};
+ }
++function validationField(error) {
++	const code = error?.code;
++	const message = error instanceof Error ? error.message : String(error);
++	if (code === "AUTH" || code === "MISSING_CREDENTIAL" || code === "INVALID_CREDENTIAL") return "apiKey";
++	if (code === "UNSUPPORTED_REASONING_EFFORT" || /reasoning|thinking/i.test(message)) return "reasoning";
++	if (code === "UNKNOWN_MODEL" || /model|deployment/i.test(message) && (error?.status === 400 || error?.status === 404)) return "model";
++	if (code === "TRANSPORT" || code === "TIMEOUT" || code === "LLM_STREAM_IDLE_TIMEOUT" || /^HTTP_404$/.test(code ?? "")) return "baseURL";
++	return "provider";
++}
++async function validateDraftModel(adapter, provider, model, reasoningEffort, signal) {
++	let replied = false;
++	for await (const chunk of adapter.stream({
++		provider,
++		model,
++		...reasoningEffort === void 0 ? {} : { reasoningEffort: ReasoningEffortId(reasoningEffort) },
++		messages: [createUserMessage({
++			content: [{ type: "text", text: "Reply with OK." }],
++			source: { kind: "plugin", plugin: "dsh-model-validation" }
++		})],
++		maxTokens: 128,
++		signal
++	})) {
++		if (chunk.type === "text-delta" && chunk.text.length > 0 || chunk.type === "block-end" && chunk.block.type === "text" && chunk.block.text.length > 0) replied = true;
++		if (chunk.type === "finish" && (chunk.reason.kind === "error" || chunk.reason.kind === "aborted")) throw new LlmError(chunk.reason.failure?.message ?? "Model validation failed", chunk.reason.failure?.code ?? "VALIDATION_FAILED");
++	}
++	if (!replied) throw new LlmError("The model returned no text response", "EMPTY_RESPONSE");
++}
+ function apply(ctx, config) {
+ 	let current = () => config;
++	let validationConfig = structuredClone(config);
+ 	let lastRaw;
+ 	let lastGood;
+ 	const options = () => {
+@@ -756,6 +784,40 @@ function apply(ctx, config) {
+ 		resolveApiKey,
+ 		resolveUserId
+ 	});
++	ctx.llm.registerDraftValidator(NS, async (request) => {
++		const profile = request.profile ?? {};
++		const configured = resolveAdapterOptions({
++			...profile,
++			models: request.models.map(({ id }) => ({ id })),
++			streamIdleTimeoutMs: 25e3
++		}, void 0);
++		const draftAdapter = new DeepSeekAdapter({
++			options: () => configured,
++			resolveApiKey: async (connection) => request.apiKey === void 0 ? resolveApiKey(connection) : assertUsableApiKey(request.apiKey, "llm-deepseek", connection.apiKeyEnv),
++			resolveUserId
++		});
++		const results = [];
++		for (const model of request.models) {
++			const timeout = AbortSignal.timeout(25e3);
++			const signal = request.signal === void 0 ? timeout : AbortSignal.any([request.signal, timeout]);
++			try {
++				await validateDraftModel(draftAdapter, request.provider, model.id, model.reasoningEffort, signal);
++				results.push({ model: model.id, ok: true });
++			} catch (error) {
++				results.push({
++					model: model.id,
++					ok: false,
++					field: validationField(error),
++					code: typeof error?.code === "string" ? error.code : "VALIDATION_FAILED",
++					message: error instanceof Error ? error.message : String(error)
++				});
++			}
++		}
++		return results;
++	});
++	ctx.on("credentials/updated", (ref) => {
++		if (options().apiKeyEnv === ref) ctx.llm.clearValidation(PROVIDER);
++	});
+ 	ctx.llm.registerConfigurableProviders([{
+ 		provider: PROVIDER,
+ 		displayName: "DeepSeek",
+@@ -770,11 +832,28 @@ function apply(ctx, config) {
+ 		registration.replace([PROVIDER]);
+ 		registeredPolicy = policy;
+ 	};
++	const clearChangedValidation = () => {
++		const next = structuredClone(current());
++		const { models: beforeModels, ...beforeShared } = validationConfig;
++		const { models: afterModels, ...afterShared } = next;
++		if (!deepEqualJson(beforeShared, afterShared)) ctx.llm.clearValidation(PROVIDER);
++		else if ((beforeModels === void 0) !== (afterModels === void 0)) ctx.llm.clearValidation(PROVIDER);
++		else {
++			const beforeById = new Map((beforeModels ?? []).map((model) => [model.id, model]));
++			const afterById = new Map((afterModels ?? []).map((model) => [model.id, model]));
++			const affected = [...new Set([...beforeById.keys(), ...afterById.keys()])].filter((id) => !deepEqualJson(beforeById.get(id), afterById.get(id)));
++			if (affected.length > 0) ctx.llm.clearValidation(PROVIDER, affected);
++		}
++		validationConfig = next;
++	};
+ 	installSettingsSection(ctx, NS, Config, config, {
+ 		setSource: (source) => {
+ 			current = source;
+ 		},
+-		onChange: ensureRegistrationFacts
++		onChange: () => {
++			clearChangedValidation();
++			ensureRegistrationFacts();
++		}
+ 	});
+ }
+ //#endregion

@@ -1,0 +1,49 @@
+diff --git a/node_modules/@deepseek-ai/dsh-client-connection/lib/client.js b/node_modules/@deepseek-ai/dsh-client-connection/lib/client.js
+--- a/node_modules/@deepseek-ai/dsh-client-connection/lib/client.js
++++ b/node_modules/@deepseek-ai/dsh-client-connection/lib/client.js
+@@ -5993,6 +5993,23 @@ window.__ModuleLoader__.load({
+ 		});
+ 		/** llm.discoverModels response value. */
+ 		const llmDiscoverModelsValueSchema = object({ models: array(discoveredModelViewSchema) });
++		const draftValidationFieldSchema = union([
++			literal("apiKey"),
++			literal("baseURL"),
++			literal("api"),
++			literal("model"),
++			literal("reasoning"),
++			literal("provider")
++		]);
++		const draftValidationResultSchema = object({
++			model: string().min(1),
++			ok: boolean(),
++			field: draftValidationFieldSchema.optional(),
++			code: string().min(1).optional(),
++			message: string().min(1).optional()
++		});
++		const llmValidateModelDraftValueSchema = object({ results: array(draftValidationResultSchema) });
++		const llmConfirmModelValidationValueSchema = object({});
+ 		//#endregion
+ 		//#region ../../host/apiproxy/lib/types/api/subagents.schema.js
+ 		/** Zod schemas for the browser-safe subagent domain. */
+@@ -6121,7 +6138,9 @@ window.__ModuleLoader__.load({
+ 			"credentials.unset": credentialsUnsetValueSchema,
+ 			"llm.providers": llmProvidersValueSchema,
+ 			"llm.models": llmModelsValueSchema,
+-			"llm.discoverModels": llmDiscoverModelsValueSchema
++			"llm.discoverModels": llmDiscoverModelsValueSchema,
++			"llm.validateModelDraft": llmValidateModelDraftValueSchema,
++			"llm.confirmModelValidation": llmConfirmModelValidationValueSchema
+ 		};
+ 		/** Default timeout for bounded unary calls (rpc-compare 2026-07-19: a hung host must not leave callers pending forever). */
+ 		const DEFAULT_TIMEOUT_MS = 3e4;
+@@ -6349,7 +6368,9 @@ window.__ModuleLoader__.load({
+ 			llm = {
+ 				providers: (payload, signal) => this.callUnary("llm.providers", payload, signal),
+ 				models: (payload, signal) => this.callUnary("llm.models", payload, signal),
+-				discoverModels: (payload, signal) => this.callUnary("llm.discoverModels", payload, signal)
++				discoverModels: (payload, signal) => this.callUnary("llm.discoverModels", payload, signal),
++				validateModelDraft: (payload, signal) => this.callUnary("llm.validateModelDraft", payload, signal, "caller-signal-only"),
++				confirmModelValidation: (payload, signal) => this.callUnary("llm.confirmModelValidation", payload, signal)
+ 			};
+ 			events = {
+ 				mux: (payload, signal, onOpen) => this.openMux(payload, signal, onOpen),

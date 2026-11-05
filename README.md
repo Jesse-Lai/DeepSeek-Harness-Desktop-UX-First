@@ -43,6 +43,28 @@ macOS 用户解压后将应用拖入 `/Applications`，再双击打开。Windows
 
 当前社区发行包没有商业代码签名证书。macOS 包使用 ad-hoc 签名但未经 Apple 公证；如果系统拦截首次启动，请在 Finder 中右键应用并选择“打开”，或前往“系统设置 → 隐私与安全性”选择“仍要打开”。Windows 可能显示 Microsoft Defender SmartScreen 提示，可选择“更多信息 → 仍要运行”。请仅从本仓库 Releases 下载，并可使用随包提供的 `SHA256SUMS` 核对文件完整性。
 
+## DeepSeek Harness 插件
+
+已经安装 `@deepseek-ai/dsh@0.1.0-rc.6` 的用户，也可以将同一套 UI 与交互优化安装到 Harness Web profile：
+
+```bash
+dsh plugin --profile web add @jesse-lai/dsh-desktop-ui
+dsh web
+```
+
+升级或卸载：
+
+```bash
+dsh plugin --profile web update @jesse-lai/dsh-desktop-ui
+dsh plugin --profile web remove @jesse-lai/dsh-desktop-ui
+```
+
+插件与桌面安装包共享同一份核心界面代码。普通 Harness 插件在 macOS 和 Windows 上都使用稳定的不透明背景；桌面安装包额外提供系统外壳，其中 macOS 版本使用 Electron 原生 vibrancy，Windows 版本使用固定背景。npm 包发布前，可以在仓库根目录使用本地路径安装测试：
+
+```bash
+dsh plugin --profile web add ./plugins/@jesse-lai/dsh-desktop-ui
+```
+
 ## 更新与本地数据
 
 1.0 初期通过 GitHub Releases 手动更新：下载新版后覆盖旧应用即可。对话、项目、设置和 API 信息存放在独立的用户数据目录中，不会因覆盖应用而清空。为兼容旧版本，应用继续读取原有的 `DSH Desktop` 数据目录。
@@ -102,3 +124,10 @@ npm run app:dev:mac
 ## License
 
 本项目采用 MIT License。第三方依赖和相关许可信息请参阅 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 和 [THIRD_PARTY_DEPENDENCIES.md](THIRD_PARTY_DEPENDENCIES.md)。
+
+## macOS 原生快捷方式
+
+macOS 26+ 桌面版复用 JesseAgent 的原生环形菜单及浮窗，按 `⌥A` 唤起（占用时回退
+到 `⌥Space`）。支持选区润色／翻译／总结、截图提问、配图、结果复制和安全回填，
+以及接入 DSH 会话的持续任务、审批、停止与主窗口继续。关闭主窗口后继续常驻菜单栏。
+视觉模型、生图接口、系统权限及开发验证见 [原生快捷方式](docs/native-shortcuts.md)。

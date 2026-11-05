@@ -1,0 +1,184 @@
+{
+  "generatedAt": "2026-09-09T06:58:30.139Z",
+  "piAiVersion": "0.82.1",
+  "scope": "Actual request construction, synthetic model metadata, stopped before transport. Not model inference.",
+  "transportAttempts": 0,
+  "rows": [
+    {
+      "id": "openai-high-concise",
+      "reasoning": {
+        "effort": "high",
+        "summary": "concise"
+      },
+      "input": [
+        {
+          "role": "developer",
+          "content": "Fixed instructions."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Fixed question."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openai-high-detailed",
+      "reasoning": {
+        "effort": "high",
+        "summary": "detailed"
+      },
+      "input": [
+        {
+          "role": "developer",
+          "content": "Fixed instructions."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Fixed question."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openai-high-null",
+      "reasoning": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "input": [
+        {
+          "role": "developer",
+          "content": "Fixed instructions."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Fixed question."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openai-summary-without-effort",
+      "reasoning": {
+        "effort": "medium",
+        "summary": "concise"
+      },
+      "input": [
+        {
+          "role": "developer",
+          "content": "Fixed instructions."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Fixed question."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openai-simple-drops-summary-option",
+      "reasoning": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "input": [
+        {
+          "role": "developer",
+          "content": "Fixed instructions."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Fixed question."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "claude-summarized",
+      "thinking": {
+        "type": "adaptive",
+        "display": "summarized"
+      },
+      "output_config": {
+        "effort": "high"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Fixed question.",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        }
+      ],
+      "system": [
+        {
+          "type": "text",
+          "text": "Fixed instructions.",
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "claude-omitted",
+      "thinking": {
+        "type": "adaptive",
+        "display": "omitted"
+      },
+      "output_config": {
+        "effort": "high"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Fixed question.",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        }
+      ],
+      "system": [
+        {
+          "type": "text",
+          "text": "Fixed instructions.",
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        }
+      ]
+    }
+  ]
+}

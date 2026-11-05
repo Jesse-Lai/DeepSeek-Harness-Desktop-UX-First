@@ -13,3 +13,6 @@ release/
 .env
 .env.*
 !.env.example
+
+# Swift build products
+.build/
